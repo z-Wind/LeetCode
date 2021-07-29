@@ -1,48 +1,57 @@
-use std::cmp::Ordering;
+// Manacher’s Algorithm
+// https://havincy.github.io/blog/post/ManacherAlgorithm/
+// https://medium.com/hoskiss-stand/manacher-299cf75db97e
 
-fn is_palindrome(s: &str) -> bool {
-    if s.len() == 0{
-        return false;
-    } else if s.len() == 1{
-        return true;
+fn insert_symbol_in_string(mut s:String) -> String {    
+    for i in (0..=s.len()).rev() {
+        s.insert(i, '_');
     }
     
-    let s1 = s.chars();
-    let s2 = s.chars().rev();
-    
-    match s1.cmp(s2) {
-        Ordering::Equal => return true,
-        _ => return false,
-    }
+    format!("^{}$", s)
 }
 
-fn longest_palindrome(s: &str) -> &str {
-    if s.len() < 2{
-        return s
-    }
-    if is_palindrome(s) { return s }
+fn radius_string(s: &str) -> (Vec<usize>, usize){
+    let mut max_index = 0;
+    let mut v: Vec<usize> = Vec::with_capacity(s.len());
+    v.push(0); //^
+    v.push(0); //_
     
-    let mut s1 = "";
-    for i in (1..s.len()){
-        if is_palindrome(&s[..s.len()-i]){
-            s1 = &s[..s.len()-i];
-            break;
+    let chars:Vec<char> = s.chars().collect();
+    let (mut center,mut center_R) = (0,0);
+    for i in (2..s.len()-1){
+        let mut r = 0;
+        let mirror_i = center-(i-center);
+        if i>=center_R || 
+           mirror_i <= 2 || 
+           i + v[mirror_i] >= center_R{
+            // calculate radius
+            while chars[i-r-1] == chars[i+r+1]{
+                r+=1
+            }
+            
+            center = i;
+            center_R = i+r;
+        } else {
+            r = v[mirror_i];
+        }
+        v.push(r);
+        
+        if v[max_index] < r{
+            max_index = i;
         }
     }
-    let mut s2 = "";
-    if s1.len() < s.len()-1{
-        s2 = longest_palindrome(&s[1..s.len()]);
-    }
     
-    if s1.len() >= s2.len(){
-        return s1;
-    } else {
-        return s2;
-    }
+    (v, max_index)
 }
 
 impl Solution {
     pub fn longest_palindrome(s: String) -> String {
-        String::from(longest_palindrome(&s))
+        let si = insert_symbol_in_string(s.clone());
+        let (v, max_index) = radius_string(&si);
+        
+        //println!("{}\n{}\n{:?}\n{}\n", s, si, v, max_index);
+        let r = v[max_index];
+        let start = (max_index-r)/2;
+        return String::from(&s[start..start+r])
     }
 }
