@@ -2,6 +2,8 @@
 // https://havincy.github.io/blog/post/ManacherAlgorithm/
 // https://medium.com/hoskiss-stand/manacher-299cf75db97e
 
+use std::cmp;
+
 fn insert_symbol_in_string(mut s:String) -> String {    
     for i in (0..=s.len()).rev() {
         s.insert(i, '_');
@@ -19,8 +21,13 @@ fn radius_string(s: &str) -> (Vec<usize>, usize){
     let chars:Vec<char> = s.chars().collect();
     let (mut center,mut center_R) = (0,0);
     for i in (2..s.len()-1){
-        let mut r = 0;
         let mirror_i = center-(i-center);
+        let mut r = if i < center_R{
+            cmp::min(v[mirror_i], center_R-i)
+        } else {
+            0
+        };
+        
         if i>=center_R || 
            mirror_i <= 2 || 
            i + v[mirror_i] >= center_R{
@@ -31,8 +38,6 @@ fn radius_string(s: &str) -> (Vec<usize>, usize){
             
             center = i;
             center_R = i+r;
-        } else {
-            r = v[mirror_i];
         }
         v.push(r);
         
