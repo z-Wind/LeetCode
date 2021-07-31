@@ -4,18 +4,20 @@ impl Solution {
             return x;
         }
         
-        let mul = if x < 0 {-1} else {1};
+        let mut temp = x;
+        let mut ans = 0;
+        while temp != 0{
+            let pop = temp%10;
+            temp /= 10;
+            
+            if (x >=0 && ans > (i32::MAX - pop)/10) || 
+               (x < 0 && ans < (i32::MIN - pop)/10) {
+                return 0;
+            }
+            
+            ans = ans * 10 + pop;
+        }
         
-        let s: String = (x*mul).to_string();        
-        let t: String = s.chars().rev().collect();
-        
-        //println!("{} => {}",s,t);
-        
-        let ans = match t.parse(){
-            Ok(x) => x,
-            Err(_) => 0,
-        };
-        
-        return ans* mul;
+        ans
     }
 }
