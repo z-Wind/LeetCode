@@ -1,15 +1,15 @@
-fn is_match(mut s: Vec<char>, mut p: Vec<char>) -> bool{
+fn is_match(mut s:&[u8], mut p: &[u8]) -> bool{
     //println!("s:{:?}\np:{:?}",s,p);
     if p.len() == 0{
         return s.len() == 0;
     }
     
-    let first_match = s.len() > 0 && (s[0] == p[0] || p[0] == '.');
-    if p.len() >= 2 && p[1] == '*'{
-        is_match(s[..].to_vec(), p[2..].to_vec()) ||
-        first_match && is_match(s[1..].to_vec(), p[..].to_vec())
+    let first_match = s.len() > 0 && (s[0] == p[0] || p[0] == b'.');
+    if p.len() >= 2 && p[1] == b'*'{
+        is_match(s, &p[2..]) ||
+        first_match && is_match(&s[1..], &p[..])
     } else {
-        first_match && is_match(s[1..].to_vec(), p[1..].to_vec())
+        first_match && is_match(&s[1..], &p[1..])
     }
 }
 
@@ -18,6 +18,6 @@ impl Solution {
         //println!("==================");
         if s == p {return true}
         
-        is_match(s.chars().collect(), p.chars().collect())
+        is_match(s.as_bytes(), p.as_bytes())
     }
 }
