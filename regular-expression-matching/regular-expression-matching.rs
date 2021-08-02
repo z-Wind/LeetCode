@@ -1,35 +1,49 @@
 use std::collections::HashMap;
 
-fn is_match(mut s:&[u8], mut p: &[u8]) -> bool{
-    let mut mem:HashMap<(usize,usize), bool>  = HashMap::new();
-    
-    //println!("s:{:?}\np:{:?}",s,p);
-    if p.len() == 0{
-        return s.len() == 0;
+struct Match<'a> {
+    mem:HashMap<(usize,usize), bool>,
+    s: &'a [u8],
+    p: &'a [u8],
+}
+
+impl<'a> Match<'a> {
+    fn new(s:&'a [u8], p: &'a [u8]) -> Self{
+        Match{
+            mem: HashMap::new(),
+            s,
+            p,
+        }
+    }
+    fn is_match(&mut self) -> bool{
+        self.dp(0,0)
     }
     
-    let mut dp = |i:usize,j:usize| -> bool {
-        if let Some(&ans) = mem.get(&(i,j)){
+    fn dp(&mut self, i:usize,j:usize) -> bool {
+        if let Some(&ans) = self.mem.get(&(i,j)){
             return ans;
         }
-        
+
         let ans:bool;
-        let s = &s[i..];
-        let p = &p[j..];
+        let s = &self.s[i..];
+        let p = &self.p[j..];
         
+        if p.len() == 0{
+            ans = s.len() == 0;
+            self.mem.insert((i,j), ans);
+            return ans;
+        }
+
         let first_match = s.len() > 0 && (s[0] == p[0] || p[0] == b'.');
         if p.len() >= 2 && p[1] == b'*'{
-            ans = is_match(s, &p[2..]) ||
-            first_match && is_match(&s[1..], &p[..]);
+            ans = self.dp(i,j+2)||
+            first_match && self.dp(i+1,j);
         } else {
-            ans = first_match && is_match(&s[1..], &p[1..]);
+            ans = first_match && self.dp(i+1,j+1);
         }
-        
-        mem.insert((i,j), ans);
+
+        self.mem.insert((i,j), ans);
         ans
-    };
-    
-    dp(0,0)
+    }
 }
 
 impl Solution {
@@ -37,6 +51,7 @@ impl Solution {
         //println!("==================");
         if s == p {return true}
         
-        is_match(s.as_bytes(), p.as_bytes())
+        let mut m = Match::new(s.as_bytes(), p.as_bytes());
+        m.is_match()
     }
 }
