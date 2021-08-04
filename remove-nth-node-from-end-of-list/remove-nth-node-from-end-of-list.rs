@@ -23,20 +23,19 @@ fn remove_nth_from_end(head: &mut Box<ListNode>, n: i32) -> i32 {
         i += 1;
     }
     
-    //println!("n:{}, i:{}", n,i);
     if n+1 == i{
         head.next = head.next.take().unwrap().next;
-        //println!("{:?}",head);
     }
     
     return i;
 }
 impl Solution {
     pub fn remove_nth_from_end(mut head: Option<Box<ListNode>>, n: i32) -> Option<Box<ListNode>> {
-        if n == remove_nth_from_end(head.as_mut().unwrap(), n){
-            head = head.unwrap().next;
-        }
+        let mut dummy = Box::new(ListNode::new(0));
+        dummy.next = head;
         
-        head
+        remove_nth_from_end(&mut dummy, n);
+        
+        dummy.next
     }
 }
