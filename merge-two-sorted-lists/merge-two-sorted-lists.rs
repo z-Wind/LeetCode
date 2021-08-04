@@ -26,23 +26,18 @@ impl Solution {
                     let v1 = l1.as_ref().unwrap().val ;
                     let v2 = l2.as_ref().unwrap().val;
                     if v1 < v2 {
-                        p.next = Some(Box::new(ListNode::new(v1)));
-                        l1 = l1.unwrap().next.take();
+                        p.next = l1.take();
+                        l1 = p.next.as_mut().unwrap().next.take();
                     } else {
-                        p.next = Some(Box::new(ListNode::new(v2)));
-                        l2 = l2.unwrap().next.take();
+                        p.next = l2.take();
+                        l2 = p.next.as_mut().unwrap().next.take();
                     }
                     p = p.next.as_mut().unwrap();
                 }
-                while l1.is_some(){
-                    p.next = Some(Box::new(ListNode::new(l1.as_ref().unwrap().val)));
-                    l1 = l1.unwrap().next.take();
-                    p = p.next.as_mut().unwrap();
-                }
-                while l2.is_some(){
-                    p.next = Some(Box::new(ListNode::new(l2.as_ref().unwrap().val)));
-                    l2 = l2.unwrap().next.take();
-                    p = p.next.as_mut().unwrap();
+                if l1.is_some(){
+                    p.next = l1.take();
+                }else if l2.is_some(){
+                    p.next = l2.take();
                 }
                 dummy.next
             },
