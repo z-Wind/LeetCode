@@ -16,25 +16,21 @@
 // }
 impl Solution {
     pub fn swap_pairs(mut head: Option<Box<ListNode>>) -> Option<Box<ListNode>> {
-        swap_pairs(head)     
-    }
-}
-use std::mem;
-fn swap_pairs(mut head: Option<Box<ListNode>>) -> Option<Box<ListNode>>{
-    if head.is_none(){
-        return None;
-    }
-    
-    let next = head.as_mut().unwrap().next.take();
-    match (head, next){
-        (None, _) => return None,
-        (head,None) => return head,
-        (mut left,mut right) => {
-            let next = swap_pairs(right.as_mut().unwrap().next.take());
-            left.as_mut().unwrap().next = next;            
-            right.as_mut().unwrap().next = left;
-            
-            return right;
-        },
+        if head.is_none(){
+            return None;
+        }
+
+        let next = head.as_mut().unwrap().next.take();
+        match (head, next){
+            (None, _) => return None,
+            (head,None) => return head,
+            (mut left,mut right) => {
+                let next = Solution::swap_pairs(right.as_mut().unwrap().next.take());
+                left.as_mut().unwrap().next = next;            
+                right.as_mut().unwrap().next = left;
+
+                return right;
+            },
+        }
     }
 }
