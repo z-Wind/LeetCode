@@ -16,16 +16,22 @@
 // }
 impl Solution {
     pub fn merge_k_lists(mut lists: Vec<Option<Box<ListNode>>>) -> Option<Box<ListNode>> {
-        if lists.len() == 0{
-            return None;
-        }
-        while lists.len() > 1{
-            let m = merge_two_lists(lists.pop().unwrap(), lists.pop().unwrap());
-            lists.insert(0,m);
-        }
-        
-        lists.pop().unwrap()
+        merge_k_lists(&mut lists[..])
     }
+}
+
+fn merge_k_lists(lists: &mut [Option<Box<ListNode>>]) -> Option<Box<ListNode>> {
+    let len = lists.len();
+    if  len == 0{
+        return None;
+    } else if(len == 1){
+        return lists[0].take();
+    }
+    
+    let mid = len/2;
+    let left = merge_k_lists(&mut lists[..mid]);
+    let right = merge_k_lists(&mut lists[mid..]);
+    merge_two_lists(left, right)
 }
 
 fn merge_two_lists(l1: Option<Box<ListNode>>, l2: Option<Box<ListNode>>) -> Option<Box<ListNode>> {
