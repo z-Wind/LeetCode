@@ -16,7 +16,15 @@
 // }
 impl Solution {
     pub fn merge_k_lists(mut lists: Vec<Option<Box<ListNode>>>) -> Option<Box<ListNode>> {
-        lists.into_iter().fold(None, |acc, x| merge_two_lists(acc, x))
+        if lists.len() == 0{
+            return None;
+        }
+        while lists.len() > 1{
+            let m = merge_two_lists(lists.remove(0), lists.remove(0));
+            lists.push(m);
+        }
+        
+        lists.remove(0)
     }
 }
 
