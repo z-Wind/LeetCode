@@ -20,11 +20,11 @@ impl Solution {
             return None;
         }
         while lists.len() > 1{
-            let m = merge_two_lists(lists.remove(0), lists.remove(0));
-            lists.push(m);
+            let m = merge_two_lists(lists.pop().unwrap(), lists.pop().unwrap());
+            lists.insert(0,m);
         }
         
-        lists.remove(0)
+        lists.pop().unwrap()
     }
 }
 
