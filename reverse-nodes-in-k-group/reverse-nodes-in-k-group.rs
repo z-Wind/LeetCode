@@ -14,44 +14,30 @@
 //     }
 //   }
 // }
+use std::mem;
+
 impl Solution {
     pub fn reverse_k_group(mut head: Option<Box<ListNode>>, k: i32) -> Option<Box<ListNode>> {
         // if head.is_none(){
         //     return None;
         // }
-        let mut node = head.as_ref();
-        for i in (0..k){
-            if node.is_none(){
+        let mut tail = &mut head;
+        for _ in (0..k){
+            if tail.is_none(){
                 return head;
             }
-            node = node.as_ref().unwrap().next.as_ref();
+            tail = &mut tail.as_mut().unwrap().next;
         }
+        let tail = tail.take();
         
+        let mut next = Solution::reverse_k_group(tail, k);
         
-        let mut vec:Vec<Option<Box<ListNode>>> = vec![];
-        let mut next = head.as_mut().unwrap().next.take();
-        for i in (0..k-1){
-            vec.push(head);
-            head = next;
-            next = head.as_mut().unwrap().next.take();
-            if next.is_none(){
-                break;
-            }
+        // reverse k nodes
+        for _ in (0..k-1){
+            mem::swap(&mut head.as_mut().unwrap().next, &mut next);
+            mem::swap(&mut head, &mut next);
         }
-        
-        // println!("vec:{:?}", vec);
-        // println!("head:{:?}", head);
-        // println!("next:{:?}", next);
-        
-        let mut node = head.as_mut().unwrap();
-        for v in vec.into_iter().rev(){
-            node.next = v;
-            node = node.next.as_mut().unwrap();
-        }
-        
-        // println!("node:{:?}",node);
-        
-        node.next = Solution::reverse_k_group(next, k);
+        mem::swap(&mut head.as_mut().unwrap().next, &mut next);      
         
         head
     }
