@@ -20,10 +20,10 @@ pub fn search(nums: &Vec<i32>, target: i32, start: usize, end: usize) -> i32 {
     //println!("{},{},{},{:?}",start,middle,end, &nums[start..=end]);
     
     let mut i = -1;
-    if nums[start] < target || nums[middle] > target{
+    if (nums[middle] > nums[start] && nums[start] < target && target < nums[middle]) ||
+       (nums[middle] < nums[start] && (nums[start] < target || nums[middle] > target)){
         i = search(&nums, target, start, middle);
-    }
-    if i == -1 && (nums[middle] < target || nums[end] > target){
+    } else{
         i = search(&nums, target, middle+1, end);
     }
     return i;
