@@ -13,7 +13,8 @@ struct CSum{
 }
 
 impl CSum{
-    fn new(candidates: Vec<i32>, target: i32) -> Self{
+    fn new(mut candidates: Vec<i32>, target: i32) -> Self{
+        candidates.sort();
         CSum{
             candidates,
             target,
@@ -32,6 +33,8 @@ impl CSum{
                let mut t = v.clone();
                t.push(self.candidates[i]);
                self.explore(t,i,sum);
+           } else{
+               break;
            }
         }            
     }
