@@ -1,26 +1,21 @@
-const INF: i32 = i32::MAX;
-
 impl Solution {
     pub fn first_missing_positive(mut nums: Vec<i32>) -> i32 {
-        for i in 0..nums.len() {
-            if !(1 <= nums[i] && nums[i] <= nums.len() as i32) {
-                nums[i] = INF;
+        let n = nums.len() as i32;
+        for i in 0..n as usize {
+            while 0 < nums[i] && nums[i] <= n && nums[i] != nums[nums[i] as usize -1] {
+                let val = nums[i] as usize -1;
+                nums.swap(i, val);
             }
         }
 
-        for i in 0..nums.len() {
-            let index = nums[i].abs() - 1;
-            if index != INF - 1 {
-                nums[index as usize] = -nums[index as usize].abs();
-            }
-        }
         //println!("{:?}",nums);
-        for i in 0..nums.len() {
-            if nums[i].is_positive() {
-                return i as i32 + 1;
+        for (i,&num) in nums.iter().enumerate() {
+            let val = i as i32 + 1;
+            if  val != num {
+                return val;
             }
         }
 
-        nums.len() as i32 + 1
+        n + 1
     }
 }
