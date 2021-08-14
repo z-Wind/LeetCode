@@ -1,118 +1,29 @@
-use std::collections::HashMap;
-use std::cmp::{min,max};
+use std::char;
 
 impl Solution {
-    pub fn multiply(mut num1: String, mut num2: String) -> String {
-        let mut carry = 0;
-        let mut prod = String::from("");
-        let mut result = String::from("0");
-        
-        
-        let mut mul = Mul::new();
-        for (i,c) in num2.chars().rev().enumerate(){
-            prod = mul.multiply_str(&num1, c);
-            result = mul.add_shift_str(&result,&prod,i);
-            //println!("{} => prod:{}, result:{}",c,prod,result);
+    pub fn multiply(num1: String, num2: String) -> String {
+        let zero = String::from("0");
+        if num1 == zero || num2 == zero {
+            return zero;
         }
-    
-        
-        result
-    }
-}
-
-struct Mul{
-    dp:HashMap<char, String>,
-}
-
-impl Mul{
-    fn new() -> Self{
-        Mul{
-            dp: HashMap::new(),
-        }
-    }
-    fn add_shift_str(&self, base:&str, s:&str, shift:usize) -> String{
-        //println!("base:{}, s:{}, shift:{}",base,s,shift);
-        if s == "0"{
-            return base.to_string();
-        }
-        
-        let mut base_iter = base.chars().rev();
-        let mut s_iter = s.chars().rev();
-        
-        let mut result = String::from("");
-        let mut carry = 0;
-        
-        for i in (0..max(base.len(),s.len()+shift)){
-            if i < shift{
-                match base_iter.next(){
-                    None => result.push('0'),
-                    Some(c) => result.push(c),
-                }
-            } else if i >= base.len(){
-                if carry > 0{
-                    let t = self.add_char(carry,'0',s_iter.next().unwrap());
-                    carry = t.0;
-                    result.push_str(&t.1);
-                } else {
-                    result.push(s_iter.next().unwrap());    
-                }  
-            } else if i >= s.len()+shift{
-                if carry > 0{
-                    let t = self.add_char(carry,'0',base_iter.next().unwrap());
-                    carry = t.0;
-                    result.push_str(&t.1);
-                } else {
-                    result.push(base_iter.next().unwrap());    
-                }  
-            } else {
-                let t = self.add_char(carry,base_iter.next().unwrap(),s_iter.next().unwrap());
-                carry = t.0;
-                result.push_str(&t.1);
+        let len = num1.len() + num2.len();
+        let mut res:Vec<u32> = vec![0;len];
+        for i in (0..num1.len()).rev() {
+            for j in (0..num2.len()).rev() {
+                res[i + j + 1] += ((num1.as_bytes()[i] - b'0') as u32) * ((num2.as_bytes()[j] - b'0') as u32);
             }
-            //println!{"result:{}", result};
         }
-        if carry > 0{
-            result.push_str(&carry.to_string());
+        for i in (1..len).rev() {
+            res[i - 1] += res[i] / 10;
+            res[i] %= 10;
         }
-        result.chars().rev().collect()
-    }
-    fn multiply_str(&mut self, s:&str, c:char) -> String{
-        if c == '0'{
-            return String::from("0");
+        let mut arr:Vec<char> = Vec::new();
+        if res[0] != 0 {
+            arr.push(char::from_digit(res[0], 10).unwrap());
         }
-        if self.dp.contains_key(&c){
-            let prod = self.dp.get(&c).unwrap();
-            return prod.to_string();
+        for i in 1..len {
+            arr.push(char::from_digit(res[i], 10).unwrap());
         }
-        
-        let mut result = String::from("");
-        let mut carry = 0;
-        let mut prod:String;
-        for sc in s.chars().rev(){
-            let t = self.multiply_char(carry, sc, c);
-            carry = t.0;
-            prod = t.1;
-            result.push_str(&prod);
-        }
-        if carry > 0{
-            result.push_str(&carry.to_string());
-        }
-        
-        result = result.chars().rev().collect();
-        self.dp.insert(c, result.clone());
-        result
-    }
-    fn multiply_char(&self, carry:i32, a:char, b:char) -> (i32, String){
-        let num1 = a.to_digit(10).unwrap();
-        let num2 = b.to_digit(10).unwrap();
-        let result = (num1*num2) as i32 + carry;
-        return (result/10, format!("{}",result as u32 % 10));
-    }
-    fn add_char(&self, carry:i32, a:char, b:char) -> (i32, String){
-        let num1 = a.to_digit(10).unwrap();
-        let num2 = b.to_digit(10).unwrap();
-        let result = (num1+num2) as i32 + carry;
-        //println!{"carry:{} a:{} b:{} result:{}", carry,a,b,result};
-        return (result/10, format!("{}",result as u32 % 10));
+        arr.into_iter().collect()
     }
 }
