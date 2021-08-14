@@ -7,7 +7,7 @@ impl Solution {
         let mut left_max = 0;
         let mut right_max = 0;
         while (left < right) {
-            println!("{},{} => {},{},{}",left, right, left_max, right_max,ans);
+            //println!("{},{} => {},{},{}",left, right, left_max, right_max,ans);
             if (height[left] < height[right]) {
                 if height[left] >= left_max {
                     left_max = height[left];
