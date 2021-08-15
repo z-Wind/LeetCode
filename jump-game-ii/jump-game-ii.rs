@@ -1,26 +1,27 @@
-use std::cmp;
+use std::cmp::max;
 
 impl Solution {
     pub fn jump(nums: Vec<i32>) -> i32 {
-        let size: usize = nums.len();
-        
-        let mut jumps: i32 = 0;
-        let mut cur_end: usize = 0;
-        let mut cur_furthest: usize = 0;
-        
-        for i in 0..size - 1{
-            cur_furthest = cmp::max(cur_furthest, i + nums[i] as usize);
-            
-            if i == cur_end{
-                jumps += 1;
-                cur_end = cur_furthest;
-				
-				if cur_end >= size - 1{
-					break;
-				}
-            }
-        }
-        
-        jumps
+        let n = nums.len();
+        let mut i = 0;
+        let mut maxReachable = 0;
+        let mut lastJumpedPos = 0;
+        let mut jumps = 0;
+	    // loop till last jump hasn't taken us till the end
+        while(lastJumpedPos < n - 1) {  
+            // furthest index reachable on the next level from current level
+		    maxReachable = max(maxReachable, i + nums[i] as usize);  
+            // current level has been iterated & maxReachable position on next level has been finalised
+            if(i == lastJumpedPos) {			  
+                // so just move to that maxReachable position
+                lastJumpedPos = maxReachable;     
+                // and increment the level
+                jumps+=1;                          
+        // NOTE: jump^ only gets updated after we iterate all possible jumps from previous level
+        //       This ensures jumps will only store minimum jump required to reach lastJumpedPos
+		}            
+		i+=1;
+	}
+	return jumps;
     }
 }
