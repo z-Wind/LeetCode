@@ -4,19 +4,27 @@ impl Solution {
         if nums.len() == 1{
             return vec![nums];
         }
-        let mut ans:HashSet<Vec<i32>> = HashSet::new();
+        let mut ans:Vec<Vec<i32>> = Vec::new();
         push(&mut ans, &mut nums, 0);
-        ans.into_iter().collect()
+        ans
         
     }
 }
 
-fn push(ans: &mut HashSet<Vec<i32>>, nums:&mut Vec<i32>, pos:usize){
+fn push(ans: &mut Vec<Vec<i32>>, nums:&mut Vec<i32>, pos:usize){
     if pos == nums.len(){
-        ans.insert(nums.clone());
+        //println!("==============");
+        ans.push(nums.clone());
     } else{
+        let mut set = HashSet::new();
         for i in (pos..nums.len()){
+            if set.contains(&nums[i]){
+                continue;
+            }
+            set.insert(nums[i]);
+            
             nums.swap(pos,i);
+            //println!("{:?} set:{:?} pos:{} i:{}", &nums[..pos+1], set, pos, i);
             push(ans, nums, pos+1);
             nums.swap(pos,i);
         }
