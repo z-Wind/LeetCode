@@ -4,20 +4,20 @@ impl Solution {
             return vec![nums];
         }
         let mut ans:Vec<Vec<i32>> = Vec::new();
-        push(&mut ans, nums, 0);
+        push(&mut ans, &mut nums, 0);
         ans
         
     }
 }
 
-fn push(ans: &mut Vec<Vec<i32>>, nums:Vec<i32>, pos:usize){
+fn push(ans: &mut Vec<Vec<i32>>, nums:&mut Vec<i32>, pos:usize){
     if pos == nums.len(){
-        ans.push(nums);
+        ans.push(nums.clone());
     } else{
         for i in (pos..nums.len()){
-            let mut nums = nums.clone();
             nums.swap(pos,i);
             push(ans, nums, pos+1);
+            nums.swap(pos,i);
         }
     }
 }
