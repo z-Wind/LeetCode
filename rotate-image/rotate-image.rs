@@ -1,10 +1,22 @@
 impl Solution {
     pub fn rotate(matrix: &mut Vec<Vec<i32>>) {
-        matrix.reverse();
-        
-        for i in 0..matrix.len() {
-            for j in 0..i {
-                mat_swap_split(matrix, i,j, j,i);
+        let n = matrix.len();
+        let mut pre_i = 0;
+        let mut pre_j = 0;
+        for i in (0..n/2+n%2) {
+            for j in (0..n/2) {
+                pre_i = i;
+                pre_j = j;
+                let mut rotate_i = pre_j;
+                let mut rotate_j = n - 1 - pre_i;
+                for _ in (0..4) {
+                    mat_swap_split(matrix, i, j, rotate_i, rotate_j);
+                    //println!("({},{}) => ({},{}): {:?}",pre_i,pre_j,rotate_i,rotate_j, matrix);
+                    pre_i = rotate_i;
+                    pre_j = rotate_j;
+                    rotate_i = pre_j;
+                    rotate_j = n - 1 - pre_i;
+                }
             }
         }
     }
