@@ -55,9 +55,6 @@ impl NQueens{
         if self.n == self.locs.len(){
             //println!("get: {:?}",self.locs);
             self.results.push(self.locs.clone());
-            //rotate 90
-            //rotate 180
-            //rotate 270
             return;
         }
         
