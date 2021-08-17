@@ -16,13 +16,14 @@
 // }
 impl Solution {
     pub fn rotate_right(mut head: Option<Box<ListNode>>, k: i32) -> Option<Box<ListNode>> {
+        if head.is_none(){
+            return None;
+        }
+        
         let mut v:Vec<Box<ListNode>> = vec![];
         while let Some(mut node) = head{
             head = node.next.take();
             v.push(node);
-        }
-        if v.len() == 0{
-            return None;
         }
         
         let k = k as usize % v.len();
