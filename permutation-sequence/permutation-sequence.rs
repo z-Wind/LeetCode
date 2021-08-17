@@ -1,42 +1,31 @@
 use std::char;
 impl Solution {
     pub fn get_permutation(n: i32, k: i32) -> String {
-        let mut first:Vec<u32> = (1..=n as u32).collect();
-        if k == 1{
-            return first.into_iter().map(|x| char::from_digit(x, 10).unwrap()).collect();
+        let mut table:Vec<char> = ('1'..=char::from_digit(n as u32, 10).unwrap()).collect();
+        let mut ans:Vec<char> = vec![];
+        for i in (0..n).rev(){
+            let index = ((k-1) / factorial(i)) as usize % table.len();
+            //println!("index;{}, table:{:?}", index, table);
+            ans.push(table[index]);
+            table.remove(index);
         }
         
-        for _ in (2..=k){
-            next_permutation(&mut first);
-        }
-        
-        first.into_iter().map(|x| char::from_digit(x, 10).unwrap()).collect()
+        ans.into_iter().collect()
     }
 }
 
-fn next_permutation(nums: &mut [u32]) -> bool {
-    //println!("{:?}",nums);
-    if nums.len() == 1 {
-        return false;
+fn factorial(n: i32) -> i32 {
+    match n{
+        0 => 1,
+        1 => 1,
+        2 => 2,
+        3 => 6,
+        4 => 24,
+        5 => 120,
+        6 => 720,
+        7 => 5040,
+        8 => 40320,
+        9 => 362880,
+        _ => (1..=n).product(),    
     }
-    
-    if next_permutation(&mut nums[1..]) {
-        return true;
-    }
-    
-    if nums[0] >= nums[1] {
-        return false;
-    }
-    
-    nums[1..].reverse();
-    //println!("reverse: {:?}",nums);
-    let mut swap_i = 0;
-    for (i,v) in nums[1..].iter().enumerate(){
-        if *v > nums[0]{
-            swap_i = i+1;
-            break;
-        }
-    }
-    nums.swap(0,swap_i);
-    return true;
 }
