@@ -6,8 +6,7 @@ impl Solution {
         for i in (0..n).rev(){
             let index = ((k-1) / factorial(i)) as usize % table.len();
             //println!("index;{}, table:{:?}", index, table);
-            ans.push(table[index]);
-            table.remove(index);
+            ans.push(table.remove(index));
         }
         
         ans.into_iter().collect()
