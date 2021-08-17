@@ -20,40 +20,44 @@ impl Solution {
         let mut start_x = 0;
         let mut start_y = 0;
         let mut next = 0;
-        'outer: loop{
+        loop{
             //println!("start: {},{}", start_x, start_y);
             for i in (0..m){
                 //println!("1: {}", matrix[start_y][start_x+i]);
                 ans.push(matrix[start_y][start_x+i]);
                 next += 1;
-                if next == number{
-                    break 'outer;
-                }
             }
+            if next == number{
+                break;
+            }
+            
             for j in (1..n){
                 //println!("2: {}", matrix[start_y+j][start_x+m-1]);
                 ans.push(matrix[start_y+j][start_x+m-1]);
                 next += 1;
-                if next == number{
-                    break 'outer;
-                }
             }
+            if next == number{
+                break;
+            }
+            
             for i in (0..m-1).rev(){
                 //println!("3: {}", matrix[start_y+n-1][start_x+i]);
                 ans.push(matrix[start_y+n-1][start_x+i]);
                 next += 1;
-                if next == number{
-                    break 'outer;
-                }
             }
+            if next == number{
+                break;
+            }
+            
             for j in (1..n-1).rev(){
                 //println!("4: {}", matrix[start_y+j][start_x]);
                 ans.push(matrix[start_y+j][start_x]);
                 next += 1;
-                if next == number{
-                    break 'outer;
-                }
             }
+            if next == number{
+                break;
+            }
+            
             m -= 2;
             n -= 2;
             start_x += 1;
