@@ -1,6 +1,5 @@
 impl Solution {
     pub fn plus_one(mut digits: Vec<i32>) -> Vec<i32> {
-        let mut carry:i32 = 0;
         for digit in digits.iter_mut().rev(){
             match digit{
                 digit @ 0..=8 => {
