@@ -1,19 +1,42 @@
-// https://leetcode.com/problems/unique-paths/discuss/22954/C%2B%2B-DP
+use std::collections::HashMap;
 
 impl Solution {
     pub fn unique_paths_with_obstacles(obstacle_grid: Vec<Vec<i32>>) -> i32 {
-        let (m,n) = (obstacle_grid.len(), obstacle_grid[0].len());
-        let mut cur = vec![0;n as usize];
-        cur[0] = 1;
-        for i in (0..m) {
-            for j in (0..n) {
-                if obstacle_grid[i][j] == 1{
-                    cur[j] = 0;
-                } else if j>0{
-                    cur[j] += cur[j - 1];
-                }
-            }
+        if obstacle_grid[obstacle_grid.len()-1][obstacle_grid[0].len()-1] == 1{
+            return 0;
         }
-        return cur[n - 1];
+        let mut uni = UNI::new();
+        uni.unique_paths(0,0,&obstacle_grid)
+    }
+}
+
+struct UNI{
+    dp:HashMap<(usize,usize), i32>,
+}
+
+impl UNI{
+    fn new() -> Self{
+        UNI{
+            dp: HashMap::new(),
+        }
+    }
+    fn unique_paths(&mut self, i: usize, j: usize, map:&Vec<Vec<i32>>) -> i32 {
+        //println!("{},{}",i, j);
+        if i == map[0].len()-1 && j == map.len()-1{
+            return 1;
+        } else if i == map[0].len() || j == map.len(){
+            return 0;
+        } else if map[j][i] == 1{
+            return 0;
+        }
+        
+        if self.dp.contains_key(&(i,j)){
+            return *self.dp.get(&(i,j)).unwrap();
+        }
+        
+        let step = self.unique_paths(i+1, j, map) + self.unique_paths(i, j+1, map);
+        self.dp.insert((i,j), step);
+        
+        step
     }
 }
