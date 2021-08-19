@@ -1,27 +1,22 @@
 impl Solution {
     pub fn my_sqrt(x: i32) -> i32 {
-        if x <= 1{
-            return x;
+        //println!("x:{}", x);
+        if x == 0{
+            return 0
         }
-        let mut val = 1;
-        let mut shift = 0;
-        while val < (x>>2){
-            val <<= 2;
-            shift += 2;
-            //println!("shift:{}, val:{}",shift, val);
+        let mut left = 1;
+        let mut right = i32::MAX;
+        loop{
+            let mid = left + (right-left)/2;
+            if x/mid >= mid && x/(mid+1) < mid+1{
+                return mid;
+            }
+            else if x/mid > mid{
+                left = mid+1;
+            } else {
+                right = mid-1;
+            }
+            //println!("mid:{}, left:{}, right:{}", mid, left, right);
         }
-        let mut root = (1 << shift/2);
-        //println!("root:{}, val:{}",root, val);
-        let mut square = root * root;
-        while square <= x{
-            root += 1;
-            square = match root.checked_mul(root){
-                Some(x) => x,
-                None => break,
-            };
-            //println!("root:{}, square:{}",root, square);
-        }
-        
-        return root-1;
     }
 }
