@@ -5,14 +5,13 @@ impl Solution {
         }
         let n  = n as usize;
         // dp(n) = dp(n-1) + dp(n-2)
-        let mut step:Vec<i32> = vec![1;n+1];
-        for i in (1..=n){
-            if i > 1{
-                step[i] = step[i-1] + step[i-2]
-            } else {
-                step[i] = step[i-1]
-            }
+        let mut step:Vec<i32> = vec![1;2];
+        for i in (2..n+1){
+            //println!("{:?}", step);
+            let sum = step[0] + step[1];
+            step[0] = step[1];
+            step[1] = sum;
         }
-        step[n]
+        step[1]
     }
 }
