@@ -15,7 +15,7 @@ impl Solution {
                 }
             }
         }
-        println!("{:?}",matrix);
+        //println!("{},{:?}",col_clear,matrix);
         for i in (1..m){
             for j in (1..n){
                 if matrix[0][j] == 0 || matrix[i][0] == 0 {
