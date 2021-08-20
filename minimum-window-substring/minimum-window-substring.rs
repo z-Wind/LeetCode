@@ -4,12 +4,9 @@ impl Solution {
         for b in t.bytes() {
             map_t[(b - b'A') as usize] += 1;
         }
-        let sb: Vec<(usize, u8)> = s
-            .match_indices(|c| map_t[(c as u8 - b'A') as usize]>0)
-            .map(|(i, s)| (i, s.bytes().next().unwrap()))
-            .collect();
+        let sb = s.as_bytes();
 
-        //println!("{:?}", sb);
+        //println!("{:?}", map_t);
 
         let (mut l, mut r) = (0, 0);
         let mut ans = (usize::MAX, None, None);
@@ -17,7 +14,7 @@ impl Solution {
         let done = map_t.iter().filter(|&&ch| ch > 0).count();
         let mut window_count = [0 as isize; (b'z' - b'A' + 1) as usize];
         while r < sb.len() {
-            let c = (sb[r].1 - b'A') as usize;
+            let c = (sb[r] - b'A') as usize;
             if map_t[c] > 0{
                 window_count[c] += 1;
                 if map_t[c] == window_count[c]{
@@ -26,11 +23,11 @@ impl Solution {
                 
             }
             while l <= r && collected == done {
-                let c =(sb[l].1 - b'A') as usize;
+                let c =(sb[l] - b'A') as usize;
                 if map_t[c]>0{
-                    let range = sb[r].0 - sb[l].0 + 1;
+                    let range = r - l + 1;
                     if range < ans.0 {
-                        ans = (range, Some(sb[l].0), Some(sb[r].0));
+                        ans = (range, Some(l), Some(r));
                     }
                     window_count[c] -= 1;
                     if map_t[c] > window_count[c]{
