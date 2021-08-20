@@ -1,84 +1,49 @@
-use std::collections::VecDeque;
-use std::mem;
+// https://leetcode.com/problems/edit-distance/discuss/25846/C%2B%2B-O(n)-space-DP
+//  if word1[i - 1] == word2[j - 1]
+//      dp[i][j] = dp[i - 1][j - 1]
+//elif word1[i - 1] != word2[j - 1], get minimum
+//      1. Replace dp[i][j] = dp[i - 1][j - 1] + 1
+//      2  Delete  dp[i][j] = dp[i - 1][j] + 1
+//      3. Insert  dp[i][j] = dp[i][j - 1] + 1.
 
-#[derive(Debug)]
-enum Action{
-    Replace,
-    Insert,
-    Delete,
-}
+// space: 2d -> 1d
+// dp[i-1][j-1],  dp[i-1][j]
+// dp[i][j-1],    dp[i][j]
+// The corresponding code:
+// dp[i][j] = min(dp[i - 1][j - 1] , dp[i][j - 1] , dp[i - 1][j] ) + 1
+
+// When using 1d array. We are updating cur[ ] from beginning to the end again and again (Row of 2D array times). The relative position is like this:
+
+// pre,       cur[i]
+// cur[i-1]   cur[i](waiting for the update)
+// The corresponding code:
+// cur[i] = min(pre, cur[i], cur[i - 1]) + 1
+use std::cmp::min;
+
 impl Solution {
     pub fn min_distance(word1: String, word2: String) -> i32 {
-        if word1 == word2{
-            return 0;
+        let m = word1.len();
+        let n = word2.len();
+        let mut pre:usize; // [i-1, j-1]
+        let mut cur = vec![0;n + 1];
+        for j in (1..=n) {
+            cur[j] = j; //[0, j] insert
         }
-        let mut queue = VecDeque::new();
-        let mut word1 = &word1[..];
-        let mut word2 = &word2[..];
-        
-        let mut min_step = i32::MAX;
-        let mut step = 0;
-        'outer: loop{
-            if !word1.is_empty() && !word2.is_empty() && word1[0..1] == word2[0..1]{
-                word1 = &word1[1..];
-                word2 = &word2[1..];
-                continue;
-            }
-            if !word1.is_empty() && !word2.is_empty() { 
-                queue.push_back((&word1[1..], &word2[1..], step, Action::Replace));
-            }
-            if !word1.is_empty() {
-                queue.push_back((&word1[1..], &word2[..], step, Action::Delete));
-            }
-            if !word2.is_empty(){
-                queue.push_back((&word1[..], &word2[1..], step, Action::Insert));
-            }
-            
-            //println!("{:?}", queue);
-            if word1.is_empty() && word2.is_empty() && step < min_step{
-                min_step = step;
-            }
-            
-            
-            loop{
-                match queue.pop_front(){
-                    None => {
-                        //println!("empty queue");
-                        break 'outer;
-                    },
-                    Some((w1, w2, layer, Action::Replace)) => {
-                        //println!("Replace");
-                        word1 = w1;
-                        word2 = w2;
-                        step = layer + 1;
-                    }
-                    Some((w1, mut w2, mut layer, Action::Insert)) => {
-                        //println!("Insert");
-                        while !w1.is_empty()  && !w2.is_empty() && w1[0..1] != w2[0..1]{
-                            w2 = &w2[1..];
-                            layer += 1;
-                        }
-                        word1 = w1;
-                        word2 = w2;
-                        step = layer + 1;
-                    }
-                    Some((mut w1, w2, mut layer, Action::Delete)) => {
-                        //println!("Delete");
-                        while !w1.is_empty() && !w2.is_empty() && w1[0..1] != w2[0..1]{
-                            w1 = &w1[1..];
-                            layer += 1;
-                        }
-                        word1 = w1;
-                        word2 = w2;
-                        step = layer + 1;
-                    }
+        for i in (1..=m) {
+            pre = cur[0];
+            cur[0] = i; // [i, 0] delete
+            for j in (1..=n) {
+                let temp = cur[j];
+                if (word1[i - 1..i] == word2[j - 1..j]) {
+                    cur[j] = pre;
+                } else {
+                    //       min(  replace,    insert,   delete  )
+                    //       min( [i-1][j-1], [i][j-1], [i-1][j] )
+                    cur[j] = min(   pre, min(cur[j - 1], cur[j])) + 1;
                 }
-                if step < min_step{
-                    break;
-                }
+                pre = temp;
             }
-            //println!("{:?} ==? {:?}", word1, word2);
         }
-        min_step
+        return cur[n] as i32;
     }
 }
