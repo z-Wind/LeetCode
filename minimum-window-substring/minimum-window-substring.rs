@@ -1,48 +1,54 @@
-use std::cmp::min;
 use std::collections::HashMap;
 
 impl Solution {
     pub fn min_window(s: String, t: String) -> String {
-        let mut t_loc: Vec<usize> = vec![usize::MAX; t.len()];
-        let mut t_loc_map: HashMap<char,Vec<usize>> = HashMap::new();
-        t.chars().enumerate()
-            .for_each(|(i,c)| t_loc_map.entry(c).or_insert(vec![]).push(i));
-        
-        let mut min_left: usize = 0;
-        let mut min_right: usize = usize::MAX;
-        for (i, c) in s.chars().enumerate() {
-            if let Some(v) =  t_loc_map.get(&c) {
-                let mut min_i = v[0];
-                for x in v.iter() {
-                    if t_loc[min_i] > t_loc[*x] {
-                        min_i = *x;
-                    }
-                }
-                if min_right == usize::MAX{
-                    for x in v.iter() {
-                        if t_loc[*x] == usize::MAX {
-                            min_i = *x;
-                            break;
-                        }
-                    }
-                }
-                t_loc[min_i] = i;
-                let left = *t_loc.iter().min().unwrap();
-                let right = *t_loc.iter().max().unwrap();
-                //println!("({},{}) ({},{}) {:?}", left, right, min_left, min_right, t_loc);
-                if right != usize::MAX
-                    && right - left < min_right - min_left
-                    && right - left + 1 >= t.len()
-                {
-                    min_left = left;
-                    min_right = right;
-                }
+        let mut map_t: HashMap<char, i32> = HashMap::new();
+        t.chars()
+            .enumerate()
+            .for_each(|(i, c)| *map_t.entry(c).or_insert(0) += 1);
+
+        let filtered_s: Vec<(usize, char)> = s
+            .match_indices(|c| map_t.contains_key(&c))
+            .map(|(i, s)| (i, s.chars().next().unwrap()))
+            .collect();
+        //println!("{:?}, {:?}", map_t, filtered_s);
+
+        let (mut l, mut r) = (0, 0);
+        let mut ans = (usize::MAX, None, None);
+        let mut collected = 0;
+        let done = map_t.len();
+        let mut window_count: HashMap<char, i32> = HashMap::new();
+        while r < filtered_s.len() {
+            let c = filtered_s[r].1;
+            *window_count.entry(c).or_insert(0) += 1;
+            match (map_t.get(&c), window_count.get(&c)) {
+                (Some(num_t), Some(num_w)) if num_t == num_w => collected += 1,
+                _ => (),
             }
-            //println!("{:?} => {},{}", t_loc, min_left, min_right);
+            while l <= r && collected == done {
+                let c = filtered_s[l].1;
+
+                let end = filtered_s[r].0;
+                let start = filtered_s[l].0;
+                let range = end - start + 1;
+                if range < ans.0 {
+                    ans = (range, Some(start), Some(end));
+                }
+                *window_count.entry(c).or_insert(0) -= 1;
+                match (map_t.get(&c), window_count.get(&c)) {
+                    (Some(num_t), Some(num_w)) if num_t > num_w => collected -= 1,
+                    _ => (),
+                }
+                //println!("{},{} => {:?}",l,r,ans);
+                l += 1;
+            }
+            r += 1;
         }
-        if min_right == usize::MAX {
-            return String::from("");
+
+        match ans{
+            (_,None,None) => String::from(""),
+            (_,Some(start),Some(end)) => s[start..=end].to_string(),
+            _ => panic!(),
         }
-        s[min_left..=min_right].to_string()
     }
 }
