@@ -1,45 +1,43 @@
-use std::collections::HashMap;
-
 impl Solution {
     pub fn min_window(s: String, t: String) -> String {
-        let mut map_t: HashMap<char, i32> = HashMap::new();
-        t.chars()
-            .enumerate()
-            .for_each(|(i, c)| *map_t.entry(c).or_insert(0) += 1);
-
-        let filtered_s: Vec<(usize, char)> = s
-            .match_indices(|c| map_t.contains_key(&c))
-            .map(|(i, s)| (i, s.chars().next().unwrap()))
+        let mut map_t= [0 as isize; (b'z' - b'A' + 1) as usize];
+        for b in t.bytes() {
+            map_t[(b - b'A') as usize] += 1;
+        }
+        let sb: Vec<(usize, u8)> = s
+            .match_indices(|c| map_t[(c as u8 - b'A') as usize]>0)
+            .map(|(i, s)| (i, s.bytes().next().unwrap()))
             .collect();
-        //println!("{:?}, {:?}", map_t, filtered_s);
+
+        //println!("{:?}", sb);
 
         let (mut l, mut r) = (0, 0);
         let mut ans = (usize::MAX, None, None);
         let mut collected = 0;
-        let done = map_t.len();
-        let mut window_count: HashMap<char, i32> = HashMap::new();
-        while r < filtered_s.len() {
-            let c = filtered_s[r].1;
-            *window_count.entry(c).or_insert(0) += 1;
-            match (map_t.get(&c), window_count.get(&c)) {
-                (Some(num_t), Some(num_w)) if num_t == num_w => collected += 1,
-                _ => (),
+        let done = map_t.iter().filter(|&&ch| ch > 0).count();
+        let mut window_count = [0 as isize; (b'z' - b'A' + 1) as usize];
+        while r < sb.len() {
+            let c = (sb[r].1 - b'A') as usize;
+            if map_t[c] > 0{
+                window_count[c] += 1;
+                if map_t[c] == window_count[c]{
+                    collected += 1;
+                }
+                
             }
             while l <= r && collected == done {
-                let c = filtered_s[l].1;
-
-                let end = filtered_s[r].0;
-                let start = filtered_s[l].0;
-                let range = end - start + 1;
-                if range < ans.0 {
-                    ans = (range, Some(start), Some(end));
+                let c =(sb[l].1 - b'A') as usize;
+                if map_t[c]>0{
+                    let range = sb[r].0 - sb[l].0 + 1;
+                    if range < ans.0 {
+                        ans = (range, Some(sb[l].0), Some(sb[r].0));
+                    }
+                    window_count[c] -= 1;
+                    if map_t[c] > window_count[c]{
+                        collected -= 1;
+                    }
+                    //println!("{},{} => {:?}",l,r,ans);
                 }
-                *window_count.entry(c).or_insert(0) -= 1;
-                match (map_t.get(&c), window_count.get(&c)) {
-                    (Some(num_t), Some(num_w)) if num_t > num_w => collected -= 1,
-                    _ => (),
-                }
-                //println!("{},{} => {:?}",l,r,ans);
                 l += 1;
             }
             r += 1;
