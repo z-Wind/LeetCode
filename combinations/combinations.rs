@@ -1,22 +1,26 @@
-// C(n,k)=C(n-1,k-1)+C(n-1,k)
-// https://zhidao.baidu.com/question/368034364206885564.html
+use std::cmp::min;
 impl Solution {
     pub fn combine(n: i32, k: i32) -> Vec<Vec<i32>> {
-        if k == 0 {
-            return vec![vec![]];
-        } else if k == n{
-            return vec![(1..=n).collect()];
-        }
-        
-        let mut result:Vec<Vec<i32>> = vec![];
-        
-        for mut cmb in Self::combine(n - 1, k - 1) {
-            cmb.push(n);
-            result.push(cmb);
-        }
-        
-        result.append(&mut Self::combine(n - 1, k));
-        
-        result
+        let mut nums:Vec<i32> = (1..=n).collect();
+        let mut ans:Vec<Vec<i32>> = Vec::new();
+        push(&mut ans, &mut nums, 0, k as usize, 0);
+        ans
+    }
+}
+
+fn push(ans: &mut Vec<Vec<i32>>, nums:&mut Vec<i32>, pos:usize, len:usize, start:usize){
+    if pos == len{
+        ans.push(nums[..len].to_vec());
+        return;
+    }
+    
+    if nums.len() - start < len - pos{
+        return;
+    }
+    
+    for i in (start..nums.len()){
+        nums.swap(pos,i);
+        push(ans, nums, pos+1, len, i+1);
+        nums.swap(pos,i);
     }
 }
