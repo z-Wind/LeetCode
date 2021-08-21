@@ -1,41 +1,20 @@
-// subset[n] = c(n,n) + c(n,n-1) + c(n,n-2) + .. c(n,1) + c(n,0)
-// c(n,k) = c(n-1,k-1) + c(n-1,k)
+// Lexicographic (Binary Sorted) Subsets
 impl Solution {
-    pub fn subsets(mut nums: Vec<i32>) -> Vec<Vec<i32>> {
-        let mut ans:Vec<Vec<i32>> = Vec::new(); 
-
-        for i in (0..nums.len()+1){
-            ans.append(&mut combine(&mut nums,i));
+    pub fn subsets(nums: Vec<i32>) -> Vec<Vec<i32>> {
+        let mut res: Vec<Vec<i32>> = vec![];
+        
+        for i in 0..2_u32.pow(nums.len() as u32) {
+            let mut subset = vec![];
+            let binary_str = format!("{:0n$b}", i,n=nums.len());
+            //println!("{}",binary_str);
+            for (bit_index, bit) in binary_str.chars().enumerate() {
+                if bit == '1' {
+                    subset.push(nums[bit_index]);
+                }
+            }
+            res.push(subset);
         }
-
-        ans
-    }
-}
-
-fn combine(nums:&mut Vec<i32>, k: usize) -> Vec<Vec<i32>> {
-    //println!("{:?},{}", nums, k);
-    let mut ans:Vec<Vec<i32>> = Vec::new();
-    push(&mut ans, nums, 0, k, 0);
-    ans
-}
-
-
-fn push(ans: &mut Vec<Vec<i32>>, nums:&mut Vec<i32>, pos:usize, len:usize, start:usize){
-    if len == 0{
-        ans.push(vec![]);
-        return
-    } else if pos == len{
-        ans.push(nums[..len].to_vec());
-        return;
-    }
-
-    if nums.len() - start < len - pos{
-        return;
-    }
-
-    for i in (start..nums.len()){
-        nums.swap(pos,i);
-        push(ans, nums, pos+1, len, i+1);
-        nums.swap(pos,i);
+        
+        res
     }
 }
