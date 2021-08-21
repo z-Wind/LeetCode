@@ -1,10 +1,10 @@
-// subset[n] = c(n,n) + c(n,n-1) + c(n,n-2) + .. c(n,1)
+// subset[n] = c(n,n) + c(n,n-1) + c(n,n-2) + .. c(n,1) + c(n,0)
 // c(n,k) = c(n-1,k-1) + c(n-1,k)
 impl Solution {
     pub fn subsets(mut nums: Vec<i32>) -> Vec<Vec<i32>> {
-        let mut ans:Vec<Vec<i32>> = vec![nums.to_vec()]; 
+        let mut ans:Vec<Vec<i32>> = Vec::new(); 
 
-        for i in (0..nums.len()){
+        for i in (0..nums.len()+1){
             ans.append(&mut combine(&mut nums,i));
         }
 
