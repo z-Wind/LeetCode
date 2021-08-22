@@ -16,34 +16,18 @@
 // }
 impl Solution {
     pub fn delete_duplicates(head: Option<Box<ListNode>>) -> Option<Box<ListNode>> {
-        let mut head_new = ListNode::new(0);
-        let mut next_new = &mut head_new;
-        
-        let mut i = 0;
-        let mut pre:i32=i32::MAX;
-        let mut val:i32=i32::MAX;
-        let mut next = head.as_ref();
-        while let Some(ref node) = next{
-            if i == 0{
-                val = node.val;
-            } else { 
-                pre = val;
-                val = node.val;
-                //println!("{},{}", pre, val);
-
-                if pre != val {
-                    next_new.next = Some(Box::new(ListNode::new(pre)));
-                    next_new = next_new.next.as_mut().unwrap();
-                }
+        if head.is_none() {
+            return None;
+        }
+        let mut h = head;
+        let mut p1 = h.as_mut().unwrap();
+        while let Some(p2) = p1.next.as_mut() {
+            if p1.val == p2.val {
+                p1.next = p2.next.take();
+            } else {
+                p1 = p1.next.as_mut().unwrap();
             }
-            
-            next = node.next.as_ref();
-            i+=1;
         }
-        if val != i32::MAX{
-            next_new.next = Some(Box::new(ListNode::new(val)));
-        }
-
-        head_new.next
+        h
     }
 }
