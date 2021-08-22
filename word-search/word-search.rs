@@ -25,7 +25,6 @@ fn backtrack(board: &mut Vec<Vec<char>>, size:&(usize,usize), pos:usize, word:&V
     } 
     //println!("{}:{} ==? board:{}",pos,word[pos],board[i][j]);
     
-    let c = board[x][y];
     board[x][y] = '.';
     if backtrack(board, size, pos+1, word, i,j-1) || 
        backtrack(board, size, pos+1, word, i,j+1) ||
@@ -33,6 +32,6 @@ fn backtrack(board: &mut Vec<Vec<char>>, size:&(usize,usize), pos:usize, word:&V
        backtrack(board, size, pos+1, word, i+1,j) {
         return true;
     }
-    board[x][y] = c;
+    board[x][y] = word[pos];
     return false;
 }
