@@ -26,7 +26,7 @@ impl Solution {
         let mut right = Box::new(ListNode::new(0));
         let mut right_p = &mut right;
         while let Some(mut node) = h{
-            println!("{:?}", node);
+            //println!("{:?}", node);
             h = node.next.take();
             
             if node.val < x{
