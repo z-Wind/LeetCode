@@ -4,21 +4,20 @@ impl Solution {
         let mut temp:Vec<i32> = Vec::new();
         nums.sort_unstable();
         //println!("{:?}",nums);
-        backtrack(&mut ans, &nums, &mut temp, 0);
+        backtrack(&mut ans, &nums[..], &mut temp);
         ans
     }
 }
 
-fn backtrack(ans:&mut Vec<Vec<i32>>, nums:&Vec<i32>, temp:&mut Vec<i32>, pos:usize){
-    //println!("pos:{}, temp:{:?}",pos,temp);
+fn backtrack(ans:&mut Vec<Vec<i32>>, nums:&[i32], temp:&mut Vec<i32>){
     ans.push(temp.clone());
-    if pos == nums.len(){
+    if nums.is_empty(){
         return;
     }
-    for i in (pos..nums.len()){
-        if i==pos || nums[i] != nums[i-1]{
+    for i in (0..nums.len()){
+        if i==0 || nums[i] != nums[i-1]{
             temp.push(nums[i]);
-            backtrack(ans, nums, temp, i+1);
+            backtrack(ans, &nums[i+1..], temp);
             temp.pop();
         }
     }
