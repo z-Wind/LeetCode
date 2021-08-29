@@ -47,37 +47,30 @@ fn create_tree(root:i32, left:&[i32] ,right:&[i32]) -> Vec<Option<Rc<RefCell<Tre
     for i in (0..left.len()){
         lefts.append(&mut create_tree(left[i], &left[..i], &left[i+1..]));
     }
+    if lefts.is_empty(){
+        lefts.push(None);
+    }
     // println!("{}: lefts: {:?}", root, lefts);
     
     let mut rights:Vec<Option<Rc<RefCell<TreeNode>>>> = Vec::new();
     for i in (0..right.len()){
         rights.append(&mut create_tree(right[i], &right[..i], &right[i+1..]));
     }
+    if rights.is_empty(){
+        rights.push(None);
+    }
     // println!("{}: rights: {:?}", root, rights);
     
     let mut roots:Vec<Option<Rc<RefCell<TreeNode>>>> = Vec::new();
-    if lefts.is_empty(){
+    for left in lefts.iter(){
         for right in rights.iter(){
             let mut root = TreeNode::new(root);
+            root.left = clone_node(left);
             root.right = clone_node(right);
             roots.push(Some(Rc::new(RefCell::new(root))));
         }
-    } else if rights.is_empty(){
-        for left in lefts.iter(){
-            let mut root = TreeNode::new(root);
-            root.left = clone_node(left);
-            roots.push(Some(Rc::new(RefCell::new(root))));
-        }
-    } else {
-        for left in lefts.iter(){
-            for right in rights.iter(){
-                let mut root = TreeNode::new(root);
-                root.left = clone_node(left);
-                root.right = clone_node(right);
-                roots.push(Some(Rc::new(RefCell::new(root))));
-            }
-        }
     }
+    
     
     //println!("roots: {:?}", roots);
     
