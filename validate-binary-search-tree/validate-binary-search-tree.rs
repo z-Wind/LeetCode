@@ -31,11 +31,14 @@ fn get_val(node: &Option<Rc<RefCell<TreeNode>>>) -> i32{
 fn is_valid_bst(root: &Option<Rc<RefCell<TreeNode>>>, lowerbound:Option<i32>, upperbound:Option<i32>) -> bool {
     if root.is_none(){
         return true;
-    } else if (upperbound.is_some() && get_val(root) >= upperbound.unwrap()) || 
-              (lowerbound.is_some() && get_val(root) <= lowerbound.unwrap()){
+    }
+    
+    let val = get_val(root);  
+    if (upperbound.is_some() && val >= upperbound.unwrap()) || 
+       (lowerbound.is_some() && val <= lowerbound.unwrap()){
         return false;
     }
-    let val = get_val(root);   
+     
     let left:&Option<Rc<RefCell<TreeNode>>> = &root.as_ref().unwrap().borrow().left;
     let right:&Option<Rc<RefCell<TreeNode>>> = &root.as_ref().unwrap().borrow().right;
     
@@ -44,15 +47,7 @@ fn is_valid_bst(root: &Option<Rc<RefCell<TreeNode>>>, lowerbound:Option<i32>, up
     } else if right.is_some() && val >= get_val(right){
         return false
     }
-    //println!("root:{}, lowerbound:{}, upperbound:{}, left:{:?}, right:{:?}",get_val(root),lowerbound,upperbound,left,right);
-    match (lowerbound, upperbound){
-        (None,None) => is_valid_bst(left, None, Some(val)) && 
-                       is_valid_bst(right, Some(val), None),
-        (Some(l),None) => is_valid_bst(left, Some(l), Some(val)) && 
-                          is_valid_bst(right, Some(val), None),
-        (None,Some(u)) => is_valid_bst(left, None, Some(val)) && 
-                          is_valid_bst(right, Some(val), Some(u)),
-        (Some(l),Some(u)) => is_valid_bst(left, Some(l), Some(val)) && 
-                             is_valid_bst(right, Some(val), Some(u)),
-    }
+    
+    is_valid_bst(left, lowerbound, Some(val)) && 
+    is_valid_bst(right, Some(val), upperbound)   
 }
