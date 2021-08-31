@@ -20,33 +20,35 @@ use std::rc::Rc;
 use std::cell::RefCell;
 use std::collections::VecDeque;
 impl Solution {
-    pub fn level_order(mut root: Option<Rc<RefCell<TreeNode>>>) -> Vec<Vec<i32>> {
+    pub fn level_order(root: Option<Rc<RefCell<TreeNode>>>) -> Vec<Vec<i32>> {
         let mut ans:Vec<Vec<i32>> = Vec::new();
-        let mut deque:VecDeque<(usize, Option<Rc<RefCell<TreeNode>>>)> = VecDeque::new();
-        let mut layer = 0;
-        while root.is_some(){
-            if ans.len() < layer+1{
-                ans.push(vec![root.as_ref().unwrap().borrow().val]);
-            } else {
-                ans[layer].push(root.as_ref().unwrap().borrow().val);
-            }
+        if root.is_none(){
+            return ans;
+        }
+        
+        let mut deque:VecDeque<Rc<RefCell<TreeNode>>> = VecDeque::new();
+        deque.push_back(Rc::clone(root.as_ref().unwrap()));
+        while !deque.is_empty(){
+            let mut temp:Vec<i32> = Vec::new();
             
-            let left = root.as_ref().unwrap().borrow().left.clone();
-            let right = root.as_ref().unwrap().borrow().right.clone();
-            
-            if left.is_some(){
-                deque.push_back((layer+1,left));    
+            let len = deque.len();
+            for _ in (0..len){
+                let root = deque.pop_front().unwrap();
+                
+                temp.push(root.borrow().val);
+                
+                let left = root.borrow().left.clone();
+                let right = root.borrow().right.clone(); 
+                
+                if root.borrow().left.is_some(){
+                    deque.push_back((Rc::clone(root.borrow().left.as_ref().unwrap())));    
+                }
+                if root.borrow().right.is_some(){
+                    deque.push_back((Rc::clone(root.borrow().right.as_ref().unwrap())));    
+                }
             }
-            if right.is_some(){
-                deque.push_back((layer+1,right));    
-            }
-            
-            let pairs = deque.pop_front();
-            if pairs.is_none(){
-                break;
-            }
-            layer = pairs.as_ref().unwrap().0;
-            root = pairs.unwrap().1;
+            // println!("{:?}", temp);
+            ans.push(temp);
         }
         ans
     }
