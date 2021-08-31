@@ -18,22 +18,24 @@
 // }
 use std::rc::Rc;
 use std::cell::RefCell;
+use std::mem::swap;
 impl Solution {
     pub fn recover_tree(root: &mut Option<Rc<RefCell<TreeNode>>>) {
         let mut v:Vec<Rc<RefCell<TreeNode>>> = Vec::new();
         traversal(root,&mut v);
         //println!("{:?}",v);
-        for i in (0..v.len()){
-            let mut min = v[i].borrow().val;
-            for j in (i+1..v.len()){
-                if v[j].borrow().val < min{
-                    let temp = min;
-                    min = v[j].borrow().val;
-                    v[i].borrow_mut().val = min;
-                    v[j].borrow_mut().val = temp;
-                }
+        
+        let mut swap_a:Option<Rc<RefCell<TreeNode>>>=None;
+        let mut swap_b:Option<Rc<RefCell<TreeNode>>>=None;
+        for pairs in v.windows(2) {
+            if swap_a.is_none() && pairs[0].borrow().val>=pairs[1].borrow().val{
+                swap_a = Some(Rc::clone(&pairs[0]));
+            }
+            if pairs[0].borrow().val>=pairs[1].borrow().val{
+                swap_b = Some(Rc::clone(&pairs[1]));
             }
         }
+        swap(&mut swap_a.unwrap().borrow_mut().val, &mut swap_b.unwrap().borrow_mut().val);
     }
 }
 
@@ -45,7 +47,7 @@ fn traversal<'a>(root: &'a Option<Rc<RefCell<TreeNode>>>, v:&'a mut Vec<Rc<RefCe
     let left:&Option<Rc<RefCell<TreeNode>>> = &r.left;
     traversal(left,v);
     //println!("{}", r.val);
-    v.push(root.clone().unwrap());
+    v.push(Rc::clone(root.as_ref().unwrap()));
     let right:&Option<Rc<RefCell<TreeNode>>> = &r.right;
     traversal(right,v);
 }
