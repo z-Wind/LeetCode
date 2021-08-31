@@ -20,7 +20,8 @@ use std::rc::Rc;
 use std::cell::RefCell;
 impl Solution {
     pub fn is_valid_bst(root: Option<Rc<RefCell<TreeNode>>>) -> bool {
-        is_valid_bst(&root,None,None)
+        let mut prev:Option<i32> = None;
+        is_valid_bst(&root,&mut prev)
     }
 }
 
@@ -28,26 +29,18 @@ fn get_val(node: &Option<Rc<RefCell<TreeNode>>>) -> i32{
     node.as_ref().unwrap().borrow().val
 }
 
-fn is_valid_bst(root: &Option<Rc<RefCell<TreeNode>>>, lowerbound:Option<i32>, upperbound:Option<i32>) -> bool {
+fn is_valid_bst<'a>(root: &'a Option<Rc<RefCell<TreeNode>>>, prev: &'a mut Option<i32>) -> bool {
     if root.is_none(){
         return true;
     }
-    
-    let val = get_val(root);  
-    if (upperbound.is_some() && val >= upperbound.unwrap()) || 
-       (lowerbound.is_some() && val <= lowerbound.unwrap()){
+    let left:&Option<Rc<RefCell<TreeNode>>> = &root.as_ref().unwrap().borrow().left;
+    if !is_valid_bst(left,prev){
         return false;
     }
-     
-    let left:&Option<Rc<RefCell<TreeNode>>> = &root.as_ref().unwrap().borrow().left;
-    let right:&Option<Rc<RefCell<TreeNode>>> = &root.as_ref().unwrap().borrow().right;
-    
-    if left.is_some() && val <= get_val(left){
-        return false
-    } else if right.is_some() && val >= get_val(right){
+    if prev.is_some() && prev.unwrap() >= get_val(root){
         return false
     }
-    
-    is_valid_bst(left, lowerbound, Some(val)) && 
-    is_valid_bst(right, Some(val), upperbound)   
+    *prev = Some(get_val(root));
+    let right:&Option<Rc<RefCell<TreeNode>>> = &root.as_ref().unwrap().borrow().right;
+    return is_valid_bst(right,prev);
 }
