@@ -41,14 +41,16 @@ impl Solution {
 }
 
 fn build_balance_tree(head: &Option<Box<ListNode>>, tail: &Option<Box<ListNode>>) -> Option<Rc<RefCell<TreeNode>>>{
-    if head == tail{
+    if head.is_none() || (tail.is_some() && head.as_ref().unwrap().val == tail.as_ref().unwrap().val){
         return None;
     }
     
     // find mid element
     let mut double:&Option<Box<ListNode>> = head;
     let mut single:&Option<Box<ListNode>> = head;
-    while double != tail && &double.as_ref().unwrap().next != tail{
+    while (tail.is_none() && (double.is_some() && double.as_ref().unwrap().next.is_some())) || (
+    (double.is_some() && tail.is_some() && double.as_ref().unwrap().val != tail.as_ref().unwrap().val) &&
+          (double.as_ref().unwrap().next.is_some() && tail.is_some() && double.as_ref().unwrap().next.as_ref().unwrap().val != tail.as_ref().unwrap().val)) {
         double = &double.as_ref().unwrap().next.as_ref().unwrap().next;
         single = &single.as_ref().unwrap().next;
     }
