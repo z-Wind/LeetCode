@@ -36,24 +36,26 @@ use std::rc::Rc;
 use std::cell::RefCell;
 impl Solution {
     pub fn sorted_list_to_bst(head: Option<Box<ListNode>>) -> Option<Rc<RefCell<TreeNode>>> {
-        let mut nums:Vec<i32> = Vec::new();
-        let mut h = head;
-        while let Some(node) = h{
-            nums.push(node.val);
-            h = node.next;
-        }
-        // println!("{:?}", nums);
-        build_balance_tree(&nums[..])
+        build_balance_tree(&head, &None)
     }
 }
 
-fn build_balance_tree(nums: &[i32]) -> Option<Rc<RefCell<TreeNode>>>{
-    if nums.is_empty(){
+fn build_balance_tree(head: &Option<Box<ListNode>>, tail: &Option<Box<ListNode>>) -> Option<Rc<RefCell<TreeNode>>>{
+    if head == tail{
         return None;
     }
-    let mid = nums.len()/2;
-    let mut root = TreeNode::new(nums[mid]);
-    root.left = build_balance_tree(&nums[..mid]);
-    root.right = build_balance_tree(&nums[mid+1..]);
+    
+    // find mid element
+    let mut double:&Option<Box<ListNode>> = head;
+    let mut single:&Option<Box<ListNode>> = head;
+    while double != tail && &double.as_ref().unwrap().next != tail{
+        double = &double.as_ref().unwrap().next.as_ref().unwrap().next;
+        single = &single.as_ref().unwrap().next;
+    }
+    
+    let mut root = TreeNode::new(single.as_ref().unwrap().val);
+    root.left = build_balance_tree(head, single);
+    root.right = build_balance_tree(&single.as_ref().unwrap().next, tail);
     Some(Rc::new(RefCell::new(root)))
 }
+
