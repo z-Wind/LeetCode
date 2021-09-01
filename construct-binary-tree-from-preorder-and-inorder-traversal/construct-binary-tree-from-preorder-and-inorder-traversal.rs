@@ -18,20 +18,29 @@
 // }
 use std::rc::Rc;
 use std::cell::RefCell;
+use std::collections::HashMap;
 impl Solution {
     pub fn build_tree(preorder: Vec<i32>, inorder: Vec<i32>) -> Option<Rc<RefCell<TreeNode>>> {
-        build_tree(&preorder[..], &inorder[..])
+        let mut inorder_map:HashMap<i32,usize> = HashMap::new();
+        for (i,val) in inorder.into_iter().enumerate(){
+            inorder_map.insert(val,i);
+        }
+        build_tree(&preorder[..], 0, preorder.len()-1, &inorder_map, 0, inorder_map.len()-1) 
     }
 }
 
-fn build_tree(preorder: &[i32], inorder: &[i32]) -> Option<Rc<RefCell<TreeNode>>> {
-    if preorder.is_empty(){
+fn build_tree(preorder: &[i32], pre_start:usize, pre_end:usize, inorder: &HashMap<i32,usize>, in_start:usize, in_end:usize) -> Option<Rc<RefCell<TreeNode>>> {
+    if pre_start >= preorder.len() || pre_start > pre_end{
         return None;
     }
-    let mut root = TreeNode::new(preorder[0]);
-    let i = inorder.iter().position(|&x| x == preorder[0]).unwrap();
+
+    let mut root = TreeNode::new(preorder[pre_start]);
+    let i = *inorder.get(&preorder[pre_start]).unwrap();
+    //println!("root:{} ({},{}) => {:?}",i, pre_start, pre_end, &preorder[pre_start..=pre_end]);
     
-    root.left = build_tree(&preorder[1..i+1], &inorder[0..i]);
-    root.right = build_tree(&preorder[i+1..], &inorder[i+1..]);
+    let in_left_len = i-in_start;
+    let in_right_len = in_end - i;
+    root.left = build_tree(preorder, pre_start+1, pre_start+in_left_len, inorder, in_start, i-1);
+    root.right = build_tree(preorder, pre_start+in_left_len+1, pre_start+in_left_len+in_right_len, inorder, i+1, in_end);
     Some(Rc::new(RefCell::new(root)))
 }
