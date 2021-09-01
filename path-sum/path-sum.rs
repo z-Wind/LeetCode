@@ -19,24 +19,20 @@
 use std::rc::Rc;
 use std::cell::RefCell;
 impl Solution {
-    pub fn has_path_sum(root: Option<Rc<RefCell<TreeNode>>>, target_sum: i32) -> bool {
-        has_path_sum(root, target_sum)
-    }
-}
+    pub fn has_path_sum(root: Option<Rc<RefCell<TreeNode>>>, mut target_sum: i32) -> bool {
+        if root.is_none(){
+            return false;
+        }
 
-fn has_path_sum(root: Option<Rc<RefCell<TreeNode>>>, mut target_sum: i32) -> bool {
-    if root.is_none(){
-        return false;
-    }
+        target_sum -= root.as_ref().unwrap().borrow().val;       
 
-    target_sum -= root.as_ref().unwrap().borrow().val;       
+        let left = root.as_ref().unwrap().borrow().left.clone();
+        let right = root.as_ref().unwrap().borrow().right.clone();
 
-    let left = root.as_ref().unwrap().borrow().left.clone();
-    let right = root.as_ref().unwrap().borrow().right.clone();
-    
-    match (left,right){
-        (None,None) => target_sum == 0,
-        (Some(x),None) | (None,Some(x)) => has_path_sum(Some(x), target_sum),
-        (Some(l),Some(r)) => has_path_sum(Some(l), target_sum) || has_path_sum(Some(r), target_sum),
+        match (left,right){
+            (None,None) => target_sum == 0,
+            (Some(x),None) | (None,Some(x)) => Self::has_path_sum(Some(x), target_sum),
+            (Some(l),Some(r)) => Self::has_path_sum(Some(l), target_sum) || Self::has_path_sum(Some(r), target_sum),
+        }
     }
 }
