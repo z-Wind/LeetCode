@@ -24,27 +24,11 @@ impl Solution {
         if root.is_none(){
             return 0;
         }
-        let mut queue: VecDeque<Option<Rc<RefCell<TreeNode>>>> = VecDeque::new();
-        queue.push_back(root);
-        let mut depth = 0;
-        'outer: while !queue.is_empty(){
-            depth += 1;
-            let len = queue.len();
-            for _ in (0..len){
-                let mut root = queue.pop_front().unwrap();
-                let left = root.as_ref().unwrap().borrow().left.clone();
-                let right = root.as_ref().unwrap().borrow().right.clone();
-                if left.is_none() && right.is_none(){
-                    break 'outer;
-                }
-                if left.is_some(){
-                    queue.push_back(left);
-                }
-                if right.is_some(){
-                    queue.push_back(right);
-                }
-            }
+        let left_h = Self::min_depth(root.as_ref().unwrap().borrow().left.clone());
+        let right_h = Self::min_depth(root.as_ref().unwrap().borrow().right.clone());
+        match (left_h,right_h){
+            (0,h) | (h,0) => h+1,
+            (h1,h2) => h1.min(h2)+1,
         }
-        depth
     }
 }
