@@ -20,43 +20,33 @@ use std::rc::Rc;
 use std::cell::RefCell;
 impl Solution {
     pub fn flatten(root: &mut Option<Rc<RefCell<TreeNode>>>) {
+        let mut flat = Flat::new();
+        flat.flatten(root);        
+    }
+}
+
+struct Flat{
+    pre:Option<Rc<RefCell<TreeNode>>>,
+}
+
+impl Flat{
+    fn new() -> Self{
+        Flat{
+            pre:None,
+        }
+    }
+    fn flatten(&mut self, root: &Option<Rc<RefCell<TreeNode>>>) {
         if root.is_none(){
             return;
         }
         
-        let mut root:Option<Rc<RefCell<TreeNode>>> = root.clone();
-        let mut stack: Vec<Option<Rc<RefCell<TreeNode>>>> = Vec::new();
+        let left = root.as_ref().unwrap().borrow_mut().left.take();
+        let right = root.as_ref().unwrap().borrow_mut().right.take();
         
-        loop{
-            //println!("{:?}", stack);
-            let left = root.as_ref().unwrap().borrow_mut().left.take();
-            let right = root.as_ref().unwrap().borrow_mut().right.take();
-            
-            match (left,right){
-                (None, None) => {
-                    if stack.is_empty(){
-                        break;
-                    }
-                    let node = stack.pop().unwrap();
-                    root.as_ref().unwrap().borrow_mut().right = node.clone();
-                    root = node;
-                },
-                (l, None) => {
-                    root.as_ref().unwrap().borrow_mut().right = l.clone();
-                    root = l;
-                },
-                (None, r) =>{
-                    root.as_ref().unwrap().borrow_mut().right = r.clone();
-                    root = r;
-                },
-                (l, r) => {
-                    stack.push(r);
-                    root.as_ref().unwrap().borrow_mut().right = l.clone();
-                    root = l;
-                },
-            }
-        }
+        self.flatten(&right);
+        self.flatten(&left);
         
-        
+        root.as_ref().unwrap().borrow_mut().right = self.pre.clone();
+        self.pre = root.clone();        
     }
 }
