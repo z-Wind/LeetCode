@@ -1,48 +1,38 @@
-use std::collections::HashMap;
+// https://leetcode.com/problems/distinct-subsequences/discuss/37316/7-10-lines-C%2B%2B-Solutions-with-Detailed-Explanations-(O(m*n)-time-and-O(m)-space)
+// https://leetcode.com/problems/distinct-subsequences/discuss/37327/Easy-to-understand-DP-in-Java
+//
+//   S 0123..j..n
+// T +----------+
+//   |1111111111|
+// 0 |0         |
+// 1 |0         |
+// 2 |0         |
+// . |0         |
+// . |0         |
+// i |0         |
+// . |0         |
+// . |0         |
+// m |0         |
+// 
+// dp[i][j] = dp[i][j-1]                    when s[j-1] != t[i-1]
+// dp[i][j] = dp[i][j-1]   +   dp[i-1][j-1] when s[j-1] == t[i-1]
+//           exclude s[j-1]   include s[j-1]
 impl Solution {
     pub fn num_distinct(s: String, t: String) -> i32 {
-        let mut count_s = [0;52];
-        for c in s.bytes(){
-            if c >= 97{
-                count_s[(c-b'a') as usize] += 1;
-            } else {
-                count_s[26+(c-b'A') as usize] += 1;
+        let s = s.as_bytes();
+        let t = t.as_bytes();
+        let n = s.len();
+        let m = t.len();
+        let mut dp:Vec<Vec<i32>> = vec![vec![0;n+1];m+1];
+        for j in (0..=n) { dp[0][j] = 1;}
+        for j in (1..=n){
+            for i in (1..=m){
+                dp[i][j] = match s[j-1] == t[i-1]{
+                    false => dp[i][j-1],
+                    true => dp[i][j-1] + dp[i-1][j-1],
+                }
             }
         }
-        let mut count_t = [0;52];
-        for c in t.bytes(){
-            if c >= 97{
-                count_t[(c-b'a') as usize] += 1;
-            } else {
-                count_t[26+(c-b'A') as usize] += 1;
-            }
-        }
-        for i in (0..52){
-            if count_s[i] < count_t[i]{
-                return 0;
-            }
-        }
-        
-        let mut dp:HashMap<(usize,usize),i32> = HashMap::new();
-        num_distinct(&mut dp, s.as_bytes(), 0, t.as_bytes(), 0)
+        return dp[m][n];
     }
-}
-
-fn num_distinct(dp:&mut HashMap<(usize,usize),i32>, s: &[u8], i:usize, t: &[u8], j:usize) -> i32{
-    if dp.contains_key(&(i,j)){
-        return *dp.get(&(i,j)).unwrap();
-    } else if j == t.len(){
-        return 1;
-    } else if i == s.len(){
-        return 0;
-    }
-    
-    let mut count = 0;
-    for k in (i..s.len()){
-        if s[k] == t[j]{
-            count += num_distinct(dp, &s,k+1, &t,j+1);
-        }
-    }
-    dp.insert((i,j),count);
-    count
 }
