@@ -1,22 +1,12 @@
-use std::collections::HashMap;
+// minpath[row][col] = triangle[row][col] + min( minpath[row+1][col], minpath[row+1][col+1] );
+// bottom to top
 impl Solution {
     pub fn minimum_total(mut triangle: Vec<Vec<i32>>) -> i32 {
-        let sum = minimum_total(&mut triangle, 0, 0);
-        //println!("{:?}",triangle);
-        sum
+        for row in (0..triangle.len()-1).rev(){
+            for col in (0..triangle[row].len()){
+                triangle[row][col] += triangle[row+1][col].min(triangle[row+1][col+1])
+            }
+        }
+        triangle[0][0]
     }
-}
-
-fn minimum_total(triangle: &mut Vec<Vec<i32>>, row:usize, col:usize) -> i32{
-    if row == triangle.len()-1{
-        return triangle[row][col];
-    }
-    let mut sum=0;
-    if col == 0{
-        sum = triangle[row][col] + minimum_total(triangle, row+1,col).min(minimum_total(triangle, row+1,col+1));
-    } else {
-        sum = triangle[row][col] + triangle[row+1][col].min(minimum_total(triangle, row+1,col+1));
-    }
-    triangle[row][col] = sum;
-    sum    
 }
