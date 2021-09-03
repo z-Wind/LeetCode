@@ -1,16 +1,16 @@
+// C(n,k) => (x+1)^n
+// C(n,k) = C(n, k-1) * (n-(k-1)) / k
+use std::iter;
 impl Solution {
     pub fn get_row(row_index: i32) -> Vec<i32> {
-        match row_index{
-            0 => vec![1],
-            x => {
-                let mut ans = Self::get_row(x-1);
-                let mut temp:Vec<i32> = vec![1];
-                for w in ans.windows(2){
-                    temp.push(w[0]+w[1]);
-                }
-                temp.push(1);
-                temp
-            },
-        }
+        // for overflow
+        let row_index = row_index as usize;
+        
+        iter::once(1)
+            .chain((1..row_index+1).scan(1, |prev, i| {
+                *prev = (*prev as usize * (row_index - (i-1)) / i) as i32;
+                Some(*prev)
+            }))
+            .collect::<Vec<i32>>()
     }
 }
