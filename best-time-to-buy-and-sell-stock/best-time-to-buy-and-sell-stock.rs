@@ -10,15 +10,22 @@ fn max_profit(prices: &[i32]) -> i32 {
         return 0;
     }
     
+    let mut is_reverse = true;
     let mut profit = 0;
     let mut min_buy = (0,i32::MAX);
     let mut max_sell = (0, i32::MIN);
-    for (i,p) in prices.iter().enumerate(){
-        if &min_buy.1 > p{
-            min_buy = (i, *p);
-        } else if &max_sell.1 < p{
-            max_sell = (i, *p);
+    for i in (0..prices.len()){
+        if min_buy.1 > prices[i]{
+            min_buy = (i, prices[i]);
+        } else if max_sell.1 < prices[i]{
+            max_sell = (i, prices[i]);
         }
+        if i>0 && prices[i-1] < prices[i]{
+            is_reverse = false;
+        }
+    }
+    if is_reverse{
+        return 0;
     }
     match max_sell.0 > min_buy.0{
         true => profit = max_sell.1 - min_buy.1,
