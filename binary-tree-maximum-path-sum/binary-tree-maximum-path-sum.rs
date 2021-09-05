@@ -16,83 +16,24 @@
 //     }
 //   }
 // }
-use std::cell::RefCell;
 use std::rc::Rc;
-use std::cmp::max;
-
-#[derive(Debug)]
-struct Path{
-    seperate_max:i32, // only_left, only_right, left_to_right, only_root
-    link:i32, // link_left, link_right, with_only_root
-}
-
-impl Path{
-    fn new(val:i32) -> Self{
-        Path{
-            seperate_max:val,
-            link:val,
-        }
-    }
-    fn max(&self) -> i32{
-        self.seperate_max.max(self.link)
-    }
-    fn update_seperate_max(&mut self, val:i32){
-         self.seperate_max = self.seperate_max.max(val);
-    }
-}
-
+use std::cell::RefCell;
 impl Solution {
     pub fn max_path_sum(root: Option<Rc<RefCell<TreeNode>>>) -> i32 {
-        let path = max_path_sum(root);
-        // println!("root: {:?}", path);
-        path.max()
+        let mut answer = i32::MIN;
+        Solution::dfs(&root, &mut answer);
+        answer
     }
-}
 
-fn max_path_sum(root: Option<Rc<RefCell<TreeNode>>>) -> Path{    
-    let val = root.as_ref().unwrap().borrow().val;
-    let left = root.as_ref().unwrap().borrow().left.clone();
-    let right = root.as_ref().unwrap().borrow().right.clone();
-    
-    match (left, right){
-        (None, None) => {
-            Path::new(val)
-        },
-        (Some(x), None) | (None, Some(x)) => {
-            let mut path = max_path_sum(Some(Rc::clone(&x)));
-            // println!("{}: {:?}", val, path);
-            
-            // only_left, only_right
-            path.update_seperate_max(x.borrow().val); 
-            path.update_seperate_max(path.link); 
-            // only_root
-            path.update_seperate_max(val) ;
-            
-            // link_left, link_right, with_only_root
-            path.link = max(val, path.link+val);
-            
-            path
+    fn dfs(node: &Option<Rc<RefCell<TreeNode>>>, answer: &mut i32) -> i32 {
+        if let Some(n) = node {
+            let val = n.borrow().val;
+            let l = 0.max(Solution::dfs(&n.borrow().left, answer));
+            let r = 0.max(Solution::dfs(&n.borrow().right, answer));
+            *answer = (*answer).max(val + l + r);
+            val + l.max(r)
+        } else {
+            0
         }
-        (Some(l), Some(r)) => {
-            let mut left_path = max_path_sum(Some(l));
-            let mut right_path = max_path_sum(Some(r));
-            // println!("{}: left: {:?}", val, left_path);
-            // println!("{}:right: {:?}", val, right_path);
-            
-            // only_left, only_right
-            left_path.update_seperate_max(right_path.seperate_max); 
-            left_path.update_seperate_max(left_path.link); 
-            left_path.update_seperate_max(right_path.link); 
-            // only_root
-            left_path.update_seperate_max(val);
-            // left_to_right
-            left_path.update_seperate_max(left_path.link + val + right_path.link); 
-            
-            // link_left, link_right, with_only_root
-            let mut link = max(left_path.link+val,right_path.link+val);
-            left_path.link = max(link, val);
-            
-            left_path
-        },
-    }    
+    }
 }
