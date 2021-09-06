@@ -23,16 +23,19 @@ impl Solution {
                 }
                 // println!("seq:{:?}",seq);
                 let key = seq.last().unwrap();
-                for i in (0..word_list.len()).rev(){
+                for i in (0..word_list.len()){
+                    if word_list[i] == ""{
+                        continue;
+                    }
                     if is_single(key.as_bytes(), word_list[i].as_bytes()){
-                        let word = word_list.remove(i);
-                        if word == end_word{
+                        if word_list[i] == end_word{
                             return seq.len() as i32 + 1;
                         }
 
                         let mut tmp_s = seq.clone();
-                        tmp_s.push(word.clone());
+                        tmp_s.push(word_list[i].clone());
                         queue.push_back(tmp_s);
+                        word_list[i] = String::from("");
                     }
                 }
             }
