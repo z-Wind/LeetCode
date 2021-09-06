@@ -10,7 +10,6 @@ impl Solution {
         }
         
         'outer: loop{
-            let mut remove_i = vec![];
             let len = queue.len();
             if len == 0{
                 break;
@@ -24,24 +23,18 @@ impl Solution {
                 }
                 // println!("seq:{:?}",seq);
                 let key = seq.last().unwrap();
-                for i in (0..word_list.len()){
+                for i in (0..word_list.len()).rev(){
                     if is_single(key.as_bytes(), word_list[i].as_bytes()){
-                        if word_list[i] == end_word{
+                        let word = word_list.remove(i);
+                        if word == end_word{
                             return seq.len() as i32 + 1;
                         }
 
-                        remove_i.push(i);
                         let mut tmp_s = seq.clone();
-                        tmp_s.push(word_list[i].clone());
+                        tmp_s.push(word.clone());
                         queue.push_back(tmp_s);
                     }
                 }
-            }
-            
-            remove_i.sort();
-            remove_i.dedup();
-            for i in remove_i.into_iter().rev(){
-                word_list.remove(i);
             }
         }
         0
