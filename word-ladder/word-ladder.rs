@@ -1,36 +1,46 @@
-// https://leetcode.com/problems/word-ladder/discuss/40707/C%2B%2B-BFS
-use std::collections::VecDeque;
 use std::collections::HashSet;
-use std::iter::FromIterator;
+use std::collections::VecDeque;
 impl Solution {
-    pub fn ladder_length(begin_word: String, end_word: String, mut word_list: Vec<String>) -> i32 {
-        let begin_word = begin_word.as_bytes().to_vec();
-        let end_word = end_word.as_bytes().to_vec();
-        let mut dict:HashSet<Vec<u8>> = HashSet::from_iter(word_list.iter().map(|x| x.as_bytes().to_vec()));
-        let mut todo:VecDeque<Vec<u8>> = VecDeque::new();
-        todo.push_back(begin_word);
-        let mut ladder = 1;
-        while !todo.is_empty() {
-            let n = todo.len();
-            for i in (0..n){
-                let mut word = todo.pop_front().unwrap();
-                if (word == end_word) {
-                    return ladder;
-                }
-                dict.remove(&word);
-                for j in (0..word.len()) {
-                    let c = word[j];
-                    for k in (0..26 as u8){
-                        word[j] = b'a' + k;
-                        if dict.contains(&word) {
-                            todo.push_back(word.clone());
+    pub fn ladder_length(begin_word: String, end_word: String, word_list: Vec<String>) -> i32 {
+        let mut words = HashSet::new();
+
+        for word in word_list {
+            words.insert(word);
+        }
+        if !words.contains(&end_word) {
+            return 0;
+        }
+
+        let mut distance: i32 = 1;
+        let mut q = VecDeque::new();
+        q.push_back(begin_word.clone());
+        let mut reached = HashSet::new();
+        reached.insert(begin_word);
+        let letters = (b'a'..=b'z').map(char::from).collect::<Vec<_>>();
+        while q.len() > 0 {
+            let q_size = q.len();
+            for _i in 0..q_size {
+                let curr_word = q.pop_front().unwrap();
+                for j in 0..curr_word.len() {
+                    for k in &letters {
+                        let new_word = (&curr_word[0..j]).to_string() + &(k.to_string()) + &curr_word[j+1..];
+                        if new_word == end_word {
+                            return distance+1;
                         }
-                     }
-                    word[j] = c;
+
+                        if !words.contains(&new_word) || new_word == curr_word {
+                            continue;
+                        }
+
+                        if !reached.contains(&new_word) {
+                            q.push_back(new_word.clone());
+                            reached.insert(new_word);
+                        }
+                    }
                 }
             }
-            ladder+=1;
+            distance += 1;
         }
-        return 0;
+        0
     }
 }
