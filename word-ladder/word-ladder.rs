@@ -1,58 +1,36 @@
+// https://leetcode.com/problems/word-ladder/discuss/40707/C%2B%2B-BFS
 use std::collections::VecDeque;
+use std::collections::HashSet;
+use std::iter::FromIterator;
 impl Solution {
     pub fn ladder_length(begin_word: String, end_word: String, mut word_list: Vec<String>) -> i32 {
-        let mut ans:Vec<Vec<String>> = Vec::new();
-        let mut queue:VecDeque<Vec<String>> = VecDeque::new();
-        
-        match word_list.iter().position(|x| x == &begin_word){
-            None => queue.push_back(vec![begin_word]),
-            Some(i) => queue.push_back(vec![word_list.remove(i)]),
-        }
-        
-        'outer: loop{
-            let len = queue.len();
-            if len == 0{
-                break;
-            }
-            // println!("queue:{:?}", queue);
-            // println!("word_list:{:?}", word_list);
-            for _ in (0..len){
-                let mut seq = queue.pop_front().unwrap();
-                if !ans.is_empty() && seq.len() >= ans[0].len() {
-                    break 'outer;
+        let begin_word = begin_word.as_bytes().to_vec();
+        let end_word = end_word.as_bytes().to_vec();
+        let mut dict:HashSet<Vec<u8>> = HashSet::from_iter(word_list.iter().map(|x| x.as_bytes().to_vec()));
+        let mut todo:VecDeque<Vec<u8>> = VecDeque::new();
+        todo.push_back(begin_word);
+        let mut ladder = 1;
+        while !todo.is_empty() {
+            let n = todo.len();
+            for i in (0..n){
+                let mut word = todo.pop_front().unwrap();
+                if (word == end_word) {
+                    return ladder;
                 }
-                // println!("seq:{:?}",seq);
-                let key = seq.last().unwrap();
-                for i in (0..word_list.len()){
-                    if word_list[i] == ""{
-                        continue;
-                    }
-                    if is_single(key.as_bytes(), word_list[i].as_bytes()){
-                        if word_list[i] == end_word{
-                            return seq.len() as i32 + 1;
+                dict.remove(&word);
+                for j in (0..word.len()) {
+                    let c = word[j];
+                    for k in (0..26 as u8){
+                        word[j] = b'a' + k;
+                        if dict.contains(&word) {
+                            todo.push_back(word.clone());
                         }
-
-                        let mut tmp_s = seq.clone();
-                        tmp_s.push(word_list[i].clone());
-                        queue.push_back(tmp_s);
-                        word_list[i] = String::from("");
-                    }
+                     }
+                    word[j] = c;
                 }
             }
+            ladder+=1;
         }
-        0
+        return 0;
     }
-}
-
-fn is_single(s1:&[u8], s2:&[u8]) -> bool{
-    let mut count = 0;
-    for i in (0..s1.len()){
-        if s1[i] != s2[i]{
-            count += 1;
-        }
-        if count > 1{
-            return false;
-        }
-    }
-    count == 1
 }
