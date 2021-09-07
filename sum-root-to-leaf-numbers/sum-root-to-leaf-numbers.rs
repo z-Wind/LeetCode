@@ -30,13 +30,13 @@ fn sum_numbers(root: Option<Rc<RefCell<TreeNode>>>, sum:i32) -> i32 {
     let right = root.as_ref().unwrap().borrow_mut().right.take();
     match (left,right){
         (None,None) => sum*10+val,
-        (Some(x),None) | (None,Some(x)) => {
+        (x,None) | (None,x) => {
             let s = sum*10+val;
-            sum_numbers(Some(x), s)
+            sum_numbers(x, s)
         },
-        (Some(l), Some(r)) => {
+        (l, r) => {
             let s = sum*10+val;
-            sum_numbers(Some(l), s) + sum_numbers(Some(r), s)
+            sum_numbers(l, s) + sum_numbers(r, s)
         },
     }
 }
