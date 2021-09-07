@@ -20,14 +20,14 @@ use std::rc::Rc;
 use std::cell::RefCell;
 impl Solution {
     pub fn sum_numbers(root: Option<Rc<RefCell<TreeNode>>>) -> i32 {
-        sum_numbers(root, 0)
+        sum_numbers(&root, 0)
     }
 }
 
-fn sum_numbers(root: Option<Rc<RefCell<TreeNode>>>, sum:i32) -> i32 {
+fn sum_numbers(root: &Option<Rc<RefCell<TreeNode>>>, sum:i32) -> i32 {
     let val = root.as_ref().unwrap().borrow().val;
-    let left = root.as_ref().unwrap().borrow_mut().left.take();
-    let right = root.as_ref().unwrap().borrow_mut().right.take();
+    let left = &root.as_ref().unwrap().borrow_mut().left.take();
+    let right = &root.as_ref().unwrap().borrow_mut().right.take();
     match (left,right){
         (None,None) => sum*10+val,
         (x,None) | (None,x) => {
