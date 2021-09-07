@@ -20,36 +20,23 @@ use std::rc::Rc;
 use std::cell::RefCell;
 impl Solution {
     pub fn sum_numbers(root: Option<Rc<RefCell<TreeNode>>>) -> i32 {
-        let (_,sum) = sum_numbers(root);
-        sum
+        sum_numbers(root, 0)
     }
 }
 
-fn sum_numbers(root: Option<Rc<RefCell<TreeNode>>>) -> (Vec<i32>, i32) {
+fn sum_numbers(root: Option<Rc<RefCell<TreeNode>>>, sum:i32) -> i32 {
     let val = root.as_ref().unwrap().borrow().val;
     let left = root.as_ref().unwrap().borrow().left.clone();
     let right = root.as_ref().unwrap().borrow().right.clone();
     match (left,right){
-        (None,None) => (vec![0],val),
+        (None,None) => sum*10+val,
         (Some(x),None) | (None,Some(x)) => {
-            let (mut layers, mut sum) = sum_numbers(Some(x));
-            for layer in layers.iter_mut(){
-                sum += val * 10_i32.pow((*layer+1) as u32);
-                *layer += 1
-            }           
-            (layers, sum)
+            let s = sum*10+val;
+            sum_numbers(Some(x), s)
         },
         (Some(l), Some(r)) => {
-            let (mut layer_l, sum_l) = sum_numbers(Some(l));
-            let (mut layer_r, sum_r) = sum_numbers(Some(r));
-            layer_l.append(&mut layer_r);
-            let mut layers = layer_l;
-            let mut sum = sum_l+sum_r;
-            for layer in layers.iter_mut(){
-                sum += val * 10_i32.pow((*layer+1) as u32);
-                *layer += 1
-            }           
-            (layers, sum)
+            let s = sum*10+val;
+            sum_numbers(Some(l), s) + sum_numbers(Some(r), s)
         },
     }
 }
