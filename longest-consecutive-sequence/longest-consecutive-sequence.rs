@@ -11,25 +11,16 @@ impl Solution {
         }
         // println!("{:?}", set);
         let mut max_count = 1;
-        while !set.is_empty(){
-            let mut count = 1;
-            let num = set.iter().next().unwrap().clone();
-            set.remove(&num);
-            
-            let mut num_add = num + 1;
-            while let Some(_) = set.take(&num_add){
-                count+=1;
-                num_add+=1;
+        for num in set.iter() {
+            if !set.contains(&(num-1)){
+                let mut cur_num = *num;
+                let mut count = 1;
+                while set.contains(&(cur_num+1)){
+                    cur_num += 1;
+                    count += 1;
+                }
+                max_count = max_count.max(count);
             }
-            
-            let mut num_sub = num - 1;
-            while let Some(_) = set.take(&num_sub){
-                count+=1;
-                num_sub-=1;
-            }
-            
-            max_count = max_count.max(count);
-            // println!("{}: {:?}",num, set);
         }
         max_count
     }
