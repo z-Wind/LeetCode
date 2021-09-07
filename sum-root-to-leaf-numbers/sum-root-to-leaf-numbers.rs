@@ -26,8 +26,8 @@ impl Solution {
 
 fn sum_numbers(root: Option<Rc<RefCell<TreeNode>>>, sum:i32) -> i32 {
     let val = root.as_ref().unwrap().borrow().val;
-    let left = root.as_ref().unwrap().borrow().left.clone();
-    let right = root.as_ref().unwrap().borrow().right.clone();
+    let left = root.as_ref().unwrap().borrow_mut().left.take();
+    let right = root.as_ref().unwrap().borrow_mut().right.take();
     match (left,right){
         (None,None) => sum*10+val,
         (Some(x),None) | (None,Some(x)) => {
