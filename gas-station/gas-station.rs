@@ -11,21 +11,23 @@
 // => any station between A and B that A can reach cannot reach B
 impl Solution {
     pub fn can_complete_circuit(gas: Vec<i32>, cost: Vec<i32>) -> i32 {
-        let mut n = 0;       
-        let mut rest = 0;
-        for i in (0..gas.len()*2){
-            let i = i % gas.len();
-            rest += gas[i]-cost[i];
-            if rest < 0{
-                rest = 0;
-                n = 0;
-            } else {
-                n += 1;
-                if n == gas.len(){
-                    return ((i+1) % gas.len()) as i32;
-                }
+        let mut sumGas = 0;
+        let mut sumCost = 0;
+        let mut start = 0;
+        let mut tank = 0;
+        for i in (0..gas.len()) {
+            sumGas += gas[i];
+            sumCost += cost[i];
+            tank += gas[i] - cost[i];
+            if (tank < 0) {
+                start = i + 1;
+                tank = 0;
             }
         }
-        -1
+        if (sumGas < sumCost) {
+            return -1;
+        } else {
+            return start as i32;
+        }
     }
 }
