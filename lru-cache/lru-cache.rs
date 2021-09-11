@@ -1,9 +1,10 @@
 use std::collections::HashMap;
-use std::collections::VecDeque;
+use std::collections::BTreeMap;
 struct LRUCache {
     map: HashMap<i32,i32>,
     capacity: usize,
-    time_order: HashMap<i32,usize>,
+    key_to_time: HashMap<i32,usize>,
+    time_to_key: BTreeMap<usize,i32>,
     time: usize,
 }
 
@@ -19,7 +20,8 @@ impl LRUCache {
         LRUCache{
             map: HashMap::with_capacity(capacity),
             capacity,
-            time_order: HashMap::with_capacity(capacity),
+            key_to_time: HashMap::with_capacity(capacity),
+            time_to_key: BTreeMap::new(),
             time: 0,
         }
     }
@@ -28,7 +30,11 @@ impl LRUCache {
         match self.map.get(&key){
             None => -1,
             Some(&val) => {
-                self.time_order.insert(key, self.time);
+                let time = self.key_to_time.get(&key).unwrap();
+                self.time_to_key.remove(time);
+                
+                self.key_to_time.insert(key, self.time);
+                self.time_to_key.insert(self.time, key);
                 self.time+=1;
                 val
             },
@@ -37,21 +43,27 @@ impl LRUCache {
     
     fn put(&mut self, key: i32, value: i32) {
         self.map.insert(key,value);
+        
         if self.map.len() > self.capacity{
-            let mut old_time = usize::MAX;
-            let mut remove_key = 0;
-            for (key, &time) in self.time_order.iter(){
-                if time < old_time{
-                    old_time = time;
-                    remove_key = *key;
-                }
+            let remove_key = self.time_to_key.values().next().unwrap();
+            self.map.remove(remove_key);
+            
+            let time = self.key_to_time.get(remove_key).unwrap().clone();
+            self.key_to_time.remove(remove_key);
+            self.time_to_key.remove(&time);
+        } else {
+            match self.key_to_time.get(&key){
+                None => (),
+                Some(time) => {
+                    self.time_to_key.remove(time);
+                },
             }
-            self.map.remove(&remove_key);
-            self.time_order.remove(&remove_key);
         }
-        self.time_order.insert(key, self.time);
+        
+        self.key_to_time.insert(key, self.time);
+        self.time_to_key.insert(self.time, key);
         self.time+=1;
-        // println!("{:?} {:?}",self.map, self.time_order);
+        // println!("{:?} {:?} {:?}",self.map, self.key_to_time, self.time_to_key);
     }
 }
 
