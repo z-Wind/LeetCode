@@ -28,7 +28,7 @@ impl LRUCache {
             Some(&val) => {
                 let i = self.deque.iter().position(|&x| x == key).unwrap();
                 self.deque.remove(i);
-                self.deque.push_back(key);
+                self.deque.push_front(key);
                 val
             },
         }
@@ -38,7 +38,7 @@ impl LRUCache {
         match self.map.get(&key){
             None => {
                 if self.map.len() == self.capacity{
-                    let remove_key = self.deque.pop_front().unwrap();
+                    let remove_key = self.deque.pop_back().unwrap();
                     self.map.remove(&remove_key);
                 }
             },
@@ -47,7 +47,7 @@ impl LRUCache {
                 self.deque.remove(i);
             },
         }
-        self.deque.push_back(key);
+        self.deque.push_front(key);
         self.map.insert(key,value);
     }
 }
