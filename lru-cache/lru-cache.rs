@@ -1,11 +1,9 @@
 use std::collections::HashMap;
-use std::collections::BTreeMap;
+use std::collections::VecDeque;
 struct LRUCache {
     map: HashMap<i32,i32>,
     capacity: usize,
-    key_to_time: HashMap<i32,usize>,
-    time_to_key: BTreeMap<usize,i32>,
-    time: usize,
+    deque: VecDeque<i32>,
 }
 
 
@@ -20,9 +18,7 @@ impl LRUCache {
         LRUCache{
             map: HashMap::with_capacity(capacity),
             capacity,
-            key_to_time: HashMap::with_capacity(capacity),
-            time_to_key: BTreeMap::new(),
-            time: 0,
+            deque: VecDeque::with_capacity(capacity),
         }
     }
     
@@ -30,40 +26,29 @@ impl LRUCache {
         match self.map.get(&key){
             None => -1,
             Some(&val) => {
-                let time = self.key_to_time.get(&key).unwrap();
-                self.time_to_key.remove(time);
-                
-                self.key_to_time.insert(key, self.time);
-                self.time_to_key.insert(self.time, key);
-                self.time+=1;
+                let i = self.deque.iter().position(|&x| x == key).unwrap();
+                self.deque.remove(i);
+                self.deque.push_back(key);
                 val
             },
         }
     }
     
     fn put(&mut self, key: i32, value: i32) {
-        self.map.insert(key,value);
-        
-        if self.map.len() > self.capacity{
-            let remove_key = self.time_to_key.values().next().unwrap();
-            self.map.remove(remove_key);
-            
-            let time = self.key_to_time.get(remove_key).unwrap().clone();
-            self.key_to_time.remove(remove_key);
-            self.time_to_key.remove(&time);
-        } else {
-            match self.key_to_time.get(&key){
-                None => (),
-                Some(time) => {
-                    self.time_to_key.remove(time);
-                },
-            }
+        match self.map.get(&key){
+            None => {
+                if self.map.len() == self.capacity{
+                    let remove_key = self.deque.pop_front().unwrap();
+                    self.map.remove(&remove_key);
+                }
+            },
+            Some(_) => {
+                let i = self.deque.iter().position(|&x| x == key).unwrap();
+                self.deque.remove(i);
+            },
         }
-        
-        self.key_to_time.insert(key, self.time);
-        self.time_to_key.insert(self.time, key);
-        self.time+=1;
-        // println!("{:?} {:?} {:?}",self.map, self.key_to_time, self.time_to_key);
+        self.deque.push_back(key);
+        self.map.insert(key,value);
     }
 }
 
