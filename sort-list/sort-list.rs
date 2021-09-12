@@ -20,11 +20,17 @@ impl Solution {
         
         let mut h = head;
         while h.is_some(){
+            let val = h.as_ref().unwrap().val;
             let next = h.as_mut().unwrap().next.take();            
-            v.push(h);            
+            let mut i = 0;
+            while i<v.len() && v[i].as_ref().unwrap().val < val{
+                i+=1;
+            }
+            v.insert(i,h);
+            
             h = next;
         }
-        v.sort_unstable_by(|a, b| a.as_ref().unwrap().val.cmp( &b.as_ref().unwrap().val));
+        
         let mut new_h = Some(Box::new(ListNode::new(0)));
         let mut h = &mut new_h;
         for node in v{
