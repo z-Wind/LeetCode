@@ -17,35 +17,27 @@
 use std::mem::swap;
 impl Solution {
     pub fn insertion_sort_list(head: Option<Box<ListNode>>) -> Option<Box<ListNode>> {
-        let mut new_h = Some(Box::new(ListNode::new(i32::MIN)));
+        let mut v:Vec<Option<Box<ListNode>>> = Vec::new();
         
         let mut h = head;
         while h.is_some(){
-            let next = h.as_mut().unwrap().next.take();
-            let i_val = h.as_ref().unwrap().val;
-            let mut node:&mut Option<Box<ListNode>> = &mut new_h;
-            let mut next_node:Option<Box<ListNode>>;
-            loop {
-                if node.as_mut().unwrap().next.is_none(){
-                    node.as_mut().unwrap().next = h;
-                    break;
-                }
-                
-                next_node = node.as_mut().unwrap().next.take();
-                let val = node.as_ref().unwrap().val;
-                let next_val = next_node.as_ref().unwrap().val;
-                if val <= i_val && i_val <= next_val{
-                    h.as_mut().unwrap().next = next_node;        
-                    node.as_mut().unwrap().next = h;
-                    break;
-                }
-                node.as_mut().unwrap().next = next_node;
-                node = &mut node.as_mut().unwrap().next;
+            let val = h.as_ref().unwrap().val;
+            let next = h.as_mut().unwrap().next.take();            
+            let mut i = 0;
+            while i<v.len() && v[i].as_ref().unwrap().val < val{
+                i+=1;
             }
+            v.insert(i,h);
             
             h = next;
         }
         
+        let mut new_h = Some(Box::new(ListNode::new(0)));
+        let mut h = &mut new_h;
+        for node in v{
+            h.as_mut().unwrap().next = node;
+            h = &mut h.as_mut().unwrap().next;
+        }
         new_h.as_mut().unwrap().next.take()
     }
 }
