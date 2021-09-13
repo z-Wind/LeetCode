@@ -12,7 +12,6 @@ impl Solution {
         if points.len() == 1{
             return 1;
         }
-        let mut max_p = i32::MIN;
         let mut line_map:HashMap<Line,HashSet<Vec<i32>>> = HashMap::new();
         for i in (0..points.len()){
             for j in (i+1..points.len()){
@@ -34,9 +33,8 @@ impl Solution {
                 let mut entry = line_map.entry(line).or_insert(HashSet::new());
                 entry.insert(points[i].clone());
                 entry.insert(points[j].clone());
-                max_p = max_p.max(entry.len() as i32);
             }
         }
-        max_p
+        line_map.values().max_by(|x, y| x.len().cmp(&y.len())).unwrap().len() as i32
     }
 }
