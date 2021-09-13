@@ -1,40 +1,40 @@
+//https://leetcode.com/problems/max-points-on-a-line/discuss/47113/A-java-solution-with-notes
 use std::collections::HashMap;
-use std::collections::HashSet;
-#[derive(PartialEq, PartialOrd, Eq, Clone, Hash, Debug)]
-enum Rate{
-    Vertical,
-    Val(u32),
-}
-#[derive(PartialEq, PartialOrd, Eq, Clone, Hash, Debug)]
-struct Line(Rate, u32);
 impl Solution {
     pub fn max_points(points: Vec<Vec<i32>>) -> i32 {
-        if points.len() == 1{
-            return 1;
-        }
-        let mut line_map:HashMap<Line,HashSet<Vec<i32>>> = HashMap::new();
-        for i in (0..points.len()){
+        if (points.is_empty()) { return 0 };
+        if (points.len()<=2) { return points.len() as i32 };
+        
+        let mut map = HashMap::new();
+        let mut result=0;
+        for i in (0..points.len()){ 
+            map.clear();
+            let mut overlap=0;
+            let mut max=0;
             for j in (i+1..points.len()){
-                let rate = match (points[i][0] - points[j][0]){
-                    0 => Rate::Vertical,
-                    x => Rate::Val(((points[i][1] - points[j][1]) as f32/x as f32).to_bits()),
-                };
-                let offset = match rate{
-                    Rate::Vertical => (points[i][0] as f32).to_bits(),
-                    Rate::Val(x) => {
-                        // y = ax + b
-                        let a = f32::from_bits(x);
-                        let b = points[i][1] as f32 - a*points[i][0] as f32;
-                        b.to_bits()
-                    }
-                };
-                let line = Line(rate,offset);
-                // println!("{:?},{:?} => {:?}",points[i],points[j],line);
-                let mut entry = line_map.entry(line).or_insert(HashSet::new());
-                entry.insert(points[i].clone());
-                entry.insert(points[j].clone());
+                let mut x=points[j][0]-points[i][0];
+                let mut y=points[j][1]-points[i][1];
+                if (x==0 && y==0){
+                    overlap+=1;
+                    continue;
+                }
+                let gcd=generateGCD(x,y);
+                if (gcd!=0){
+                    x/=gcd;
+                    y/=gcd;
+                }
+                
+                let entry = map.entry((x,y)).or_insert(0);
+                *entry += 1;
+                max=max.max(*entry);
             }
+            result=result.max(max+overlap+1);
         }
-        line_map.values().max_by(|x, y| x.len().cmp(&y.len())).unwrap().len() as i32
+        result
     }
+}
+
+fn generateGCD(a:i32,b:i32) -> i32{
+    if (b==0) {a}
+    else {generateGCD(b,a%b)}
 }
