@@ -9,8 +9,9 @@ impl Solution {
         
         let mut start = 0;
         let mut end = len-1;
+        let mut mid;
         while end > start{
-            let mid = (start+end)/2;
+            mid = (start+end)/2;
             if nums[mid+1] > nums[mid]{
                 start = mid+1;
             } else {
