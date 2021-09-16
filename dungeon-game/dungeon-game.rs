@@ -16,8 +16,8 @@ impl Solution {
         
         for i in (1..m){
             for j in (1..n){
-                let from_left = update(&dp[i-1][j], dungeon[i][j]);
-                let from_up = update(&dp[i][j-1], dungeon[i][j]);
+                let from_up = update(&dp[i-1][j], dungeon[i][j]);
+                let from_left = update(&dp[i][j-1], dungeon[i][j]);
                 dp[i][j] = compare(from_left, from_up);
             }
         }
