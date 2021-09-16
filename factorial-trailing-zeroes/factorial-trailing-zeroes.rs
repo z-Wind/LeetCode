@@ -1,12 +1,9 @@
+// get divisor 2 & 5, 5 is rare, so only count 5
 impl Solution {
-    pub fn trailing_zeroes(n: i32) -> i32 {
-        let mut count = 0;
-        for mut num in (1..=n){
-            while num%5 == 0{
-                count+=1;
-                num/=5;
-            }
+    pub fn trailing_zeroes(mut n: i32) -> i32 {
+        if n < 5{
+            return 0;
         }
-        count
+        n/5 + Self::trailing_zeroes(n/5)
     }
 }
