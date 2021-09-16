@@ -1,29 +1,37 @@
 // dp[i][j] = max(dungeon[i][j] + dp[i-1][j], dungeon[i][j] + dp[i][j-1])
-use std::cmp::{min,max};
+//
+//               dp[i-1][j]
+//  dp[i][j-1]   dp[i][j]
+//
+//               dp[j]
+//  dp[j-1]      dp[j](update)
+//
 impl Solution {
     pub fn calculate_minimum_hp(dungeon: Vec<Vec<i32>>) -> i32 {
         let m = dungeon.len();
         let n = dungeon[0].len();
-        let mut dp = vec![vec![vec![(i32::MAX,0_i32)];n];m];
+        let mut dp = vec![vec![(i32::MAX,0_i32)];n];
         
-        dp[0][0] = update(&dp[0][0], dungeon[0][0]);
-        for i in (1..m){
-            dp[i][0] = update(&dp[i-1][0], dungeon[i][0]);
-        }
+        dp[0] = update(&dp[0], dungeon[0][0]);
         for j in (1..n){
-            dp[0][j] = update(&dp[0][j-1], dungeon[0][j]);
+            dp[j] = update(&dp[j-1], dungeon[0][j]);
         }
         
         for i in (1..m){
-            for j in (1..n){
-                let from_up = update(&dp[i-1][j], dungeon[i][j]);
-                let from_left = update(&dp[i][j-1], dungeon[i][j]);
-                dp[i][j] = compare(from_left, from_up);
+            // println!("{:?}", dp);
+            for j in (0..n){
+                if j == 0{
+                    dp[0] = update(&dp[0], dungeon[i][0]);
+                    continue;
+                }
+                let from_up = update(&dp[j], dungeon[i][j]);
+                let from_left = update(&dp[j-1], dungeon[i][j]);
+                dp[j] = compare(from_left, from_up);
             }
         }
         
         // println!("{:?}", dp);
-        let ans = dp[m-1][n-1].iter().max_by_key(|x| x.0).unwrap();
+        let ans = dp[n-1].iter().max_by_key(|x| x.0).unwrap();
         if ans.0 >= 0{
             return 1;
         } else {
@@ -32,7 +40,6 @@ impl Solution {
     }
 }
 
-//
 fn compare(mut a:Vec<(i32,i32)>, mut b:Vec<(i32,i32)>) -> Vec<(i32,i32)>{
     let mut result = a;
     for v in b{
