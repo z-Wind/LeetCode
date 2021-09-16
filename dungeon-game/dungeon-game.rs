@@ -19,11 +19,8 @@ impl Solution {
         
         for i in (1..m){
             // println!("{:?}", dp);
-            for j in (0..n){
-                if j == 0{
-                    dp[0] = update(&dp[0], dungeon[i][0]);
-                    continue;
-                }
+            dp[0] = update(&dp[0], dungeon[i][0]);
+            for j in (1..n){
                 let from_up = update(&dp[j], dungeon[i][j]);
                 let from_left = update(&dp[j-1], dungeon[i][j]);
                 dp[j] = compare(from_left, from_up);
@@ -51,7 +48,7 @@ fn compare(mut a:Vec<(i32,i32)>, mut b:Vec<(i32,i32)>) -> Vec<(i32,i32)>{
             } else if v.0 < result[i].0 && v.1 > result[i].1 ||
                       v.0 > result[i].0 && v.1 < result[i].1{
                 push = true;
-            } else if v.0 <= result[i].0 && v.1 <= result[i].1 {
+            } else {//if v.0 <= result[i].0 && v.1 <= result[i].1 {
                 push = false;
                 break;
             }
