@@ -4,36 +4,14 @@ impl Solution {
         let mut nums = nums.iter()
                         .map(|num| num.to_string())
                         .collect::<Vec<String>>();
-        nums.sort_unstable_by(|a, b| cmp(a.as_bytes(), b.as_bytes()).reverse());
-        let s = nums.join("").trim_start_matches('0').to_string();
-        if &s == ""{
+        nums.sort_unstable_by(|a, b| cmp(a, b).reverse());
+        if nums[0] == "0"{
             return String::from("0");
         }
-        s
+        nums.join("").trim_start_matches('0').to_string()
     }
 }
 
-fn cmp(a:&[u8], b:&[u8]) -> Ordering{
-    // println!("{},{}", String::from_utf8(a.to_vec()).unwrap(), String::from_utf8(b.to_vec()).unwrap());
-    let mut a_iter = a.iter();
-    let mut b_iter = b.iter();
-    let mut i = 0;
-    loop{
-        match (a_iter.next(), b_iter.next()){
-            (None, None) => return Ordering::Equal,
-            (Some(a), Some(b)) => {
-                match a.cmp(b){
-                    Ordering::Equal => (),
-                    x => return x,
-                }
-            },
-            (Some(x), None) => {
-                return cmp(&a[i..],b);
-            },
-            (None, Some(x)) => {
-                return cmp(a,&b[i..]);
-            },
-        }
-        i+=1;
-    }
+fn cmp(a:&str, b:&str) -> Ordering{
+    (a.to_owned()+b).cmp(&(b.to_owned()+a))
 }
