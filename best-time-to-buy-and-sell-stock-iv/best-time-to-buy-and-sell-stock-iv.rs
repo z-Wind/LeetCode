@@ -4,20 +4,18 @@
 
 impl Solution {
     pub fn max_profit(k: i32, prices: Vec<i32>) -> i32 {
-        max_profit(k as usize, prices)
-    }
-}
-
-fn max_profit(k_n: usize, prices: Vec<i32>) -> i32 {
-    if (prices.len() == 0) { return 0 };
-    let mut dp = vec![0;k_n+1];
-    let mut min = vec![prices[0];k_n+1];
-    for i in (1..prices.len()) {
-        for k in (1..=k_n) {
-            min[k] = min[k].min(prices[i] - dp[k-1]);
-            dp[k] = dp[k].max(prices[i] - min[k]);
+        if (prices.len() == 0) { return 0 };
+        
+        let mut k_n = k as usize;
+        let mut dp = vec![0;k_n+1];
+        let mut min = vec![prices[0];k_n+1];
+        for i in (1..prices.len()) {
+            for k in (1..=k_n) {
+                min[k] = min[k].min(prices[i] - dp[k-1]);
+                dp[k] = dp[k].max(prices[i] - min[k]);
+            }
         }
-    }
 
-    return dp[k_n];
+        return dp[k_n];
+    }
 }
