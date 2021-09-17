@@ -1,5 +1,4 @@
-// dp[i] = nums[i] + max(dp[i+2] + dp[i+3])
-
+// dp[i] = nums[i] + max(dp[i+2], dp[i+3])
 use std::cmp::max;
 impl Solution {
     pub fn rob(nums: Vec<i32>) -> i32 {
