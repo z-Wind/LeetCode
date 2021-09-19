@@ -6,7 +6,7 @@ impl Solution {
         for i in (2..n) {
             if !is_prime[i] {
                 count+=1;
-                for j in (2..).take_while(|j| i*j<n) {
+                for j in (i..).take_while(|j| i*j<n) {
                     is_prime[i*j] = true;
                 }
             }
