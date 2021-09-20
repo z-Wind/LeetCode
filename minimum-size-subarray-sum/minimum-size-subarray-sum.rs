@@ -4,19 +4,14 @@ impl Solution {
         let mut right:usize = 0;
         let mut sum = 0;
         let mut min_len = i32::MAX;
-        while left < nums.len(){
-            if right < nums.len() && sum < target{
-                sum+=nums[right];
-                right+=1;
-            } else if sum >= target{
-                let len = (right-left) as i32;
-                min_len = min_len.min(len);
-                sum-=nums[left];
-                left+=1;
-            } else {
-                break;
+        while right < nums.len(){
+            sum += nums[right];
+            right += 1;
+            while sum >= target{
+                min_len = min_len.min((right-left) as i32);
+                sum -= nums[left];
+                left += 1;
             }
-            // println!("{:?} {} => {}",&nums[left..right],sum,min_len);
         }
         if min_len == i32::MAX{
             return 0;
