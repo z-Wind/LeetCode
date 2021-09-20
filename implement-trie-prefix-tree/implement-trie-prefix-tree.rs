@@ -33,13 +33,8 @@ impl Trie {
     /** Inserts a word into the trie. */
     fn insert(&mut self, word: String) {
         let mut children = &mut self.prefix_tree.children;
-        for c in word.chars(){
-            let i = (c as u8 - b'a') as usize;
-            match children[i]{
-                None => children[i] = Some(Box::new(Node::new())),
-                Some(_) => (),
-            }
-            children = &mut children[i].as_mut().unwrap().children;
+        for i in word.bytes().map(|c| ((c - b'a') as usize) as usize){
+            children = &mut children[i].get_or_insert(Box::new(Node::new())).children;
         }
         // println!("{:?}", self.prefix_tree);
         self.set.insert(word);
@@ -53,8 +48,7 @@ impl Trie {
     /** Returns if there is any word in the trie that starts with the given prefix. */
     fn starts_with(&self, prefix: String) -> bool {
         let mut children = &self.prefix_tree.children;
-        for c in prefix.chars(){
-            let i = (c as u8 - b'a') as usize;
+        for i in prefix.bytes().map(|c| ((c - b'a') as usize) as usize){
             match &children[i]{
                 None => return false,
                 Some(node) => children = &node.children,
