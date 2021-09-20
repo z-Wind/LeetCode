@@ -1,20 +1,15 @@
-use std::collections::HashMap;
 use std::collections::HashSet;
-#[derive(Debug)]
+#[derive(Debug, Default)]
 struct Node {
-    val: char,
-    children: HashMap::<char,Box<Node>>,
+    children: [Option<Box<Node>>;26],
 }
 impl Node{
-    fn new(val:char) -> Self{
-        Node{
-            val,
-            children:HashMap::new(),
-        }    
+    fn new() -> Self{        
+        Default::default()
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 struct Trie {
     prefix_tree: Box<Node>,
     set: HashSet<String>
@@ -30,7 +25,7 @@ impl Trie {
     /** Initialize your data structure here. */
     fn new() -> Self {
         Trie{
-            prefix_tree:Box::new(Node::new('0')),
+            prefix_tree:Box::new(Node::new()),
             set:HashSet::new(),
         }
     }
@@ -39,8 +34,12 @@ impl Trie {
     fn insert(&mut self, word: String) {
         let mut children = &mut self.prefix_tree.children;
         for c in word.chars(){
-            let entry = children.entry(c).or_insert(Box::new(Node::new(c)));
-            children = &mut entry.children;
+            let i = (c as u8 - b'a') as usize;
+            match children[i]{
+                None => children[i] = Some(Box::new(Node::new())),
+                Some(_) => (),
+            }
+            children = &mut children[i].as_mut().unwrap().children;
         }
         // println!("{:?}", self.prefix_tree);
         self.set.insert(word);
@@ -55,7 +54,8 @@ impl Trie {
     fn starts_with(&self, prefix: String) -> bool {
         let mut children = &self.prefix_tree.children;
         for c in prefix.chars(){
-            match children.get(&c){
+            let i = (c as u8 - b'a') as usize;
+            match &children[i]{
                 None => return false,
                 Some(node) => children = &node.children,
             }
