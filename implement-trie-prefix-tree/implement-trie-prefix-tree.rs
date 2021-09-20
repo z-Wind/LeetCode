@@ -1,18 +1,7 @@
-use std::collections::HashSet;
-#[derive(Debug, Default)]
-struct Node {
-    children: [Option<Box<Node>>;26],
-}
-impl Node{
-    fn new() -> Self{        
-        Default::default()
-    }
-}
-
 #[derive(Debug, Default)]
 struct Trie {
-    prefix_tree: Box<Node>,
-    set: HashSet<String>
+    is_end: bool,
+    children: [Option<Box<Trie>>;26],
 }
 
 
@@ -24,34 +13,37 @@ impl Trie {
 
     /** Initialize your data structure here. */
     fn new() -> Self {
-        Trie{
-            prefix_tree:Box::new(Node::new()),
-            set:HashSet::new(),
-        }
+        Default::default()
     }
     
     /** Inserts a word into the trie. */
     fn insert(&mut self, word: String) {
-        let mut children = &mut self.prefix_tree.children;
+        let mut curr = self;
         for i in word.bytes().map(|c| ((c - b'a') as usize) as usize){
-            children = &mut children[i].get_or_insert(Box::new(Node::new())).children;
+            curr = curr.children[i].get_or_insert(Box::new(Trie::new()));
         }
-        // println!("{:?}", self.prefix_tree);
-        self.set.insert(word);
+        curr.is_end = true;
     }
     
     /** Returns if the word is in the trie. */
     fn search(&self, word: String) -> bool {
-        self.set.contains(&word)
+        let mut curr = self;
+        for i in word.bytes().map(|c| ((c - b'a') as usize) as usize){
+            match &curr.children[i]{
+                None => return false,
+                Some(node) => curr = node,
+            }
+        }
+        curr.is_end
     }
     
     /** Returns if there is any word in the trie that starts with the given prefix. */
     fn starts_with(&self, prefix: String) -> bool {
-        let mut children = &self.prefix_tree.children;
+        let mut curr = self;
         for i in prefix.bytes().map(|c| ((c - b'a') as usize) as usize){
-            match &children[i]{
+            match &curr.children[i]{
                 None => return false,
-                Some(node) => children = &node.children,
+                Some(node) => curr = node,
             }
         }
         true
