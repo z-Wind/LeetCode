@@ -24,18 +24,16 @@ impl WordDictionary {
         curr.is_end = true;
     }
     
-    fn search(&self, word: String) -> bool {
-        let word = word.as_bytes();
+    fn search_str(&self, word: &str) -> bool {
         let mut curr = self;
-        for (i,c) in word.iter().enumerate(){
+        for (i,c) in word.bytes().enumerate(){
             match c{
                 b'.'=> {
                     for node in curr.children.iter() {
                         if node.is_none(){
                             continue;
                         }
-                        let new_word = String::from_utf8(word[i+1..].to_vec()).unwrap();
-                        if Self::search(node.as_ref().unwrap(), new_word){
+                        if Self::search_str(node.as_ref().unwrap(), &word[i+1..]){
                             return true;
                         }
                     }
@@ -52,6 +50,10 @@ impl WordDictionary {
             }
         }
         curr.is_end
+    }
+    
+    fn search(&self, word: String) -> bool {
+        self.search_str(&word)
     }
 }
 
