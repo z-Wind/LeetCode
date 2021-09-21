@@ -19,7 +19,7 @@ impl Trie {
     /** Inserts a word into the trie. */
     fn insert(&mut self, word: String) {
         let mut curr = self;
-        for i in word.bytes().map(|c| ((c - b'a') as usize) as usize){
+        for i in word.bytes().map(|c| (c - b'a') as usize){
             curr = curr.children[i].get_or_insert(Box::new(Trie::new()));
         }
         curr.is_end = true;
@@ -28,7 +28,7 @@ impl Trie {
     /** Returns if the word is in the trie. */
     fn search(&self, word: String) -> bool {
         let mut curr = self;
-        for i in word.bytes().map(|c| ((c - b'a') as usize) as usize){
+        for i in word.bytes().map(|c| (c - b'a') as usize){
             match &curr.children[i]{
                 None => return false,
                 Some(node) => curr = node,
@@ -40,7 +40,7 @@ impl Trie {
     /** Returns if there is any word in the trie that starts with the given prefix. */
     fn starts_with(&self, prefix: String) -> bool {
         let mut curr = self;
-        for i in prefix.bytes().map(|c| ((c - b'a') as usize) as usize){
+        for i in prefix.bytes().map(|c| (c - b'a') as usize){
             match &curr.children[i]{
                 None => return false,
                 Some(node) => curr = node,
