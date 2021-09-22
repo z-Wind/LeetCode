@@ -1,7 +1,7 @@
 use std::collections::HashSet;
 #[derive(Debug, Default)]
 struct WordDictionary {
-    is_end: bool,
+    word: String,
     children: [Option<Box<WordDictionary>>;26],
 }
 
@@ -17,7 +17,7 @@ impl WordDictionary {
         for i in word.bytes().map(|c| (c - b'a') as usize){
             curr = curr.children[i].get_or_insert(Box::new(WordDictionary::new()));
         }
-        curr.is_end = true;
+        curr.word = word;
     }
     
     fn search_char(&self, c: u8) -> &Option<Box<WordDictionary>> {
@@ -36,11 +36,10 @@ impl Solution {
         }
         
         let mut ans:HashSet<String> = HashSet::new();
-        let mut temp = String::new();
         let words_dict = Some(Box::new(words_dict));
         for i in (0..board.len()){
             for j in (0..board[0].len()){
-                find_words(&mut ans,&mut temp, &mut board, &words_dict, i, j) 
+                find_words(&mut ans, &mut board, &words_dict, i, j) 
             }
         }
         
@@ -48,7 +47,7 @@ impl Solution {
     }
 }
 
-fn find_words(ans: &mut HashSet<String>,temp: &mut String, board: &mut Vec<Vec<char>>, node: &Option<Box<WordDictionary>>, i:usize, j:usize) {
+fn find_words(ans: &mut HashSet<String>, board: &mut Vec<Vec<char>>, node: &Option<Box<WordDictionary>>, i:usize, j:usize) {
     // println!("{},{}: {}",i,j,temp);
     if i >= board.len() || j >= board[0].len(){
         return;
@@ -60,15 +59,13 @@ fn find_words(ans: &mut HashSet<String>,temp: &mut String, board: &mut Vec<Vec<c
             board[i][j] = '_';
             let next_node = node.as_ref().unwrap().search_char(c as u8);
             if next_node.is_some(){
-                temp.push(c);
-                if next_node.as_ref().unwrap().is_end{
-                    ans.insert(temp.clone());
+                if !next_node.as_ref().unwrap().word.is_empty(){
+                    ans.insert(next_node.as_ref().unwrap().word.clone());
                 }
-                find_words(ans, temp, board, next_node,i-1,j);
-                find_words(ans, temp, board, next_node,i+1,j);
-                find_words(ans, temp, board, next_node,i,j-1);
-                find_words(ans, temp, board, next_node,i,j+1);
-                temp.pop();
+                find_words(ans, board, next_node,i-1,j);
+                find_words(ans, board, next_node,i+1,j);
+                find_words(ans, board, next_node,i,j-1);
+                find_words(ans, board, next_node,i,j+1);
             }
             board[i][j] = c;
         }
