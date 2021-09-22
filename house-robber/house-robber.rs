@@ -12,7 +12,7 @@ impl Solution {
         
         let mut pre = 0;
         let mut cur = 0;
-        for i in (0..n).rev(){
+        for i in (0..n){
             let temp = cur;
             cur = cur.max(pre+nums[i]);
             pre = temp;
