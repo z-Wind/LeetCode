@@ -1,5 +1,8 @@
+use rand::thread_rng;
+use rand::seq::SliceRandom;
 impl Solution {
     pub fn find_kth_largest(mut nums: Vec<i32>, k: i32) -> i32 {
+        nums.shuffle(&mut thread_rng());
         let k = nums.len() - k as usize;
         // println!("k:{}",k);
         let mut left = 0;
