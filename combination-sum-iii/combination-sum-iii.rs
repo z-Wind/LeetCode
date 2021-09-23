@@ -3,23 +3,23 @@ impl Solution {
         let mut ans:Vec<Vec<i32>> = Vec::new();
         let mut temp:Vec<i32> = Vec::new();
         
-        sum(&mut ans, &mut temp, 1, k as usize, 0,n);
+        sum(&mut ans, &mut temp, 1, k as usize,n);
         
         ans
     }
 }
 
-fn sum(ans:&mut Vec<Vec<i32>>, temp:&mut Vec<i32>, start:i32, k:usize, curr:i32, target:i32){
-    if temp.len() == k && curr == target{
+fn sum(ans:&mut Vec<Vec<i32>>, temp:&mut Vec<i32>, start:i32, k:usize, target:i32){
+    if temp.len() == k && target==0{
         ans.push(temp.clone());
         return;
-    } else if start > 9 || temp.len() > k || curr > target{
+    } else if temp.len() > k || target < 0{
         return;
     } 
     
     for num in (start..=9){
         temp.push(num);
-        sum(ans,temp,num+1,k,curr+num,target);
+        sum(ans,temp,num+1,k,target-num);
         temp.pop();
     }
 }
