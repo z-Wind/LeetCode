@@ -4,12 +4,12 @@ impl Solution {
         let mut map:HashMap<i32,usize> = HashMap::new();
         for i in (0..nums.len()) {
             match map.insert(nums[i], i){
-                None => (),
                 Some(j) => {
                     if i-j <= k as usize{
                         return true;
                     }
                 },
+                None => (),
             }
         }
         false
