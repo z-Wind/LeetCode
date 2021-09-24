@@ -1,60 +1,67 @@
-use std::cmp::Reverse;
+// https://briangordon.github.io/2014/08/the-skyline-problem.html
+// https://zhuanlan.zhihu.com/p/48403793
+// https://leetcode.com/problems/the-skyline-problem/discuss/61197/(Guaranteed)-Really-Detailed-and-Good-(Perfect)-Explanation-of-The-Skyline-Problem
+
+use std::cmp::Ordering;
+use std::collections::BTreeMap;
+
+#[derive(Debug)]
+struct Point{
+    x:i32,
+    y:i32,
+    is_start:bool,
+}
 impl Solution {
-    pub fn get_skyline(mut buildings: Vec<Vec<i32>>) -> Vec<Vec<i32>> {        
-        buildings.sort_by_key(|x| x[2]);
-        // println!(" b: {:?}",buildings);
-        let mut new_buildings:Vec<Vec<i32>> = Vec::new();
-        'outer: while !buildings.is_empty(){
-            let mut b = buildings.pop().unwrap();
-            for i in (0..new_buildings.len()){
-                let nb = &mut new_buildings[i];
-                // println!(" b:{:?}\nnb:{:?}",b,nb);
-                // same height
-                if b[2] == nb[2] && 
-                   (nb[1] >= b[0] && b[0] >= nb[0] || 
-                    nb[1] >= b[1] && b[1] >= nb[0]){
-                    nb[0] = nb[0].min(b[0]);
-                    nb[1] = nb[1].max(b[1]);
-                    continue 'outer; 
-                }
-                // no intersection
-                if (b[0] <= nb[0] && b[1] <= nb[0]) ||
-                   (b[0] >= nb[1] && b[1] >= nb[1]){
-                       continue;
-                }
-                // include
-                if nb[1] >= b[0] && b[0] >= nb[0] && 
-                   nb[1] >= b[1] && b[1] >= nb[0]{
-                   continue 'outer; 
-                }
-                // intersection
-                if b[0] < nb[0] && nb[1] >= b[1] && b[1] > nb[0]{ // left
-                    b[1] = nb[0];
-                } else if b[1] > nb[1] && nb[1] > b[0] && b[0] >= nb[0]{ // right
-                    b[0] = nb[1];
-                } else if b[1] > nb[1] && b[0] < nb[0]{ // middle
-                    buildings.push(vec![b[0], nb[0], b[2]]);
-                    buildings.push(vec![nb[1], b[1], b[2]]);
-                    continue 'outer; 
-                }
-            }
-            new_buildings.push(b);
+    pub fn get_skyline(buildings: Vec<Vec<i32>>) -> Vec<Vec<i32>> {        
+        let mut points:Vec<Point> = Vec::new();
+        for b in buildings{
+            points.push(Point{x:b[0],y:b[2],is_start:true});
+            points.push(Point{x:b[1],y:b[2],is_start:false});
         }
-        new_buildings.sort_by_key(|x| x[0]);
-        // println!("nb: {:?}",new_buildings);
+        points.sort_unstable_by(|a, b| sort_cmp(a,b));
+        // println!("{:?}", points);
         
-        let mut points:Vec<Vec<i32>> = Vec::new();
-        for w in new_buildings.windows(2){
-            if w[0][1] == w[1][0]{
-                points.push(vec![w[0][0], w[0][2]]);
+        let mut ans:Vec<Vec<i32>> = Vec::new();
+        let mut heap = BTreeMap::new();
+        *heap.entry(0).or_insert(0) += 1;
+        let mut pre_h = 0;
+        for p in points{
+            // println!("{}: {:?}",pre_h, p);
+            if p.is_start{
+                *heap.entry(p.y).or_insert(0) += 1;
             } else {
-                points.push(vec![w[0][0], w[0][2]]);
-                points.push(vec![w[0][1], 0]);
+                let mut entry = heap.entry(p.y).or_insert(0);
+                *entry -= 1;
+                if *entry == 0{
+                    heap.remove(&p.y);
+                }
             }
+            if let Some(&h) = heap.keys().last(){
+                if pre_h != h{
+                    ans.push(vec![p.x,h]);
+                    pre_h = h;
+                }
+            }
+            // println!("{:?}",ans);
         }
-        let n = new_buildings.len() - 1;
-        points.push(vec![new_buildings[n][0], new_buildings[n][2]]);
-        points.push(vec![new_buildings[n][1], 0]);
-        points
+        ans
+    }
+}
+
+fn sort_cmp(a:&Point, b:&Point) -> Ordering{
+    match (a.is_start, b.is_start, a.x.cmp(&b.x), a.y.cmp(&b.y)){        
+        (_, _, Ordering::Less, _) => Ordering::Less,
+        (_, _, Ordering::Greater, _) => Ordering::Greater,
+        
+        (true, false, Ordering::Equal, _) => Ordering::Less,
+        (false, true, Ordering::Equal, _) => Ordering::Greater,
+        
+        (true, true, Ordering::Equal, Ordering::Less) => Ordering::Greater,
+        (true, true, Ordering::Equal, Ordering::Greater) => Ordering::Less,
+        (true, true, Ordering::Equal, Ordering::Equal) => Ordering::Equal,
+        
+        (false, false, Ordering::Equal, Ordering::Less) => Ordering::Less,
+        (false, false, Ordering::Equal, Ordering::Greater) => Ordering::Greater,
+        (false, false, Ordering::Equal, Ordering::Equal) => Ordering::Equal,
     }
 }
