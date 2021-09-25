@@ -18,30 +18,19 @@
 // }
 use std::rc::Rc;
 use std::cell::RefCell;
-use std::collections::VecDeque;
 impl Solution {
     pub fn count_nodes(root: Option<Rc<RefCell<TreeNode>>>) -> i32 {
         if root.is_none(){
             return 0;
         }
-        let mut queue: VecDeque<Option<Rc<RefCell<TreeNode>>>> = VecDeque::new();
-        queue.push_back(root);
-        let mut count = 0;
-        while !queue.is_empty(){
-            let len = queue.len();
-            count += len;
-            for _ in (0..len){
-                let node = queue.pop_front().unwrap();
-                let left = node.as_ref().unwrap().borrow_mut().left.take();
-                let right = node.as_ref().unwrap().borrow_mut().right.take();
-                if left.is_some(){
-                    queue.push_back(left);
-                }
-                if right.is_some(){
-                    queue.push_back(right);
-                }
-            }
-        }
-        count as i32
+        let mut count = 1;
+        
+        let left = root.as_ref().unwrap().borrow_mut().left.take();
+        let right = root.as_ref().unwrap().borrow_mut().right.take();
+        
+        count += Self::count_nodes(left);
+        count += Self::count_nodes(right);
+         
+        count
     }
 }
