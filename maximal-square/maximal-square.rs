@@ -1,44 +1,43 @@
-// https://github.com/z-Wind/LeetCode/blob/main/largest-rectangle-in-histogram/largest-rectangle-in-histogram.rs
+// find side length
+// dp(i,j)=min(dp(i−1,j), dp(i,j−1), dp(i−1,j−1)) + 1.
+//
+// dp(i-1,j-1) dp(i-1,j)
+// dp(i,j-1)   dp(i,j)
+
+use std::cmp::min;
 impl Solution {
     pub fn maximal_square(matrix: Vec<Vec<char>>) -> i32 {
         let m = matrix.len();
         let n = matrix[0].len();
-        let mut v:Vec<i32> = vec![0;n];
-        let mut max_square = 0;
+        let mut dp:Vec<Vec<i32>> = vec![vec![0;n];m];
+        let mut max_side = 0;
         for i in (0..m){
-            for j in (0..n){
+            match matrix[i][0]{
+                '0' => dp[i][0] = 0,
+                '1' => dp[i][0] = 1,
+                _ => panic!(),
+            }
+            max_side = max_side.max(dp[i][0]);
+        }
+        for j in (0..n){
+            match matrix[0][j]{
+                '0' => dp[0][j] = 0,
+                '1' => dp[0][j] = 1,
+                _ => panic!(),
+            }
+            max_side = max_side.max(dp[0][j]);
+        }
+        
+        for i in (1..m){
+            for j in (1..n){
                 match matrix[i][j]{
-                    '0' => v[j] = 0,
-                    '1' => v[j] += 1,
+                    '1' => dp[i][j] = min(dp[i-1][j],min(dp[i][j-1],dp[i-1][j-1])) + 1,
+                    '0' => dp[i][j] = 0,
                     _ => panic!(),
                 }
+                max_side = max_side.max(dp[i][j]);
             }
-            let area = largest_square_area(&mut v);
-            // println!("{}: {:?}",area, v);
-            max_square = max_square.max(area);
         }
-        max_square
+        max_side * max_side
     }
-}
-
-fn largest_square_area(heights: &mut Vec<i32>) -> i32 {
-    if (heights.len() == 0) {
-        return 0;
-    }
-    let mut maxArea = 0;
-    let mut stack:Vec<(i32,i32)> = vec![(-1,0)];
-    heights.push(0);
-    for (i,&h) in heights.iter().enumerate(){
-        // println!("{:?}", stack);
-        while h < stack.last().unwrap().1{
-            let (_,h_stack) = stack.pop().unwrap();
-            let w = i as i32 - stack.last().unwrap().0 -1;
-            let square_side = w.min(h_stack);
-            maxArea = maxArea.max(square_side*square_side);
-        } 
-        stack.push((i as i32, h));
-    }
-    heights.pop();
-
-    return maxArea;
 }
