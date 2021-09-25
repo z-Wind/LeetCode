@@ -53,6 +53,6 @@ impl Solution {
 }
 
 fn area(ax1: i32, ay1: i32, ax2: i32, ay2: i32) -> i32{
-    println!("({},{}) ({},{})",ax1,ay1,ax2,ay2);
+    // println!("({},{}) ({},{})",ax1,ay1,ax2,ay2);
     ((ax2-ax1)*(ay2-ay1)).abs()
 }
