@@ -6,86 +6,57 @@ enum Cal{
 impl Solution {
     pub fn calculate(s: String) -> i32 {
         let mut stack:Vec<Cal> = Vec::new();
-        let mut num = 0;
+        let mut result = 0;
         let mut sign = 1;
+        let mut op = &b'+';
+        let mut curr_num = 0;
+        let mut last_num = 0;
         for c in s.as_bytes(){
             match c{
-                b'0'..=b'9' => num = num*10 + (c-b'0') as i32,
-                b'-' => {
-                    match stack.last(){
-                        Some(Cal::Op(b'*')) => {
-                            stack.pop();
-                            if let Cal::Num(x) = stack.pop().unwrap(){
-                                num = x*num;   
-                            }
+                b'0'..=b'9' => curr_num = curr_num*10 + (c-b'0') as i32,
+                b'+' | b'-' | b'*' | b'/' => {
+                    match op{
+                        b'+' => {
+                            result += last_num;
+                            last_num = curr_num;
                         },
-                        Some(Cal::Op(b'/')) => {
-                            stack.pop();
-                            if let Cal::Num(x) = stack.pop().unwrap(){
-                                num = x/num;    
-                            }
+                        b'-' => {
+                            result += last_num;
+                            last_num = -curr_num;
                         },
-                        _ => (),
+                        b'*' => {
+                            last_num *= curr_num;
+                        },
+                        b'/' => {
+                            last_num /= curr_num;
+                        },
+                        _ => panic!(),
                     }
-                    stack.push(Cal::Num(num*sign));
-                    stack.push(Cal::Op(b'+'));
-                    num = 0;
-                    sign = -1;
-                },
-                b'+' | b'*' | b'/' => {
-                    match stack.last(){
-                        Some(Cal::Op(b'*')) => {
-                            stack.pop();
-                            if let Cal::Num(x) = stack.pop().unwrap(){
-                                num = x*num;   
-                            }
-                        },
-                        Some(Cal::Op(b'/')) => {
-                            stack.pop();
-                            if let Cal::Num(x) = stack.pop().unwrap(){
-                                num = x/num;    
-                            }
-                        },
-                        _ => (),
-                    }
-                    stack.push(Cal::Num(num*sign));
-                    stack.push(Cal::Op(*c));
-                    num = 0;
-                    sign = 1;
+                    op = c;
+                    curr_num = 0;
                 },
                 b' '=>(),
                 _ => panic!(),
             }
         }
-        // println!("{:?}",stack);
-        num *= sign;
-        while !stack.is_empty(){
-            // println!("{}",num);
-            match stack.pop(){
-                Some(Cal::Op(b'+')) => {
-                    if let Cal::Num(x) = stack.pop().unwrap(){
-                        num = x+num;   
-                    }
-                },
-                Some(Cal::Op(b'-')) => {
-                    if let Cal::Num(x) = stack.pop().unwrap(){
-                        num = x-num;   
-                    }
-                },
-                Some(Cal::Op(b'*')) => {
-                    if let Cal::Num(x) = stack.pop().unwrap(){
-                        num = x*num;   
-                    }
-                },
-                Some(Cal::Op(b'/')) => {
-                    if let Cal::Num(x) = stack.pop().unwrap(){
-                        num = x/num;   
-                    }
-                },
-                unknown => panic!("{:?}",unknown),
-            }
+        match op{
+            b'+' => {
+                result += last_num;
+                last_num = curr_num;
+            },
+            b'-' => {
+                result += last_num;
+                last_num = -curr_num;
+            },
+            b'*' => {
+                last_num *= curr_num;
+            },
+            b'/' => {
+                last_num /= curr_num;
+            },
+            _ => panic!(),
         }
-        
-        num
+        result+=last_num;
+        result
     }
 }
