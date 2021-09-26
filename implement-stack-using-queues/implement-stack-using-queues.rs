@@ -1,5 +1,6 @@
+use std::collections::VecDeque;
 struct MyStack {
-    stack:Vec<i32>
+    queue:VecDeque<i32>
 }
 
 
@@ -11,24 +12,29 @@ impl MyStack {
 
     fn new() -> Self {
         Self{
-            stack:Vec::new(),
+            queue:VecDeque::new(),
         }
     }
     
     fn push(&mut self, x: i32) {
-        self.stack.push(x);
+        let len = self.queue.len();
+        self.queue.push_back(x);
+        for _ in (0..len){
+            let x = self.queue.pop_front().unwrap();
+            self.queue.push_back(x);
+        }
     }
     
     fn pop(&mut self) -> i32 {
-        self.stack.pop().unwrap()
+        self.queue.pop_front().unwrap()
     }
     
     fn top(&self) -> i32 {
-        *self.stack.last().unwrap()
+        *self.queue.front().unwrap()
     }
     
     fn empty(&self) -> bool {
-        self.stack.is_empty()
+        self.queue.is_empty()
     }
 }
 
