@@ -1,6 +1,7 @@
 struct MyQueue {
     stack:Vec<i32>,
     queue:Vec<i32>,
+    front:i32,
 }
 
 
@@ -14,29 +15,35 @@ impl MyQueue {
         Self{
             stack:Vec::new(),
             queue:Vec::new(),
+            front:0,
         }
     }
     
     fn push(&mut self, x: i32) {
-        while let Some(x) = self.queue.pop(){
-            self.stack.push(x);
+        if self.stack.is_empty(){
+            self.front = x;
         }
-        self.queue.push(x);
-        while let Some(x) = self.stack.pop(){
-            self.queue.push(x);
-        }
+        self.stack.push(x);
     }
     
     fn pop(&mut self) -> i32 {
+        if self.queue.is_empty(){
+            while let Some(x) = self.stack.pop(){
+                self.queue.push(x);
+            }
+        }
         self.queue.pop().unwrap()
     }
     
     fn peek(&self) -> i32 {
+        if self.queue.is_empty(){
+            return self.front;
+        }
         *self.queue.last().unwrap()
     }
     
     fn empty(&self) -> bool {
-        self.queue.is_empty()
+        self.stack.is_empty() && self.queue.is_empty()
     }
 }
 
