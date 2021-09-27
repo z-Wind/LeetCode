@@ -1,6 +1,6 @@
-use std::collections::VecDeque;
 struct MyQueue {
-    queue:VecDeque<i32>,
+    stack:Vec<i32>,
+    queue:Vec<i32>,
 }
 
 
@@ -12,20 +12,27 @@ impl MyQueue {
 
     fn new() -> Self {
         Self{
-            queue:VecDeque::new(),
+            stack:Vec::new(),
+            queue:Vec::new(),
         }
     }
     
     fn push(&mut self, x: i32) {
-        self.queue.push_back(x);
+        while let Some(x) = self.queue.pop(){
+            self.stack.push(x);
+        }
+        self.queue.push(x);
+        while let Some(x) = self.stack.pop(){
+            self.queue.push(x);
+        }
     }
     
     fn pop(&mut self) -> i32 {
-        self.queue.pop_front().unwrap()
+        self.queue.pop().unwrap()
     }
     
     fn peek(&self) -> i32 {
-        *self.queue.front().unwrap()
+        *self.queue.last().unwrap()
     }
     
     fn empty(&self) -> bool {
