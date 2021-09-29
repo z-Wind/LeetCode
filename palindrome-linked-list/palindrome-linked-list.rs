@@ -17,11 +17,10 @@
 impl Solution {
     pub fn is_palindrome(head: Option<Box<ListNode>>) -> bool {
         let mut v = Vec::new();
-        let mut h = head;
+        let mut h = &head;
         while h.is_some(){
-            let next = h.as_mut().unwrap().next.take();
-            v.push(h);
-            h = next;
+            v.push(h.as_ref().unwrap().val);
+            h = &h.as_ref().unwrap().next;
         }
         
         let mut left = 0;
