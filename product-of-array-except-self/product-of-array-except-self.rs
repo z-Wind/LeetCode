@@ -1,34 +1,21 @@
 impl Solution {
     pub fn product_except_self(mut nums: Vec<i32>) -> Vec<i32> {
-        let mut product = 1;
-        let mut zeros = 0;
-        for num in nums.iter(){
-            if *num == 0{
-                zeros += 1;
-            } else {
-                if zeros >= 2{
-                    product = 0;
-                    break;
-                }
-                product *= num;
-            }
+        let n = nums.len();
+        let mut left_prod = vec![nums[0];n];
+        for i in (1..n){
+            left_prod[i] = left_prod[i-1] * nums[i];
         }
-        if zeros == 1{
-            for num in nums.iter_mut(){
-                if *num == 0{
-                    *num = product;
-                } else {
-                    *num = 0;
-                }
-            }
-        } else if zeros > 1{
-            for num in nums.iter_mut(){
-                *num = 0;
-            }
-        } else {
-            for num in nums.iter_mut(){
-                *num = product/(*num);
-            }
+        let mut right_prod = vec![nums[n-1];n];
+        for i in (0..n-1).rev(){
+            right_prod[i] = right_prod[i+1] * nums[i];
+        }
+        // println!("left :{:?}", left_prod);
+        // println!("right:{:?}", right_prod);
+        
+        nums[0] = right_prod[1];
+        nums[n-1] = left_prod[n-2];
+        for i in (1..n-1){
+            nums[i] = left_prod[i-1] * right_prod[i+1];
         }
         nums
     }
