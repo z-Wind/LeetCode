@@ -30,29 +30,12 @@ impl Solution {
 
 fn lowest_common_ancestor(root: Option<Rc<RefCell<TreeNode>>>, p:i32, q:i32) -> Option<Rc<RefCell<TreeNode>>> {
     let val = root.as_ref().unwrap().borrow().val;
-    if val == p || val == q{
-        return root;
-    }
-    let left = root.as_ref().unwrap().borrow().left.clone();
-    let right = root.as_ref().unwrap().borrow().right.clone();
     
-    match (p<val, q<val){
-        (true,true) => {
-            if left.as_ref().unwrap().borrow().val == p
-            || left.as_ref().unwrap().borrow().val == q{
-                return left;
-            }
-            return lowest_common_ancestor(left, p, q);
-        },
-        (false,false) => {
-            if right.as_ref().unwrap().borrow().val == p
-            || right.as_ref().unwrap().borrow().val == q{
-                return right;
-            }
-            return lowest_common_ancestor(right, p, q);
-        },
-        (true,false) | (false,true) =>{
-            return root;
-        },
+    if p<val && q<val{
+        lowest_common_ancestor(root.unwrap().borrow_mut().left.take(), p, q)
+    } else if p>val && q>val{
+        lowest_common_ancestor(root.unwrap().borrow_mut().right.take(), p, q)
+    } else {
+        root
     }
 }
