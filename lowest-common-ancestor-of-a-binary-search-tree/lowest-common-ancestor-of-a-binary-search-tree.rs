@@ -23,18 +23,16 @@ impl Solution {
     pub fn lowest_common_ancestor(root: Option<Rc<RefCell<TreeNode>>>, p: Option<Rc<RefCell<TreeNode>>>, q: Option<Rc<RefCell<TreeNode>>>) -> Option<Rc<RefCell<TreeNode>>> {
         let p_val = p.as_ref().unwrap().borrow().val;
         let q_val = q.as_ref().unwrap().borrow().val;
-        if root.as_ref().unwrap().borrow().val == p_val
-        || root.as_ref().unwrap().borrow().val == q_val{
-            return root;
-        }
     
-        let (pa, _) = lowest_common_ancestor(root, p_val, q_val, 0);
-        pa
+        lowest_common_ancestor(root, p_val, q_val)
     }
 }
 
-fn lowest_common_ancestor(root: Option<Rc<RefCell<TreeNode>>>, p:i32, q:i32, h:i32) -> (Option<Rc<RefCell<TreeNode>>>,i32) {
+fn lowest_common_ancestor(root: Option<Rc<RefCell<TreeNode>>>, p:i32, q:i32) -> Option<Rc<RefCell<TreeNode>>> {
     let val = root.as_ref().unwrap().borrow().val;
+    if val == p || val == q{
+        return root;
+    }
     let left = root.as_ref().unwrap().borrow().left.clone();
     let right = root.as_ref().unwrap().borrow().right.clone();
     
@@ -42,19 +40,19 @@ fn lowest_common_ancestor(root: Option<Rc<RefCell<TreeNode>>>, p:i32, q:i32, h:i
         (true,true) => {
             if left.as_ref().unwrap().borrow().val == p
             || left.as_ref().unwrap().borrow().val == q{
-                return (left,h+1);
+                return left;
             }
-            return lowest_common_ancestor(left, p, q, h+1);
+            return lowest_common_ancestor(left, p, q);
         },
         (false,false) => {
             if right.as_ref().unwrap().borrow().val == p
             || right.as_ref().unwrap().borrow().val == q{
-                return (right,h+1);
+                return right;
             }
-            return lowest_common_ancestor(right, p, q, h+1);
+            return lowest_common_ancestor(right, p, q);
         },
         (true,false) | (false,true) =>{
-            return (root,h);
+            return root;
         },
     }
 }
