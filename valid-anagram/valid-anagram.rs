@@ -4,9 +4,9 @@ impl Solution {
         if s.len() != t.len(){
             return false;
         }
+        let mut map:HashMap<char,i32> = HashMap::with_capacity(s.len());
         let mut s = s.chars();
         let mut t = t.chars();
-        let mut map:HashMap<char,i32> = HashMap::new();
         while let (Some(cs), Some(ct)) = (s.next(), t.next()){
             *map.entry(cs).or_insert(0) += 1;
             *map.entry(ct).or_insert(0) -= 1;
