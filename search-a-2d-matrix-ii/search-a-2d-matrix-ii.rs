@@ -9,12 +9,10 @@ impl Solution {
         let mut j = n-1;
         while i < m && j < n{
             // println!("{},{}",i,j);
-            if matrix[i][j] == target{
-                return true;
-            } else if matrix[i][j] > target{
-                j-=1;
-            } else {
-                i+=1;
+            match matrix[i][j].cmp(&target) {
+                std::cmp::Ordering::Less => i += 1,
+                std::cmp::Ordering::Greater => j -= 1,
+                std::cmp::Ordering::Equal => return true,
             }
         }
         false
