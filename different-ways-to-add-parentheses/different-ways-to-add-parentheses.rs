@@ -4,7 +4,7 @@ impl Solution {
             .enumerate()
             .filter_map(|e| if matches!(e.1,'+' | '-' | '*') { Some(e.0) } else { None })
             .collect::<Vec<usize>>();
-        println!("{:?}", ops);
+        // println!("{:?}", ops);
         compute(&expression, &mut ops, 0, expression.len()-1)
     }
 }
