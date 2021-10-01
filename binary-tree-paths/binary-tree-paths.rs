@@ -25,28 +25,25 @@ impl Solution {
         }
         
         let mut ans:Vec<String> = Vec::new();
-        let mut temp:Vec<String> = Vec::new();
-        dfs(&mut ans, &mut temp, root);
+        dfs(&mut ans, String::new(), root);
         ans
     }
 }
 
-fn dfs(ans:&mut Vec<String>, temp:&mut Vec<String>, root: Option<Rc<RefCell<TreeNode>>>){
+fn dfs(ans:&mut Vec<String>, path:String, root: Option<Rc<RefCell<TreeNode>>>){
     let val = root.as_ref().unwrap().borrow().val;
-    temp.push(val.to_string());
     let left = root.as_ref().unwrap().borrow().left.clone();
     let right = root.as_ref().unwrap().borrow().right.clone();
     match (left,right){
         (None,None) => {
-            ans.push(temp.join("->"));
+            ans.push(format!("{}{}",path,val));
         },
         (x,None) | (None,x) =>{
-            dfs(ans,temp,x);          
+            dfs(ans,format!("{}{}->",path,val),x);          
         },
         (left, right) =>{
-            dfs(ans,temp,left);
-            dfs(ans,temp,right);       
+            dfs(ans,format!("{}{}->",path,val),left);
+            dfs(ans,format!("{}{}->",path,val),right);       
         },
     }
-    temp.pop();
 }
