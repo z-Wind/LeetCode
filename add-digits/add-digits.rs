@@ -1,13 +1,9 @@
+// Digital Root
 impl Solution {
     pub fn add_digits(mut num: i32) -> i32 {
-        while num >= 10{
-            let mut sum = 0;
-            while num != 0{
-                sum += num%10;
-                num/=10;
-            }
-            num = sum;
+        match num{
+            0 => 0,
+            x => 1+(x-1)%9,
         }
-        num
     }
 }
