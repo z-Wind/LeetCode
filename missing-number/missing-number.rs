@@ -1,22 +1,11 @@
+// https://leetcode.com/problems/missing-number/discuss/69791/4-Line-Simple-Java-Bit-Manipulate-Solution-with-Explaination
+// a^b^b = a
 impl Solution {
-    pub fn missing_number(mut nums: Vec<i32>) -> i32 {
-        let n = nums.len();
-        for i in (0..n){
-            let mut num = nums[i].abs() as usize;
-            if num == n + 1{
-                num = 0;
-            }
-            if num < n{
-                nums[num] = -nums[num];
-                if nums[num] == 0{
-                    nums[num] = -(n as i32) - 1;
-                }
-            }
+    pub fn missing_number(nums: Vec<i32>) -> i32 {
+        let mut xor = 0;
+        for i in (0..nums.len()){
+            xor = xor ^ (i as i32 + 1) ^ nums[i];
         }
-        // println!("{:?}", nums);
-        match nums.iter().position(|&x| x>=0) {
-            Some(x) => x as i32,
-            None => n as i32,
-        }
+        xor
     }
 }
