@@ -3,24 +3,24 @@ impl Solution {
         if num == 0{
             return String::from("Zero");
         }
-        let mut ans:Vec::<String> = Vec::new();
+        let mut ans = String::new();
         let mut digits = 0;
         while num != 0{
             let mut n = num%1000;
             if n != 0{  
                 match digits{
                     0 => (),
-                    3 => ans.push(number_to_word(1000)),
-                    6 => ans.push(number_to_word(1000_000)),
-                    9 => ans.push(number_to_word(1000_000_000)),
+                    3 => ans = number_to_word(1000) + " " + &ans,
+                    6 => ans = number_to_word(1000_000) + " " + &ans,
+                    9 => ans = number_to_word(1000_000_000) + " " + &ans,
                     _ => panic!("digits:{}", digits),
                 }
                 match n{
                     1..=99 => match_1_99_to_word(&mut ans,n),
                     100..=999 => {
                         match_1_99_to_word(&mut ans, n%100);
-                        ans.push(number_to_word(100));
-                        ans.push(number_to_word(n/100));
+                        ans = number_to_word(100) + " " + &ans;
+                        ans = number_to_word(n/100) + " " + &ans;
                     },
                     _ => panic!("n:{}", n),
                 }
@@ -29,18 +29,17 @@ impl Solution {
             num /= 1000;
             digits += 3;
         }
-        ans.reverse();
-        ans.join(" ")
+        ans.trim_end().to_string()
     }
 }
 
-fn match_1_99_to_word(ans:&mut Vec<String>, num: i32){
+fn match_1_99_to_word(ans:&mut String, num: i32){
     match num{
         0 => (),
-        1..=20 | 30 | 40 | 50 | 60 | 70 | 80 | 90 => ans.push(number_to_word(num)),
+        1..=20 | 30 | 40 | 50 | 60 | 70 | 80 | 90 => *ans = number_to_word(num) + " " + &ans,
         21..=99 => {
-            ans.push(number_to_word(num%10));
-            ans.push(number_to_word(num/10 * 10));
+            *ans = number_to_word(num%10) + " " + &ans;
+            *ans = number_to_word(num/10 * 10) + " " + &ans;
         },
         x => panic!("n:{}", x),
     }
