@@ -15,15 +15,7 @@ impl Solution {
                     9 => ans = number_to_word(1000_000_000) + " " + &ans,
                     _ => panic!("digits:{}", digits),
                 }
-                match n{
-                    1..=99 => match_1_99_to_word(&mut ans,n),
-                    100..=999 => {
-                        match_1_99_to_word(&mut ans, n%100);
-                        ans = number_to_word(100) + " " + &ans;
-                        ans = number_to_word(n/100) + " " + &ans;
-                    },
-                    _ => panic!("n:{}", n),
-                }
+                match_1_999_to_words(&mut ans,n);
             }
             // println!("{}:{:?}",n,ans);
             num /= 1000;
@@ -33,7 +25,7 @@ impl Solution {
     }
 }
 
-fn match_1_99_to_word(ans:&mut String, num: i32){
+fn match_1_999_to_words(ans:&mut String, num: i32){
     match num{
         0 => (),
         1..=20 | 30 | 40 | 50 | 60 | 70 | 80 | 90 => *ans = number_to_word(num) + " " + &ans,
@@ -41,7 +33,12 @@ fn match_1_99_to_word(ans:&mut String, num: i32){
             *ans = number_to_word(num%10) + " " + &ans;
             *ans = number_to_word(num/10 * 10) + " " + &ans;
         },
-        x => panic!("n:{}", x),
+        100..=999 => {
+            match_1_999_to_words(ans, num%100);
+            *ans = number_to_word(100) + " " + &ans;
+            *ans = number_to_word(num/100) + " " + &ans;
+        }
+        x => panic!("num:{}", x),
     }
 }
 
