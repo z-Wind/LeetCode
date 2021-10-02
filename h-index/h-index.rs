@@ -1,13 +1,21 @@
+// https://leetcode.com/problems/h-index/discuss/70768/Java-bucket-sort-O(n)-solution-with-detail-explanation
+
 impl Solution {
     pub fn h_index(citations: Vec<i32>) -> i32 {
         let n = citations.len();
         let mut h_count = vec![0;n+1];
         for c in citations{
-            for i in 0..=n.min(c as usize){
-                h_count[i] += 1;   
-            }
+            let i = n.min(c as usize);
+            h_count[i] += 1;
         }
         // println!("{:?}", h_count);
-        h_count.iter().enumerate().rposition(|(i, &count)| count>=i as i32 ).unwrap() as i32
+        let mut count = 0;
+        for i in (0..=n).rev(){
+            count += h_count[i];
+            if count >= i{
+                return i as i32;
+            }
+        }
+        0
     }
 }
