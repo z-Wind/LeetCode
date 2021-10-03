@@ -17,9 +17,10 @@ fn num_squares(dp:&mut HashMap<i32,i32>, n: i32) -> i32 {
     }
     
     let mut ans = i32::MAX;
-    let limit = (n as f64).sqrt() as i32;
-    for i in (1..=limit).rev(){
+    let mut i = 1;
+    while i*i <= n{
         ans = ans.min(1+num_squares(dp, n-i*i));
+        i+=1
     }
     dp.insert(n,ans);
     ans
