@@ -1,6 +1,10 @@
-use std::collections::VecDeque;
+// https://leetcode.com/problems/find-median-from-data-stream/discuss/74047/JavaPython-two-heap-solution-O(log-n)-add-O(1)-find
+
+use std::collections::BinaryHeap;
+use std::cmp::Reverse;
 struct MedianFinder {
-    nums:VecDeque<i32>,
+    before:BinaryHeap<i32>,
+    after:BinaryHeap<Reverse<i32>>,
 }
 
 
@@ -12,31 +16,26 @@ impl MedianFinder {
 
     fn new() -> Self {
         Self{
-            nums:VecDeque::new(),
+            before:BinaryHeap::new(),
+            after:BinaryHeap::new(),
         }
     }
     
     fn add_num(&mut self, num: i32) {
-        if self.nums.is_empty() || num >= self.nums[self.nums.len()-1]{
-            self.nums.push_back(num);
-        } else if num <= self.nums[0] {
-            self.nums.push_front(num);
+        if self.before.len() == self.after.len(){
+            self.after.push(Reverse(num));
+            self.before.push(self.after.pop().unwrap().0);
         } else {
-            let mut pos = 0;
-            while num > self.nums[pos]{
-                pos += 1;
-            }
-            self.nums.insert(pos, num);  
+            self.before.push(num);
+            self.after.push(Reverse(self.before.pop().unwrap()));
         }
-        // println!("{:?}", self.nums);
     }
     
     fn find_median(&self) -> f64 {
-        let i = self.nums.len()/2;
-        if self.nums.len()%2 == 0{
-            return (self.nums[i-1]+self.nums[i]) as f64 / 2.0;
+        if self.before.len() == self.after.len(){
+            (self.before.peek().unwrap() + self.after.peek().unwrap().0) as f64 / 2.0
         } else {
-            return self.nums[i] as f64;
+            *self.before.peek().unwrap() as f64
         }
     }
 }
