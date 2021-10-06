@@ -1,7 +1,6 @@
-use std::collections::BTreeMap;
+use std::collections::VecDeque;
 struct MedianFinder {
-    nums:BTreeMap<i32,usize>,
-    len:usize,
+    nums:VecDeque<i32>,
 }
 
 
@@ -13,41 +12,32 @@ impl MedianFinder {
 
     fn new() -> Self {
         Self{
-            nums:BTreeMap::new(),
-            len:0,
+            nums:VecDeque::new(),
         }
     }
     
     fn add_num(&mut self, num: i32) {
-        *self.nums.entry(num).or_insert(0)+=1;
-        self.len += 1; 
-        // println!("{:?}:{}", self.nums,self.len);
+        if self.nums.is_empty() || num >= self.nums[self.nums.len()-1]{
+            self.nums.push_back(num);
+        } else if num <= self.nums[0] {
+            self.nums.push_front(num);
+        } else {
+            let mut pos = 0;
+            while num > self.nums[pos]{
+                pos += 1;
+            }
+            self.nums.insert(pos, num);  
+        }
+        // println!("{:?}", self.nums);
     }
     
     fn find_median(&self) -> f64 {
-        let (x,y) = if self.len%2 == 0{
-            let i = self.len/2;
-            (i,i+1)
+        let i = self.nums.len()/2;
+        if self.nums.len()%2 == 0{
+            return (self.nums[i-1]+self.nums[i]) as f64 / 2.0;
         } else {
-            let i = self.len/2;
-            (i+1,i+1)
-        };
-        // println!("{},{}",x,y);
-        let mut count = 0;
-        let mut a = None;
-        let mut b = None;
-        for (key, value) in self.nums.iter() {
-            count += value;
-            if count >= x && a.is_none(){
-                a = Some(key);
-            }
-            if count >= y && b.is_none(){
-                b = Some(key);
-                break;
-            }
+            return self.nums[i] as f64;
         }
-        // println!("{:?},{:?}",a,b);
-        (a.unwrap() + b.unwrap()) as f64 / 2.0
     }
 }
 
