@@ -35,12 +35,12 @@ impl Codec {
 
     fn serialize(&mut self, root: Option<Rc<RefCell<TreeNode>>>) -> String {
         self.temp = root;
-        String::from("12345")
+        String::new()
     }
 	
-    fn deserialize(&self, data: String) -> Option<Rc<RefCell<TreeNode>>> {
+    fn deserialize(&mut self, data: String) -> Option<Rc<RefCell<TreeNode>>> {
         // println!("{}", data);
-        self.temp.clone()
+        self.temp.take()
     }
 }
 
