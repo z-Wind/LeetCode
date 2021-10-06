@@ -18,7 +18,6 @@
 // }
 use std::rc::Rc;
 use std::cell::RefCell;
-use std::collections::VecDeque;
 struct Codec {
 }
 
@@ -61,7 +60,10 @@ impl Codec {
                     count+=1;
                 },
                 ')' => count-=1,
-                ',' if count == 1 => split = i,
+                ',' if count == 1 => {
+                    split = i;
+                    break;
+                },
                 _ => (),
             }    
         }
