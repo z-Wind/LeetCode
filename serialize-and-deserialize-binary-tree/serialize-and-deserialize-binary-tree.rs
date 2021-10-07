@@ -1,3 +1,5 @@
+// https://leetcode.com/problems/serialize-and-deserialize-binary-tree/discuss/74253/Easy-to-understand-Java-Solution
+
 // Definition for a binary tree node.
 // #[derive(Debug, PartialEq, Eq)]
 // pub struct TreeNode {
@@ -32,11 +34,11 @@ impl Codec {
 
     fn serialize(&mut self, root: Option<Rc<RefCell<TreeNode>>>) -> String {
         if root.is_none(){
-            return String::new();
+            return String::from("");
         }
         let left = root.as_ref().unwrap().borrow_mut().left.take();
         let right = root.as_ref().unwrap().borrow_mut().right.take();
-        format!("{}({},{})", 
+        format!("{},{},{}", 
             root.as_ref().unwrap().borrow().val.to_string(),
             self.serialize(left),
             self.serialize(right),
@@ -48,31 +50,24 @@ impl Codec {
         if data.is_empty(){
             return None;
         }
-        let mut count = 0;
-        let mut root_end = 0;
-        let mut split = 0;
-        for (i,char) in data.chars().enumerate(){
-            match char{
-                '(' => {
-                    if count == 0{
-                        root_end = i;
-                    }
-                    count+=1;
-                },
-                ')' => count-=1,
-                ',' if count == 1 => {
-                    split = i;
-                    break;
-                },
-                _ => (),
-            }    
+        let mut nodes = data.split(',');
+        self.build_tree(&mut nodes)
+    }
+    
+    fn build_tree<'a, I>(&self, nodes:&mut I) -> Option<Rc<RefCell<TreeNode>>> 
+    where
+        I: Iterator<Item = &'a str>,
+    {
+        let val = nodes.next().unwrap();
+        if val == "" {
+            return None;
+        } else {
+            let mut node = TreeNode::new(val.parse().unwrap());
+            node.left = self.build_tree(nodes);
+            node.right = self.build_tree(nodes);
+            
+            return Some(Rc::new(RefCell::new(node)));
         }
-        let val:i32 = data[0..root_end].parse().unwrap();
-        // println!("{}",val);
-        let mut root = Some(Rc::new(RefCell::new(TreeNode::new(val))));
-        root.as_ref().unwrap().borrow_mut().left = self.deserialize(data[root_end+1..split].to_string());
-        root.as_ref().unwrap().borrow_mut().right = self.deserialize(data[split+1..data.len()-1].to_string());
-        root
     }
 }
 
