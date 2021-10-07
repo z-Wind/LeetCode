@@ -8,19 +8,21 @@ impl Solution {
         for i in (0..secret.len()){
             if secret[i] == guess[i]{
                 bulls += 1;
+                continue;
             }
-            let idx = (secret[i] - b'0') as usize;
+            
+            let mut idx = (secret[i] - b'0') as usize;
             if digits[idx] < 0{
                 cows+=1;
             }
             digits[idx] += 1;
-            let idx = (guess[i] - b'0') as usize;
+            idx = (guess[i] - b'0') as usize;
             if digits[idx] > 0{
                 cows+=1;
             }
             digits[idx] -= 1;
         }
         
-        format!("{}A{}B",bulls,cows-bulls)
+        format!("{}A{}B",bulls,cows)
     }
 }
