@@ -1,20 +1,17 @@
-// dp[i] = 1 + max(dp[j]) j=i+1..n if nums[j] > nums[i]
+// https://leetcode.com/problems/longest-increasing-subsequence/discuss/74824/JavaPython-Binary-search-O(nlogn)-time-with-explanation/206357
+// https://www.cs.princeton.edu/courses/archive/spring13/cos423/lectures/LongestIncreasingSubsequence.pdf
+
 impl Solution {
     pub fn length_of_lis(nums: Vec<i32>) -> i32 {
-        let n = nums.len();
-        let mut dp = vec![1;n];
-        let mut ans = 1;
-        for i in (0..n-1).rev(){
-            let mut val = 0;
-            for j in (i+1..n){
-                if nums[j] > nums[i] {
-                     val = val.max(dp[j]);
-                }
+        let mut piles = Vec::with_capacity(nums.len());
+        for num in nums {
+            let idx = piles.binary_search(&num).unwrap_or_else(|e| e);
+            if idx == piles.len(){
+                piles.push(num);
+            } else {
+                piles[idx] = num;
             }
-            dp[i] += val;
-            ans = ans.max(dp[i]);
         }
-        // println!("{:?}", dp);
-        ans
+        piles.len() as i32
     }
 }
