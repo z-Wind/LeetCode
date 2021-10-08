@@ -36,12 +36,12 @@ impl Solution {
         
         let mut ans:HashSet<String> = HashSet::new();
         let mut temp = String::new();
-        backtrack(&mut ans, &mut temp, &s, 0, 0, max_left, max_right);
+        backtrack(&mut ans, &mut temp, s.as_bytes(), 0, 0, max_left, max_right);
         ans.into_iter().collect()
     }
 }
 
-fn backtrack(ans:&mut HashSet<String>, temp:&mut String, s:&str, start:usize, count:i32, max_left:i32, max_right:i32){
+fn backtrack(ans:&mut HashSet<String>, temp:&mut String, s:&[u8], start:usize, count:i32, max_left:i32, max_right:i32){
     // println!("{}:{} {}", count, temp, max_remove);
     if start == s.len(){
         if count == 0{
@@ -49,26 +49,24 @@ fn backtrack(ans:&mut HashSet<String>, temp:&mut String, s:&str, start:usize, co
         }
         return;
     }
-    if max_left < 0 || max_right < 0{
+    if max_left < 0 || max_right < 0 || count < 0{
         return;
     }
-    match &s[start..start+1]{
-        "(" => {
+    match s[start]{
+        b'(' => {
             temp.push('(');
             backtrack(ans, temp, s, start+1, count+1, max_left, max_right);
             temp.pop();
             backtrack(ans, temp, s, start+1, count, max_left-1, max_right);
         },
-        ")" => {
-            if count > 0{
-                temp.push(')');
-                backtrack(ans, temp, s, start+1, count-1, max_left, max_right);
-                temp.pop();
-            }
+        b')' => {
+            temp.push(')');
+            backtrack(ans, temp, s, start+1, count-1, max_left, max_right);
+            temp.pop();
             backtrack(ans, temp, s, start+1, count, max_left, max_right-1);
         },
         c => {
-            temp.push_str(c);
+            temp.push(c as char);
             backtrack(ans, temp, s, start+1, count, max_left, max_right);
             temp.pop();
         },
