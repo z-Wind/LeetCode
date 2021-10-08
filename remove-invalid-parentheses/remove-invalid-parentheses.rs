@@ -9,6 +9,26 @@ impl Solution {
     }
 }
 
+// i
+// j
+// ())())
+//  ji  
+// ())())
+// ()()) <= remove ')', i, j equal shift one
+// 
+//  j  i
+// ()())
+// befroe i is ok closure
+// and we get extra one ')'
+// so we can choose any ')' before i include i to remove
+//
+// if we don't record j and just choose any ')' before i include i to remove                   
+//     i           i 
+// (a)b)c) -> (ab)c) -> (abc) or (ab)c
+//         -> (a)bc) -> (abc) or (a)bc
+//                      repeat remove ')' after a
+// that's why we need to record j
+//
 fn backtrack(s:String, ans:&mut Vec<String>, last_i:usize, last_j:usize, par:[u8;2]) {
     // println!("par:{:?}, s:{}, {},{}", par, s, last_i, last_j);
     let mut stack:i32 = 0;
@@ -30,6 +50,7 @@ fn backtrack(s:String, ans:&mut Vec<String>, last_i:usize, last_j:usize, par:[u8
                 backtrack(temp, ans, i, j, par);
             }
         }
+        // just process extra one par[1]
         return;
     }
     
