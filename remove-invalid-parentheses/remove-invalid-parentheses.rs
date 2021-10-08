@@ -42,14 +42,13 @@ impl Solution {
 }
 
 fn backtrack(ans:&mut HashSet<String>, temp:&mut String, s:&[u8], start:usize, count:i32, max_left:i32, max_right:i32){
-    // println!("{}:{} {}", count, temp, max_remove);
-    if start == s.len(){
+    // println!("{}:{} {} {}", count, temp, max_left, max_right);
+    if max_left < 0 || max_right < 0 || count < 0{
+        return;
+    } else if start == s.len(){
         if count == 0{
             ans.insert(temp.clone());
         }
-        return;
-    }
-    if max_left < 0 || max_right < 0 || count < 0{
         return;
     }
     match s[start]{
