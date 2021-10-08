@@ -1,5 +1,5 @@
 struct NumArray {
-    nums:Vec<i32>,
+    sums:Vec<i32>,
 }
 
 
@@ -10,13 +10,21 @@ struct NumArray {
 impl NumArray {
 
     fn new(nums: Vec<i32>) -> Self {
+        let sums:Vec<i32> = nums.iter().scan(0, |sum, &x| {
+            *sum+=x;
+            Some(*sum)
+        }).collect();
+        // println!("{:?}", sums);
         Self{
-            nums,
+            sums,
         }
     }
     
     fn sum_range(&self, left: i32, right: i32) -> i32 {
-        self.nums[left as usize..=right as usize].iter().sum()
+        if left == 0{
+            return self.sums[right as usize];
+        }
+        self.sums[right as usize] - self.sums[left as usize -1]
     }
 }
 
