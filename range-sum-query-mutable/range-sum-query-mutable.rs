@@ -54,7 +54,8 @@ impl SegmentTree {
 
     // O(logn)
     fn query(&self, start: usize, end: usize) -> i32 {
-        if start <= self.start && self.end <= end {
+        // NOTE: Exact match
+        if start == self.start && self.end == end {
             return self.sum;
         }
         let mid = self.start + (self.end - self.start) / 2;
