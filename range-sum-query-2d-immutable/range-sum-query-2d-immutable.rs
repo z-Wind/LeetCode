@@ -10,14 +10,13 @@ struct NumMatrix {
 impl NumMatrix {
 
     fn new(matrix: Vec<Vec<i32>>) -> Self {
-        let sums:Vec<Vec<i32>> = matrix.iter().map(|nums| {
-            nums.iter()
-                .scan(0, |sum, &x| {
-                    *sum += x;
-                    Some(*sum)
-                })
-                .collect::<Vec<i32>>()
-        }).collect();
+        let mut sums:Vec<Vec<i32>> = vec![vec![0;matrix[0].len()+1];matrix.len()+1];
+        for i in (0..matrix.len()){
+            for j in (0..matrix[0].len()){
+                sums[i+1][j+1] = sums[i][j+1] + sums[i+1][j] - sums[i][j] + matrix[i][j]
+            }
+        }
+        
         // println!("{:?}", sums);
         Self { sums }
     }
@@ -28,18 +27,8 @@ impl NumMatrix {
         let col1 = col1 as usize;
         let col2 = col2 as usize;
         
-        // println!("({},{}), ({},{})", row1, col1, row2, col2);
-        let mut sum = 0;
-        for i in (row1..=row2){
-            // println!("{},{}",self.sums[i][col1],self.sums[i][col2]);
-            if col1 == 0{
-                sum += self.sums[i][col2];
-            } else {
-                sum += (self.sums[i][col2] - self.sums[i][col1-1]);
-            }
-        }
-        // println!("=========");
-        sum
+
+        self.sums[row2+1][col2+1] - self.sums[row1][col2+1] - self.sums[row2+1][col1] + self.sums[row1][col1]
     }
 }
 
