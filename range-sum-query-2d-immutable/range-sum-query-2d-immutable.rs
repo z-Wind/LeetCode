@@ -18,7 +18,7 @@ impl NumMatrix {
                 })
                 .collect::<Vec<i32>>()
         }).collect();
-        println!("{:?}", sums);
+        // println!("{:?}", sums);
         Self { sums }
     }
     
