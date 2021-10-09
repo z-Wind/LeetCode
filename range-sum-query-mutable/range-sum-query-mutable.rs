@@ -34,8 +34,13 @@ impl BinaryIndexedTree {
     }
 
     // O(logn)
-    fn update(&mut self, i: usize, delta: i32) {
+    fn update(&mut self, i: usize, val: i32) {        
+        // get previous value
+        let prev: i32 = self.query(i) - self.query(i - 1);
+        let delta: i32 = val - prev;
+        
         let mut i = i + 1;
+        
         // update prefix sum in BIT
         while(i <= self.len){
             self.vals[i as usize] += delta;
@@ -59,7 +64,6 @@ impl BinaryIndexedTree {
 
 #[derive(Debug)]
 struct NumArray {
-    nums:Vec<i32>,
     bit:BinaryIndexedTree,
 }
 
@@ -73,23 +77,17 @@ impl NumArray {
     fn new(nums: Vec<i32>) -> Self {
         let bit = BinaryIndexedTree::new(&nums);
         Self{
-            nums,
             bit,
         }
     }
     
     fn update(&mut self, index: i32, val: i32) {
         let index = index as usize;
-        let delta = val - self.nums[index];
-        self.bit.update(index, delta);
-        self.nums[index] = val;
+        self.bit.update(index, val);
     }
     
     fn sum_range(&self, left: i32, right: i32) -> i32 {
-        match left{
-            0 => self.bit.query(right as usize),
-            _ => self.bit.query(right as usize) - self.bit.query(left as usize - 1),
-        }
+        self.bit.query(right as usize) - self.bit.query(left as usize - 1)
     }
 }
 
