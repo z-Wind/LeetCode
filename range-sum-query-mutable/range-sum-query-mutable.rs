@@ -1,81 +1,66 @@
-// Ref: https://en.wikipedia.org/wiki/Segment_tree
+// https://medium.com/@edison.cy.yang/explaining-the-binary-indexed-tree-34f27ad0a513
+// https://zh.wikipedia.org/wiki/%E6%A0%91%E7%8A%B6%E6%95%B0%E7%BB%84
+// https://cp.wiwiho.me/fenwick-tree/
+// https://yuihuang.com/binary-indexed-tree/?utm_source=rss&utm_medium=rss&utm_campaign=binary-indexed-tree
 
 #[derive(Debug)]
-struct SegmentTree {
-    pub start: usize,
-    pub end: usize,
-    pub sum: i32,
-    pub left: Option<Box<SegmentTree>>,
-    pub right: Option<Box<SegmentTree>>,
+struct BinaryIndexedTree {
+    vals:Vec<i32>,
+    len:usize,
 }
 
-impl SegmentTree {
+impl BinaryIndexedTree {
     // O(n)
-    fn new(start: usize, end: usize, vals: &[i32]) -> Self {
-        if start == end {
-            return Self {
-                start,
-                end,
-                sum: vals[start],
-                left: None,
-                right: None,
-            };
+    fn new(nums: &[i32]) -> Self {
+        let mut tree = Self{
+            vals:vec![0;nums.len()+1],
+            len:nums.len(),
+        };
+        for i in (0..nums.len()){
+            tree.update(i, nums[i]);
         }
-        let mid = start + (end - start) / 2;
-        let left = Self::new(start, mid, vals);
-        let right = Self::new(mid + 1, end, vals);
-        let sum = left.sum + right.sum;
-        Self {
-            start,
-            end,
-            sum,
-            left: Some(Box::new(left)),
-            right: Some(Box::new(right)),
-        }
+        // println!("{:?}", tree.vals);
+        tree
+    }
+    
+    fn low_bit(&self, x:usize) -> usize{
+        // get last bit equal 1
+        //             3       6
+        //  x        011    0110
+        // -x        101    1010
+        // x & (-x)  001    0010
+        let x = x as i32;
+        (x & (-x)) as usize
     }
 
     // O(logn)
-    fn update(&mut self, index: usize, val: i32) {
-        // NOTE: If is leaf, update itself
-        if self.start == self.end && self.end == index {
-            self.sum = val;
-            return;
+    fn update(&mut self, i: usize, delta: i32) {
+        let mut i = i + 1;
+        // update prefix sum in BIT
+        while(i <= self.len){
+            self.vals[i as usize] += delta;
+            i += self.low_bit(i);
         }
-        // NOTE: If is not leaf, update left or right
-        let mid = self.start + (self.end - self.start) / 2;
-        if index <= mid {
-            self.left.as_mut().unwrap().update(index, val);
-        } else {
-            self.right.as_mut().unwrap().update(index, val);
-        }
-        // NOTE: After update children, update self
-        self.sum = self.left.as_ref().unwrap().sum + self.right.as_ref().unwrap().sum;
+        // println!("{:?}", self.vals);
     }
 
     // O(logn)
-    fn query(&self, start: usize, end: usize) -> i32 {
-        // NOTE: Exact match
-        if start == self.start && self.end == end {
-            return self.sum;
+    // nums[0..=i].sum
+    fn query(&self, i: usize) -> i32 {
+        let mut i = i+1;
+        let mut sum = 0;
+        while i > 0{
+            sum += self.vals[i];
+            i -= self.low_bit(i);
         }
-        let mid = self.start + (self.end - self.start) / 2;
-        // NOTE: Range on the left or right
-        if end <= mid{
-            return self.left.as_ref().unwrap().query(start, end);
-        // NOTE: Range on the right
-        } else if start > mid {
-            return self.right.as_ref().unwrap().query(start, end);
-        // NOTE: Range on both sides
-        } else {
-            return self.left.as_ref().unwrap().query(start, mid)
-                + self.right.as_ref().unwrap().query(mid + 1, end);
-        }
+        sum
     }
 }
 
 #[derive(Debug)]
 struct NumArray {
-    sums:SegmentTree,
+    nums:Vec<i32>,
+    bit:BinaryIndexedTree,
 }
 
 
@@ -86,17 +71,25 @@ struct NumArray {
 impl NumArray {
 
     fn new(nums: Vec<i32>) -> Self {
+        let bit = BinaryIndexedTree::new(&nums);
         Self{
-            sums: SegmentTree::new(0, nums.len()-1, &nums),
+            nums,
+            bit,
         }
     }
     
     fn update(&mut self, index: i32, val: i32) {
-        self.sums.update(index as usize, val);
+        let index = index as usize;
+        let delta = val - self.nums[index];
+        self.bit.update(index, delta);
+        self.nums[index] = val;
     }
     
     fn sum_range(&self, left: i32, right: i32) -> i32 {
-        self.sums.query(left as usize, right as usize)
+        match left{
+            0 => self.bit.query(right as usize),
+            _ => self.bit.query(right as usize) - self.bit.query(left as usize - 1),
+        }
     }
 }
 
