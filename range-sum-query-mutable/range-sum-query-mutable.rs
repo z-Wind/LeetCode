@@ -1,93 +1,104 @@
-// https://medium.com/@edison.cy.yang/explaining-the-binary-indexed-tree-34f27ad0a513
-// https://zh.wikipedia.org/wiki/%E6%A0%91%E7%8A%B6%E6%95%B0%E7%BB%84
-// https://cp.wiwiho.me/fenwick-tree/
-// https://yuihuang.com/binary-indexed-tree/?utm_source=rss&utm_medium=rss&utm_campaign=binary-indexed-tree
+// Ref: https://en.wikipedia.org/wiki/Segment_tree
+
+use std::cell::RefCell;
+use std::rc::Rc;
 
 #[derive(Debug)]
-struct BinaryIndexedTree {
-    vals:Vec<i32>,
-    len:usize,
+struct SegmentTree {
+    pub start: usize,
+    pub end: usize,
+    pub sum: i32,
+    pub left: Option<Rc<RefCell<SegmentTree>>>,
+    pub right: Option<Rc<RefCell<SegmentTree>>>,
 }
 
-impl BinaryIndexedTree {
+impl SegmentTree {
     // O(n)
-    fn new(nums: &[i32]) -> Self {
-        let mut tree = Self{
-            vals:vec![0;nums.len()+1],
-            len:nums.len(),
-        };
-        for i in (0..nums.len()){
-            tree.update(i, nums[i]);
+    fn new(start: usize, end: usize, vals: &[i32]) -> Self {
+        if start == end {
+            return Self {
+                start,
+                end,
+                sum: vals[start],
+                left: None,
+                right: None,
+            };
         }
-        // println!("{:?}", tree.vals);
-        tree
-    }
-    
-    fn low_bit(&self, x:usize) -> usize{
-        // get last bit equal 1
-        //             3       6
-        //  x        011    0110
-        // -x        101    1010
-        // x & (-x)  001    0010
-        let x = x as i32;
-        (x & (-x)) as usize
-    }
-
-    // O(logn)
-    fn update(&mut self, i: usize, val: i32) {        
-        // get previous value
-        let prev: i32 = self.query(i) - self.query(i - 1);
-        let delta: i32 = val - prev;
-        
-        let mut i = i + 1;
-        
-        // update prefix sum in BIT
-        while(i <= self.len){
-            self.vals[i as usize] += delta;
-            i += self.low_bit(i);
+        let mid = start + (end - start) / 2;
+        let left = Self::new(start, mid, vals);
+        let right = Self::new(mid + 1, end, vals);
+        let sum = left.sum + right.sum;
+        Self {
+            start,
+            end,
+            sum,
+            left: Some(Rc::new(RefCell::new(left))),
+            right: Some(Rc::new(RefCell::new(right))),
         }
-        // println!("{:?}", self.vals);
     }
 
     // O(logn)
-    // nums[0..=i].sum
-    fn query(&self, i: usize) -> i32 {
-        let mut i = i+1;
-        let mut sum = 0;
-        while i > 0{
-            sum += self.vals[i];
-            i -= self.low_bit(i);
+    fn update(&mut self, index: usize, val: i32) {
+        // NOTE: If is leaf, update itself
+        if self.start == self.end && self.end == index {
+            self.sum = val;
+            return;
         }
-        sum
+        // NOTE: If is not leaf, update left or right
+        let mid = self.start + (self.end - self.start) / 2;
+        if index <= mid {
+            self.left.as_ref().unwrap().borrow_mut().update(index, val);
+        } else {
+            self.right.as_ref().unwrap().borrow_mut().update(index, val);
+        }
+        // NOTE: After update children, update self
+        self.sum =
+            self.left.as_ref().unwrap().borrow().sum + self.right.as_ref().unwrap().borrow().sum;
+    }
+
+    // O(logn)
+    fn query(&self, start: usize, end: usize) -> i32 {
+        // NOTE: Exact match
+        if start == self.start && self.end == end {
+            return self.sum;
+        }
+        let mid = self.start + (self.end - self.start) / 2;
+        // NOTE: Range on the left or right
+        if end <= mid {
+            return self.left.as_ref().unwrap().borrow().query(start, end);
+        // NOTE: Range on the right
+        } else if start > mid {
+            return self.right.as_ref().unwrap().borrow().query(start, end);
+        // NOTE: Range on both sides
+        } else {
+            return self.left.as_ref().unwrap().borrow().query(start, mid)
+                + self.right.as_ref().unwrap().borrow().query(mid + 1, end);
+        }
     }
 }
 
 #[derive(Debug)]
 struct NumArray {
-    bit:BinaryIndexedTree,
+    sums: SegmentTree,
 }
 
-
-/** 
+/**
  * `&self` means the method takes an immutable reference.
  * If you need a mutable reference, change it to `&mut self` instead.
  */
 impl NumArray {
-
     fn new(nums: Vec<i32>) -> Self {
-        let bit = BinaryIndexedTree::new(&nums);
-        Self{
-            bit,
+        Self {
+            sums: SegmentTree::new(0, nums.len() - 1, &nums),
         }
     }
-    
+
     fn update(&mut self, index: i32, val: i32) {
-        let index = index as usize;
-        self.bit.update(index, val);
+        self.sums.update(index as usize, val);
     }
-    
+
     fn sum_range(&self, left: i32, right: i32) -> i32 {
-        self.bit.query(right as usize) - self.bit.query(left as usize - 1)
+        self.sums.query(left as usize, right as usize)
     }
 }
 
