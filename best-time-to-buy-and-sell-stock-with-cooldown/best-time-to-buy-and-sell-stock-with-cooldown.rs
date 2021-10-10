@@ -9,23 +9,31 @@
 // s0[i] = max(s0[i - 1], s2[i - 1]); // Stay at s0, or rest from s2
 // s1[i] = max(s1[i - 1], s0[i - 1] - prices[i]); // Stay at s1, or buy from s0
 // s2[i] = s1[i - 1] + prices[i]; // Only one way from s1
+//
+// s0[i-1] s0[i]
+// s1[i-1] s1[i]
+// s2[i-1] s2[i]
+//
+// s0 s0(update)
+// s1 s1(update)
+// s2 s2(update)
 
 use std::cmp::max;
 impl Solution {
     pub fn max_profit(prices: Vec<i32>) -> i32 {
         let n = prices.len();
-        if n <= 1 { return 0; }
-		let mut s0 = vec![0;n];
-		let mut s1 = vec![0;n];
-		let mut s2 = vec![0;n];
-		s1[0] = -prices[0];
-		s0[0] = 0;
-		s2[0] = i32::MIN;
-		for i in 1..n {
-			s0[i] = max(s0[i - 1], s2[i - 1]);
-			s1[i] = max(s1[i - 1], s0[i - 1] - prices[i]);
-			s2[i] = s1[i - 1] + prices[i];
-		}
-		return max(s0[n - 1], s2[n - 1]);
+        if n <= 1 {
+            return 0;
+        }
+        let mut s0 = 0;
+        let mut s1 = -prices[0];
+        let mut s2 = i32::MIN;
+        for price in prices {
+            let s1_temp = s1;
+            s1 = max(s1, s0 - price);
+            s0 = max(s0, s2);
+            s2 = s1_temp + price;
+        }
+        return max(s0, s2);
     }
 }
