@@ -4,7 +4,7 @@
 use std::cmp::max;
 impl Solution {
     pub fn max_profit(prices: Vec<i32>) -> i32 {
-        MaxProfit_V3(prices.clone())
+        MaxProfit_V3(prices)
     }
 }
 
