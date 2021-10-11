@@ -1,6 +1,4 @@
 // find the center of longest path
-use std::collections::VecDeque;
-use std::collections::HashSet;
 impl Solution {
     pub fn find_min_height_trees(n: i32, edges: Vec<Vec<i32>>) -> Vec<i32> {
         if n == 1{
@@ -11,7 +9,6 @@ impl Solution {
         
         let n = n as usize;
         let mut links:Vec<Vec<i32>> = vec![vec![];n];
-        let mut edge_num:Vec<i32> = vec![0;n];
         for edge in edges{
             // a-b
             let a = edge[0] as usize;
@@ -19,8 +16,6 @@ impl Solution {
             
             links[a].push(edge[1]);
             links[b].push(edge[0]);
-            edge_num[a] += 1;
-            edge_num[b] += 1;
         }
         
         // println!("{:?}", links);
