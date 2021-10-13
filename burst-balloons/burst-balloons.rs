@@ -14,24 +14,18 @@ impl Solution {
 
         let n = ballons.len();
         let mut dp = vec![vec![0; n]; n];
-        max_coins(&mut dp, &ballons, 0, ballons.len() - 1)
+        for k in 2..n{
+            for left in 0..n-k{
+                let right = left + k;
+                for i in left + 1..right {
+                    dp[left][right] = dp[left][right].max(
+                        ballons[left] * ballons[i] * ballons[right]
+                            + dp[left][i]
+                            + dp[i][right]
+                    );
+                }        
+            }
+        }
+        dp[0][n-1]
     }
-}
-
-fn max_coins(dp: &mut Vec<Vec<i32>>, nums: &Vec<i32>, left: usize, right: usize) -> i32 {
-    if dp[left][right] != 0 {
-        return dp[left][right];
-    }
-        
-    let mut coins = 0;
-
-    for i in (left + 1..right) {
-        coins = coins.max(
-            nums[left] * nums[i] * nums[right]
-                + max_coins(dp, nums, left, i)
-                + max_coins(dp, nums, i, right),
-        );
-    }
-    dp[left][right] = coins;
-    coins
 }
