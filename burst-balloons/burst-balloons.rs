@@ -13,26 +13,25 @@ impl Solution {
         ballons.push(1);
 
         let n = ballons.len();
-        let mut dp = vec![vec![None; n]; n];
+        let mut dp = vec![vec![0; n]; n];
         max_coins(&mut dp, &ballons, 0, ballons.len() - 1)
     }
 }
 
-fn max_coins(dp: &mut Vec<Vec<Option<i32>>>, nums: &Vec<i32>, left: usize, right: usize) -> i32 {
-    match dp[left][right] {
-        Some(coins) => coins,
-        None => {
-            let mut coins = 0;
-
-            for i in (left + 1..right) {
-                coins = coins.max(
-                    nums[left] * nums[i] * nums[right]
-                        + max_coins(dp, nums, left, i)
-                        + max_coins(dp, nums, i, right),
-                );
-            }
-            dp[left][right] = Some(coins);
-            coins
-        }
+fn max_coins(dp: &mut Vec<Vec<i32>>, nums: &Vec<i32>, left: usize, right: usize) -> i32 {
+    if dp[left][right] != 0 {
+        return dp[left][right];
     }
+        
+    let mut coins = 0;
+
+    for i in (left + 1..right) {
+        coins = coins.max(
+            nums[left] * nums[i] * nums[right]
+                + max_coins(dp, nums, left, i)
+                + max_coins(dp, nums, i, right),
+        );
+    }
+    dp[left][right] = coins;
+    coins
 }
