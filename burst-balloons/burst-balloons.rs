@@ -7,9 +7,11 @@ impl Solution {
     pub fn max_coins(nums: Vec<i32>) -> i32 {
         let mut ballons = Vec::with_capacity(nums.len() + 1);
         ballons.push(1);
-        nums.into_iter()
-            .filter(|&x| x != 0)
-            .for_each(|x| ballons.push(x));
+        for num in nums{
+            if num != 0{
+                ballons.push(num);
+            }
+        }
         ballons.push(1);
 
         let n = ballons.len();
