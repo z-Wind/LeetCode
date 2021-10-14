@@ -15,10 +15,12 @@ impl Solution {
         let mut idx:Vec<usize> = vec![0;primes.len()];
         for i in 1..n{
             for j in 0..primes.len(){
-                if nums[i-1] == nums[idx[j]]*primes[j]{
+                let mut next = nums[idx[j]]*primes[j];
+                if nums[i-1] == next{
                     idx[j] += 1;
+                    next = nums[idx[j]]*primes[j];
                 }
-                nums[i] = nums[i].min(nums[idx[j]]*primes[j])
+                nums[i] = nums[i].min(next);
             }
         }
         // println!("{:?}", nums);
