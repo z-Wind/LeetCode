@@ -12,15 +12,15 @@ impl Solution {
         let mut nums = vec![i32::MAX;n];
         nums[0] = 1;
         
+        let mut pre_computed: Vec<i32> = vec![1; primes.len()];
         let mut idx:Vec<usize> = vec![0;primes.len()];
         for i in 1..n{
             for j in 0..primes.len(){
-                let mut next = nums[idx[j]]*primes[j];
-                if nums[i-1] == next{
+                if nums[i-1] == pre_computed[j]{
+                    pre_computed[j] = nums[idx[j]]*primes[j];
                     idx[j] += 1;
-                    next = nums[idx[j]]*primes[j];
                 }
-                nums[i] = nums[i].min(next);
+                nums[i] = nums[i].min(pre_computed[j]);
             }
         }
         // println!("{:?}", nums);
