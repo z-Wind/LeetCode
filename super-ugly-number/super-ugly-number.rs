@@ -9,19 +9,19 @@ impl Solution {
             return 1;    
         }
         let n = n as usize;
-        let mut nums = vec![1];
+        let mut nums = vec![1;n];
         
         let mut idx:Vec<usize> = vec![0;primes.len()];
-        while nums.len() < n{
+        for i in 1..n{
             let v:Vec<(usize,i32)> = idx.iter()
                           .enumerate()
                           .map(|(i,&x)| (i,nums[x]*primes[i]))
                           .collect();
             let &(_,next) = v.iter().min_by(|(_,a),(_,b)| a.cmp(b)).unwrap();
-            nums.push(next);
-            for i in 0..v.len(){
-                if v[i].1 == next{
-                    idx[i] += 1;      
+            nums[i] = next;
+            for j in 0..v.len(){
+                if v[j].1 == next{
+                    idx[j] += 1;      
                 }
             }
         }
