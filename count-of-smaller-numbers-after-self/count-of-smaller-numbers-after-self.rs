@@ -1,98 +1,101 @@
-// https://leetcode.com/problems/count-of-smaller-numbers-after-self/discuss/1298079/Rust-SegmentTree-solution
+// https://leetcode.com/problems/count-of-smaller-numbers-after-self/discuss/445769/merge-sort-CLEAR-simple-EXPLANATION-with-EXAMPLES-O(n-lg-n)
 
-#[derive(Debug)]
-struct SegmentTree {
-    pub start: usize,
-    pub end: usize,
-    pub sum: i32,
-    pub left: Option<Box<SegmentTree>>,
-    pub right: Option<Box<SegmentTree>>,
+// Wrapper class for each and every value of the input array,
+// to store the original index position of each value, before we merge sort the array
+#[derive(Debug, Clone, Copy)]
+struct ArrayValWithOrigIdx {
+    val: i32,
+    originalIdx: usize,
 }
 
-impl SegmentTree {
-    // O(n)
-    fn new(start: usize, end: usize, vals: &[i32]) -> Self {
-        if start == end {
-            return Self {
-                start,
-                end,
-                sum: vals[start],
-                left: None,
-                right: None,
-            };
+impl ArrayValWithOrigIdx {
+    fn new(val:i32, originalIdx:usize) -> Self{
+        Self{
+            val,
+            originalIdx,
         }
-        let mid = start + (end - start) / 2;
-        let left = Self::new(start, mid, vals);
-        let right = Self::new(mid + 1, end, vals);
-        let sum = left.sum + right.sum;
-        Self {
-            start,
-            end,
-            sum,
-            left: Some(Box::new(left)),
-            right: Some(Box::new(right)),
+    }
+}
+
+fn mergeSortAndCount(nums:&mut Vec<ArrayValWithOrigIdx>, start:usize, end:usize, result:&mut Vec<i32>) {
+    if start >= end {
+        return;
+    }
+
+    let mid = (start + end) / 2;
+    mergeSortAndCount(nums, start, mid, result);
+    mergeSortAndCount(nums, mid + 1, end, result);
+
+    // left subarray start...mid
+    // right subarray mid+1...end
+    let mut leftPos = start;
+    let mut rightPos = mid + 1;
+    let mut merged:Vec<ArrayValWithOrigIdx> = Vec::new();
+    let mut numElemsRightArrayLessThanLeftArray = 0;
+    while leftPos < mid + 1 && rightPos <= end {
+        if nums[leftPos].val > nums[rightPos].val {
+            // this code block is exactly what the problem is asking us for:
+            // a number from the right side of the original input array, is smaller
+            // than a number from the left side
+            //
+            // within this code block,
+            // nums[rightPos] is smaller than the start of the left sub-array.
+            // Since left sub-array is already sorted,
+            // nums[rightPos] must also be smaller than the entire remaining left sub-array
+            numElemsRightArrayLessThanLeftArray+=1;
+
+            // continue with normal merge sort, merge
+            merged.push(nums[rightPos].clone());
+            rightPos+=1;
+        } else {
+            // a number from left side of array, is smaller than a number from
+            // right side of array
+            result[nums[leftPos].originalIdx] += numElemsRightArrayLessThanLeftArray;
+
+            // Continue with normal merge sort
+            merged.push(nums[leftPos].clone());
+            leftPos+=1;
         }
     }
 
-    // O(logn)
-    fn update(&mut self, index: usize, val: i32) {
-        // NOTE: If is leaf, update itself
-        if self.start == self.end && self.end == index {
-            self.sum = val;
-            return;
-        }
-        // NOTE: If is not leaf, update left or right
-        let mid = self.start + (self.end - self.start) / 2;
-        if index <= mid {
-            self.left.as_mut().unwrap().update(index, val);
-        } else {
-            self.right.as_mut().unwrap().update(index, val);
-        }
-        // NOTE: After update children, update self
-        self.sum = self.left.as_ref().unwrap().sum + self.right.as_ref().unwrap().sum;
+    // part of normal merge sort, if either left or right sub-array is not empty,
+    // move all remaining elements into merged result
+    while leftPos < mid + 1 {
+        result[nums[leftPos].originalIdx] += numElemsRightArrayLessThanLeftArray;
+
+        merged.push(nums[leftPos].clone());
+        leftPos+=1;
+    }
+    while (rightPos <= end) {
+        merged.push(nums[rightPos].clone());
+        rightPos+=1;
     }
 
-    // O(logn)
-    fn query(&self, start: usize, end: usize) -> i32 {
-        // NOTE: Exact match
-        if self.start == start && self.end == end {
-            return self.sum;
-        }
-        let mid = self.start + (self.end - self.start) / 2;
-        // NOTE: Range on the left or right
-        if end <= mid{
-            return self.left.as_ref().unwrap().query(start, end);
-        // NOTE: Range on the right
-        } else if start > mid {
-            return self.right.as_ref().unwrap().query(start, end);
-        // NOTE: Range on both sides
-        } else {
-            return self.left.as_ref().unwrap().query(start, mid)
-                + self.right.as_ref().unwrap().query(mid + 1, end);
-        }
+    // part of normal merge sort
+    // copy back merged result into array
+    let mut pos = start;
+    for m in merged {
+        nums[pos] = m.clone();
+        pos+=1;
     }
 }
 
 impl Solution {
     pub fn count_smaller(nums: Vec<i32>) -> Vec<i32> {
-        // since num[i] in [-1e4, 1e4], right shift 10_000 to make cts storable in array
-        let n = nums.len();
-        let mut cts = vec![0; 20_001];
-        let mut segment_tree = SegmentTree::new(0, 20_000, &cts);
-        
-        let mut ans = vec![0; n];
-        for i in (0..n).rev() {
-            let idx = (nums[i] + 10_000) as usize;
-            if idx == 0 { 
-                ans[i] = 0;
-            } else {
-                ans[i] = segment_tree.query(0, idx - 1);
-            }
-            
-            // Update data
-            cts[idx] += 1;
-            segment_tree.update(idx, cts[idx]);
+        if nums.is_empty() {
+            return vec![];   
         }
-        ans
+         
+        let n = nums.len();
+        let mut result = vec![0;n];
+        
+        let mut newNums:Vec<ArrayValWithOrigIdx> = Vec::with_capacity(n);
+        for i in 0..n{
+            newNums.push(ArrayValWithOrigIdx::new(nums[i], i));
+        }
+
+        mergeSortAndCount(&mut newNums, 0, n - 1, &mut result);
+
+        result
     }
 }
