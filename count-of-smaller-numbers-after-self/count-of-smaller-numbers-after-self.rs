@@ -30,7 +30,7 @@ fn mergeSortAndCount(nums:&mut Vec<ArrayValWithOrigIdx>, start:usize, end:usize,
     // right subarray mid+1...end
     let mut leftPos = start;
     let mut rightPos = mid + 1;
-    let mut merged:Vec<ArrayValWithOrigIdx> = Vec::new();
+    let mut merged:Vec<ArrayValWithOrigIdx> = Vec::with_capacity(end-start+1);
     let mut numElemsRightArrayLessThanLeftArray = 0;
     while leftPos < mid + 1 && rightPos <= end {
         if nums[leftPos].val > nums[rightPos].val {
@@ -75,7 +75,8 @@ fn mergeSortAndCount(nums:&mut Vec<ArrayValWithOrigIdx>, start:usize, end:usize,
     // copy back merged result into array
     let mut pos = start;
     for m in merged {
-        nums[pos] = m.clone();
+        nums[pos].val = m.val;
+        nums[pos].originalIdx = m.originalIdx;
         pos+=1;
     }
 }
