@@ -1,28 +1,98 @@
+// https://leetcode.com/problems/count-of-smaller-numbers-after-self/discuss/1298079/Rust-SegmentTree-solution
+
+#[derive(Debug)]
+struct SegmentTree {
+    pub start: usize,
+    pub end: usize,
+    pub sum: i32,
+    pub left: Option<Box<SegmentTree>>,
+    pub right: Option<Box<SegmentTree>>,
+}
+
+impl SegmentTree {
+    // O(n)
+    fn new(start: usize, end: usize, vals: &[i32]) -> Self {
+        if start == end {
+            return Self {
+                start,
+                end,
+                sum: vals[start],
+                left: None,
+                right: None,
+            };
+        }
+        let mid = start + (end - start) / 2;
+        let left = Self::new(start, mid, vals);
+        let right = Self::new(mid + 1, end, vals);
+        let sum = left.sum + right.sum;
+        Self {
+            start,
+            end,
+            sum,
+            left: Some(Box::new(left)),
+            right: Some(Box::new(right)),
+        }
+    }
+
+    // O(logn)
+    fn update(&mut self, index: usize, val: i32) {
+        // NOTE: If is leaf, update itself
+        if self.start == self.end && self.end == index {
+            self.sum = val;
+            return;
+        }
+        // NOTE: If is not leaf, update left or right
+        let mid = self.start + (self.end - self.start) / 2;
+        if index <= mid {
+            self.left.as_mut().unwrap().update(index, val);
+        } else {
+            self.right.as_mut().unwrap().update(index, val);
+        }
+        // NOTE: After update children, update self
+        self.sum = self.left.as_ref().unwrap().sum + self.right.as_ref().unwrap().sum;
+    }
+
+    // O(logn)
+    fn query(&self, start: usize, end: usize) -> i32 {
+        // NOTE: Exact match
+        if self.start == start && self.end == end {
+            return self.sum;
+        }
+        let mid = self.start + (self.end - self.start) / 2;
+        // NOTE: Range on the left or right
+        if end <= mid{
+            return self.left.as_ref().unwrap().query(start, end);
+        // NOTE: Range on the right
+        } else if start > mid {
+            return self.right.as_ref().unwrap().query(start, end);
+        // NOTE: Range on both sides
+        } else {
+            return self.left.as_ref().unwrap().query(start, mid)
+                + self.right.as_ref().unwrap().query(mid + 1, end);
+        }
+    }
+}
+
 impl Solution {
     pub fn count_smaller(nums: Vec<i32>) -> Vec<i32> {
+        // since num[i] in [-1e4, 1e4], right shift 10_000 to make cts storable in array
         let n = nums.len();
-        let mut nums_sorted = Vec::with_capacity(n);
+        let mut cts = vec![0; 20_001];
+        let mut segment_tree = SegmentTree::new(0, 20_000, &cts);
         
-        let mut ans:Vec<i32> = vec![0;n];
-        for i in (0..n).rev(){
-            let count = match nums_sorted.binary_search(&nums[i]){
-                Err(idx) => {
-                    nums_sorted.insert(idx, nums[i]);
-                    idx
-                },
-                Ok(mut idx) => {
-                    nums_sorted.insert(idx, nums[i]);
-                    while idx != 0 && nums_sorted[idx-1] == nums_sorted[idx]{
-                        idx -= 1;
-                    }  
-                    idx
-                },
-            };
+        let mut ans = vec![0; n];
+        for i in (0..n).rev() {
+            let idx = (nums[i] + 10_000) as usize;
+            if idx == 0 { 
+                ans[i] = 0;
+            } else {
+                ans[i] = segment_tree.query(0, idx - 1);
+            }
             
-            ans[i] = count as i32;
-            // println!("{} => {}: {:?}",nums[i], count, nums_sorted);
+            // Update data
+            cts[idx] += 1;
+            segment_tree.update(idx, cts[idx]);
         }
-        
         ans
     }
 }
