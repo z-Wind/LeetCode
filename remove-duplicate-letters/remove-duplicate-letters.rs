@@ -1,56 +1,41 @@
-use std::collections::VecDeque;
+use std::collections::{VecDeque, BTreeMap};
 impl Solution {
     pub fn remove_duplicate_letters(s: String) -> String {
-        let mut len = 0;
-        let mut count_c = vec![VecDeque::new();26];
-        let mut select = [false;26];
+        let mut count_c:BTreeMap<u8, VecDeque<usize>> = BTreeMap::new();
         for (i,c) in s.bytes().enumerate(){
-            let ci = (c - b'a') as usize;
-            if count_c[ci].is_empty(){
-                len+=1;
-            }
-            count_c[ci].push_back(i);
+            count_c.entry(c).or_insert(VecDeque::new()).push_back(i);
         }
         
-        let mut temp = vec![b'a';len];
-        match remove_duplicate_letters(&mut temp, 0, count_c, &mut select){
+        let mut temp = Vec::new();
+        match remove_duplicate_letters(&mut temp, 0, count_c){
             Some(ans) => String::from_utf8(ans).unwrap(),
             _ => String::new(),
         }
     }
 }
 
-fn remove_duplicate_letters(temp:&mut Vec<u8>, start:usize, count_c: Vec<VecDeque<usize>>, select:&mut [bool;26]) -> Option<Vec<u8>>{
-    // println!("{}: {:?}", String::from_utf8(temp.clone()).unwrap(), count_c);
-    if start == temp.len(){
+fn remove_duplicate_letters(temp:&mut Vec<u8>, start:usize, count_c: BTreeMap<u8, VecDeque<usize>>) -> Option<Vec<u8>>{
+    if count_c.is_empty(){
         return Some(temp.clone());
     }
     
-    'outer: for i in 0..count_c.len(){
-        if select[i] || count_c[i].is_empty(){
-            continue;
-        }
+    'outer: for (c, v1) in count_c.iter(){
         let mut counts = count_c.clone();
-        for j in 0..counts.len(){
-            if i == j || select[j] || counts[j].is_empty(){
-                continue;
-            }
-            // println!("{}:{:?}, {}:{:?}", i, count_c[i], j, counts[j]);
-            while counts[j][0] < count_c[i][0]{
-                counts[j].pop_front();
-                if counts[j].is_empty(){
+        counts.remove(c);
+        for v2 in counts.values_mut(){
+            while v2[0] < v1[0]{
+                v2.pop_front();
+                if v2.is_empty(){
                     continue 'outer;   
                 }
             }
         }
-        select[i] = true;
-        temp[start] += (i as u8);
-        match remove_duplicate_letters(temp,start+1,counts,select){
+        temp.push(*c);
+        match remove_duplicate_letters(temp, start+1, counts){
             None => (),
             x => return x,
         }
-        select[i] = false;
-        temp[start] -= (i as u8);
+        temp.pop();
     }
     None
 }
