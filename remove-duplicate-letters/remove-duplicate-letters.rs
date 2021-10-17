@@ -1,41 +1,35 @@
-use std::collections::{VecDeque, BTreeMap};
+// https://leetcode.com/problems/remove-duplicate-letters/discuss/76769/Java-solution-using-Stack-with-comments
+
 impl Solution {
     pub fn remove_duplicate_letters(s: String) -> String {
-        let mut count_c:BTreeMap<u8, VecDeque<usize>> = BTreeMap::new();
-        for (i,c) in s.bytes().enumerate(){
-            count_c.entry(c).or_insert(VecDeque::new()).push_back(i);
+        let mut res = [0; 26]; // will contain number of occurences of character (i+'a')
+        let mut visited = [false; 26]; // will contain if character ('a' + i) is present in current result Stack
+        for c in s.chars() {
+            // count number of occurences of character
+            res[(c as u8 - b'a') as usize] += 1;
         }
-        
-        let mut temp = Vec::new();
-        match remove_duplicate_letters(&mut temp, 0, count_c){
-            Some(ans) => String::from_utf8(ans).unwrap(),
-            _ => String::new(),
-        }
-    }
-}
-
-fn remove_duplicate_letters(temp:&mut Vec<u8>, start:usize, count_c: BTreeMap<u8, VecDeque<usize>>) -> Option<Vec<u8>>{
-    if count_c.is_empty(){
-        return Some(temp.clone());
-    }
-    
-    'outer: for (c, v1) in count_c.iter(){
-        let mut counts = count_c.clone();
-        counts.remove(c);
-        for v2 in counts.values_mut(){
-            while v2[0] < v1[0]{
-                v2.pop_front();
-                if v2.is_empty(){
-                    continue 'outer;   
-                }
+        let mut sb: Vec<char> = Vec::new(); // answer stack
+        for c in s.chars() {
+            let index = (c as u8 - b'a') as usize;
+            res[index] -= 1; // decrement number of characters remaining in the string to be analysed
+            if (visited[index]) {
+                // if character is already present in stack, dont bother
+                continue;
             }
+            // if current character is smaller than last character in stack which occurs later in the string again
+            // it can be removed and  added later e.g stack = bc remaining string abc then a can pop b and then c
+            while sb.len() > 0
+                && c < sb[sb.len() - 1]
+                && res[(sb[sb.len() - 1] as u8 - b'a') as usize] != 0
+            {
+                let last_c = (sb[sb.len() - 1] as u8 - b'a') as usize;
+                visited[last_c] = false;
+                sb.pop();
+            }
+            sb.push(c); // add current character and mark it as visited
+            visited[index] = true;
         }
-        temp.push(*c);
-        match remove_duplicate_letters(temp, start+1, counts){
-            None => (),
-            x => return x,
-        }
-        temp.pop();
+
+        sb.into_iter().collect()
     }
-    None
 }
