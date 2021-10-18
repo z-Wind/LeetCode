@@ -1,24 +1,19 @@
-use std::collections::HashSet;
 impl Solution {
     pub fn max_product(words: Vec<String>) -> i32 {
         let n = words.len();
-        let mut set:Vec<HashSet<char>> = vec![HashSet::new();n];
+        let mut set:Vec<i32> = vec![0;n];
+        
+        for i in 0..n{
+            for c in words[i].bytes(){
+                set[i] |= 1 << (c-b'a');
+            }
+        }
         
         let mut max_val = 0;
         for i in 0..n{
             let w1 = words[i].len();
-            if set[i].is_empty(){
-                for c in words[i].chars(){
-                    set[i].insert(c);
-                }
-            }
             for j in i+1..n{
-                if set[j].is_empty(){
-                    for c in words[j].chars(){
-                        set[j].insert(c);
-                    }
-                }
-                if !set[i].is_disjoint(&set[j]){
+                if (set[i] & set[j]) != 0{
                     continue;
                 }
                 let w2 = words[j].len();
