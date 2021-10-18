@@ -4,16 +4,20 @@ impl Solution {
         let n = words.len();
         let mut set:Vec<HashSet<char>> = vec![HashSet::new();n];
         
-        for i in 0..n{
-            for c in words[i].chars(){
-                set[i].insert(c);
-            }
-        }
-        
         let mut max_val = 0;
         for i in 0..n{
             let w1 = words[i].len();
+            if set[i].is_empty(){
+                for c in words[i].chars(){
+                    set[i].insert(c);
+                }
+            }
             for j in i+1..n{
+                if set[j].is_empty(){
+                    for c in words[j].chars(){
+                        set[j].insert(c);
+                    }
+                }
                 if !set[i].is_disjoint(&set[j]){
                     continue;
                 }
