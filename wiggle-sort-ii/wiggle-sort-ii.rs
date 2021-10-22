@@ -19,32 +19,22 @@ impl Solution {
     }
 }
 
-fn wiggle_sort(nums: &mut VecDeque<i32>, num:i32, odd:bool) -> Option<Vec<i32>>{
+fn wiggle_sort(nums: &mut VecDeque<i32>, prev:i32, odd:bool) -> Option<Vec<i32>>{
     // println!("{},{}, {:?}", num, odd, nums);
     if nums.is_empty(){
         return Some(vec![]);
     }
     for i in 0..nums.len(){
-        if odd && nums[i] > num{
-            let sel = nums.swap_remove_front(i).unwrap();
-            match wiggle_sort(nums, sel, !odd){
+        if (odd && nums[i] > prev) || (!odd && nums[i] < prev){
+            let cur = nums.swap_remove_front(i).unwrap();
+            match wiggle_sort(nums, cur, !odd){
                 None => (),
                 Some(mut x) => {
-                    x.push(sel);
+                    x.push(cur);
                     return Some(x);
                 }
             }
-            nums.push_front(sel);
-        } else if !odd && nums[i] < num{
-            let sel = nums.swap_remove_front(i).unwrap();
-            match wiggle_sort(nums, sel, !odd){
-                None => (),
-                Some(mut x) => {
-                    x.push(sel);
-                    return Some(x);
-                }
-            }
-            nums.push_front(sel);
+            nums.push_front(cur);
         }
     }
     None
