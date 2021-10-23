@@ -1,8 +1,15 @@
 impl Solution {
-    pub fn is_power_of_three(mut n: i32) -> bool {
-        while n > 1 && n % 3 == 0{
-            n/=3;
+    pub fn is_power_of_three(n: i32) -> bool {
+        if n >= 1162261467{
+            return n == 1162261467;
         }
-        n == 1
+        
+        let mut m = 1;
+        while m < n{
+            m = m+m+m;
+            // println!("{}",m);
+        }
+        
+        m == n
     }
 }
