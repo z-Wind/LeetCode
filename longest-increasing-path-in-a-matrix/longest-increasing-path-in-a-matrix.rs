@@ -9,7 +9,7 @@ impl Solution {
         let mut ans = 0;
         for i in 0..m {
             for j in 0..n {
-                longest_increasing_path(&mut ans, &mut dp, &matrix, i, j);
+                ans = ans.max(longest_increasing_path(&mut dp, &matrix, i, j));
             }
         }
         // println!("[");
@@ -23,7 +23,6 @@ impl Solution {
 }
 
 fn longest_increasing_path(
-    ans: &mut i32,
     dp: &mut Vec<Vec<i32>>,
     matrix: &Vec<Vec<i32>>,
     i: usize,
@@ -39,9 +38,7 @@ fn longest_increasing_path(
     // }
     // println!("]");
 
-    if i >= m || j >= n {
-        return 0;
-    } else if dp[i][j] != 0 {
+    if dp[i][j] != 0 {
         return dp[i][j];
     }
 
@@ -51,7 +48,7 @@ fn longest_increasing_path(
         }
         // println!("{},{} => {},{}",i,j,k,l);
         match matrix[k][l].cmp(&matrix[i][j]) {
-            Ordering::Greater => longest_increasing_path(ans, dp, matrix, k, l),
+            Ordering::Greater => longest_increasing_path(dp, matrix, k, l),
             Ordering::Less => 0,
             Ordering::Equal => 0,
         }
@@ -67,6 +64,5 @@ fn longest_increasing_path(
         // right
         update(i,j+1));
 
-    *ans = (*ans).max(dp[i][j]);
     dp[i][j]
 }
