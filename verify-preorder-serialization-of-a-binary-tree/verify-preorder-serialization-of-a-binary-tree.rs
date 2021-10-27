@@ -1,15 +1,15 @@
+// https://leetcode.com/problems/verify-preorder-serialization-of-a-binary-tree/discuss/78551/7-lines-Easy-Java-Solution/188285
+
 impl Solution {
     pub fn is_valid_serialization(preorder: String) -> bool {
-        let mut nodes:Vec<&str> = preorder.split(',').rev().collect();
-        is_valid_serialization(&mut nodes) && nodes.len() == 0
+        let mut edges = 1; // 1 for root
+        for node in preorder.split(',') {
+            edges-=1; // consume one edge
+            if edges < 0 { return false; } // to prevent the case: [#,](https://leetcode.com/problems/powx-n) a, ...
+            if node != "#"{
+                edges += 2; // generate 2 edges
+            }
+        }
+        edges == 0
     }
-}
-
-fn is_valid_serialization(nodes: &mut Vec<&str>) -> bool {
-    // println!("{:?}", nodes.iter().rev().collect::<Vec<_>>());
-    match nodes.pop(){
-        None => false,
-        Some("#") => true,
-        Some(_) => is_valid_serialization(nodes) && is_valid_serialization(nodes), 
-    }    
 }
