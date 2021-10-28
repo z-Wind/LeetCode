@@ -1,25 +1,16 @@
-// find min[0..i] < nums[i] < max[i+1..]
+// https://leetcode.com/problems/increasing-triplet-subsequence/discuss/79004/Concise-Java-solution-with-comments.
+// min < mid < nums[i]
+
 impl Solution {
     pub fn increasing_triplet(nums: Vec<i32>) -> bool {
-        let n = nums.len();
-        if n < 3{
-            return false;
+        // start with two largest values, as soon as we find a number bigger than both, while both have been updated, return true.
+        let mut min = i32::MAX;
+        let mut mid = i32::MAX;
+        for num in nums {
+            if num <= min { min = num; } // update small if n is smaller than both
+            else if num <= mid { mid = num; } // update big only if greater than small but smaller than big
+            else { return true; } // return if you find a number bigger than both
         }
-        
-        let mut max = vec![0;n];
-        max[n-1] = nums[n-1];
-        for i in (0..n-1).rev(){
-            max[i] = nums[i].max(max[i+1]);
-        }
-        
-        let mut min = nums[0];
-        for i in 1..n-1{
-            if min < nums[i] && nums[i] < max[i]{
-                return true;
-            }
-            min = min.min(nums[i]);
-        }
-        
-        false
+        return false;
     }
 }
