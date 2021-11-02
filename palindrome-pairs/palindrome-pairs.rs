@@ -1,59 +1,92 @@
+// https://leetcode.com/problems/palindrome-pairs/discuss/79195/O(n-*-k2)-java-solution-with-Trie-structure
+
 impl Solution {
     pub fn palindrome_pairs(words: Vec<String>) -> Vec<Vec<i32>> {
-        let mut ans:Vec<Vec<i32>> = Vec::new();
-        let mut words_rev:Vec<String> = Vec::new();
-        for i in 0..words.len(){
-            words_rev.push(words[i].chars().rev().collect::<String>())
+        let mut ans: Vec<Vec<i32>> = Vec::new();
+        let mut trie = Trie::new();
+        for i in 0..words.len() {
+            trie.insert_rev(&words[i], i as i32);
         }
-        palindrome_pairs(&mut ans, &words, &words_rev, 0);
+        // println!("{:?}", trie);
+
+        for i in 0..words.len() {
+            trie.palindrome_pairs(&words[i], i as i32, &mut ans);
+            // println!("{}:{} => {:?}", i, words[i], ans);
+        }
+
         ans
     }
 }
 
-fn palindrome_pairs(ans:&mut Vec<Vec<i32>>, words: &Vec<String>, words_rev: &Vec<String>, start:usize){
-    if start == words.len(){
-        return;
-    }
-    for i in start+1..words.len(){
-        let (a,b) = if words[start].len() >= words[i].len(){
-            (start, i)
-        } else {
-            (i, start)
-        };
-        
-        match words[a].strip_prefix(&words_rev[b]){
-            None => (),
-            Some(s) => {
-                if is_palindrome(s.as_bytes()){
-                    ans.push(vec![a as i32, b as i32]);
-                }
-            },
-        }
-        match words[a].strip_suffix(&words_rev[b]){
-            None => (),
-            Some(s) => {
-                if is_palindrome(s.as_bytes()){
-                    ans.push(vec![b as i32, a as i32])
-                }
-            },
-        }
-    }
-    
-    palindrome_pairs(ans, words, words_rev, start+1);
+#[derive(Debug, Default)]
+struct Trie {
+    index: i32,
+    list: Vec<i32>,
+    children: [Option<Box<Trie>>; 26],
 }
 
-fn is_palindrome(s:&[u8]) -> bool{
-    if s.len() == 0{
+impl Trie {
+    /** Initialize your data structure here. */
+    fn new() -> Self {
+        Self{
+            index: -1,
+            ..Default::default()
+        }
+    }
+
+    /** Inserts a reverse word into the trie. */
+    fn insert_rev(&mut self, word: &str, index: i32) {
+        let mut curr = self;
+        for (i, c) in word.bytes().map(|c| (c - b'a') as usize).enumerate().rev() {
+            if is_palindrome(&word[0..=i].as_bytes()) {
+                curr.list.push(index);
+            }
+            
+            curr = curr.children[c].get_or_insert(Box::new(Trie::new()));
+        }
+        
+        curr.list.push(index);
+        curr.index = index;
+    }
+
+    fn palindrome_pairs(&self, prefix: &str, index: i32, ans: &mut Vec<Vec<i32>>) {
+        let mut curr = self;
+        for (i, c) in prefix.bytes().map(|c| (c - b'a') as usize).enumerate() {
+            // febe, f or "", aa
+            if curr.index != -1
+                && curr.index != index
+                && is_palindrome(&prefix[i..].as_bytes())
+            {
+                ans.push(vec![index, curr.index]);
+            }
+            match &curr.children[c] {
+                None => return,
+                Some(node) => {
+                    curr = node;
+                }
+            }
+        }
+
+        for &i in curr.list.iter() {
+            if i != index {
+                ans.push(vec![index, i]);
+            }
+        }
+    }
+}
+
+fn is_palindrome(s: &[u8]) -> bool {
+    if s.len() == 0 {
         return true;
     }
     let mut i = 0;
-    let mut j = s.len()-1;
-    while i < j{
-        if s[i] != s[j]{
+    let mut j = s.len() - 1;
+    while i < j {
+        if s[i] != s[j] {
             return false;
         }
-        i+=1;
-        j-=1;
+        i += 1;
+        j -= 1;
     }
     return true;
 }
