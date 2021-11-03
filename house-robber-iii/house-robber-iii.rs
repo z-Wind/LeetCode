@@ -25,23 +25,32 @@ use std::rc::Rc;
 impl Solution {
     pub fn rob(root: Option<Rc<RefCell<TreeNode>>>) -> i32 {
         let ans = rob(root.as_ref());
-        ans.0.max(ans.1 + ans.2)
+        ans.0.max(ans.1)
     }
 }
 
-fn rob(root: Option<&Rc<RefCell<TreeNode>>>) -> (i32, i32, i32) {
+fn rob(root: Option<&Rc<RefCell<TreeNode>>>) -> (i32, i32) {
     if root.is_none() {
-        return (0, 0, 0);
+        return (0, 0);
     }
+    
     let root = root.as_ref().unwrap().borrow_mut();
     let left_money = rob(root.left.as_ref());
     let right_money = rob(root.right.as_ref());
 
-    let ans = (
-        root.val + left_money.1 + left_money.2 + right_money.1 + right_money.2,
-        left_money.0.max(left_money.1+left_money.2),
-        right_money.0.max(right_money.1+right_money.2),
-    );
+    let children = left_money.0 + right_money.0;
+    let grandchildren = left_money.1 + right_money.1;
+    let ans = if children > root.val + grandchildren {
+        (
+            children,
+            children,
+        )
+    } else {
+        (
+            root.val + grandchildren,
+            children.max(grandchildren),
+        )
+    };
     // println!("{} => {:?}", root.val, ans);
     ans
 }
