@@ -1,21 +1,13 @@
+// https://leetcode.com/problems/counting-bits/discuss/79539/Three-Line-Java-Solution
+// f[i] = f[i / 2] + i % 2.
+
 impl Solution {
     pub fn count_bits(n: i32) -> Vec<i32> {
-        let n = n as usize + 1;
-        let mut ans = Vec::with_capacity(n as usize + 1);
-        ans.push(0);
-        let mut i = 1;
-        while i < n{
-            if i&1 == 0{
-                for j in 0..i{
-                    ans.push(ans[j]+1);
-                    i+=1;
-                }
-            } else {
-                ans.push(ans[i-1]+1);
-                i+=1;
-            }
-            // println!("{}:{:?}", i, ans);
+        let n = n as usize;
+        let mut ans = vec![0;n+1];
+        for i in 0..=n{
+            ans[i] = ans[i>>1] + (i as i32 & 1);
         }
-        ans[..n].to_vec()
+        ans
     }
 }
