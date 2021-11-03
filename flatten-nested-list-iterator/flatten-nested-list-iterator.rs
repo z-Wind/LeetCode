@@ -1,3 +1,5 @@
+// https://leetcode.com/problems/flatten-nested-list-iterator/discuss/80147/Simple-Java-solution-using-a-stack-with-explanation
+
 // #[derive(Debug, PartialEq, Eq)]
 // pub enum NestedInteger {
 //   Int(i32),
@@ -5,9 +7,7 @@
 // }
 #[derive(Debug)]
 struct NestedIterator {
-    vec: Vec<NestedInteger>,
-    sub: Option<Box<NestedIterator>>,
-    temp: Option<i32>,
+    stack: Vec<NestedInteger>,
 }
 
 /**
@@ -17,50 +17,32 @@ struct NestedIterator {
 impl NestedIterator {
     fn new(mut nestedList: Vec<NestedInteger>) -> Self {
         nestedList.reverse();
-        let mut x = Self {
-            vec: nestedList,
-            sub: None,
-            temp: None,
-        };
-        x.has_next();
-        x
+        Self {
+            stack: nestedList,
+        }
     }
 
     fn next(&mut self) -> i32 {
-        // println!("{:?}", self);
-        if self.temp.is_some(){
-            let x = self.temp.unwrap();
-            self.temp = None;
+        if let Some(NestedInteger::Int(x)) = self.stack.pop(){
             return x;
         }
-        if self.has_next(){
-            return self.sub.as_mut().unwrap().next();
-        }
-        panic!("empty");
+        panic!("impossible");
     }
 
     fn has_next(&mut self) -> bool {
-        if self.temp.is_some() || 
-            (self.sub.is_some() && self.sub.as_mut().unwrap().has_next()){
-            return true;
-        }
-        
-        while let Some(nest) = self.vec.pop() {
-            match nest{
-                NestedInteger::Int(x) => {
-                    self.temp = Some(x);
-                    return true;
+        match self.stack.pop(){
+            None => false,
+            Some(NestedInteger::List(vec)) => {
+                for ele in vec.into_iter().rev(){
+                    self.stack.push(ele);
                 }
-                NestedInteger::List(vec) => {
-                    let mut sub = NestedIterator::new(vec);
-                    if sub.has_next(){
-                        self.sub = Some(Box::new(sub));
-                        return true;
-                    }
-                }
+                self.has_next()
             }
+            Some(x) => {
+                self.stack.push(x);
+                true
+            },
         }
-        false
     }
 }
 
