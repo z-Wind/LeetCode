@@ -1,3 +1,7 @@
+// proof:
+// https://leetcode.com/problems/integer-break/discuss/80721/Why-factor-2-or-3-The-math-behind-this-problem.
+// why always 2 or 3
+
 //  2 => 1x1
 //  3 => 1x2
 //  4 => 2x2
@@ -21,14 +25,11 @@
 impl Solution {
     pub fn integer_break(n: i32) -> i32 {
         let n = n as usize;
-        let mut dp = vec![1;7.max(n+1)];
+        let mut dp = vec![1;4.max(n+1)];
         dp[2] = 1;
         dp[3] = 2;
-        dp[4] = 4;
-        dp[5] = 6;
-        dp[6] = 9;
-        let mut prefix = 3;
-        for i in 7..=n{
+        let mut prefix = 1;
+        for i in 4..=n{
             match (i-4) % 3{
                 0 => dp[i] = prefix * 2 * 2,
                 1 => dp[i] = prefix * 3 * 2,
