@@ -1,51 +1,62 @@
-use std::collections::BTreeSet;
+// https://leetcode.com/problems/data-stream-as-disjoint-intervals/discuss/511630/Elegant-Rust-(use-BTreeMap)
+
+use std::collections::BTreeMap;
+
 struct SummaryRanges {
-    set:BTreeSet<i32>,
+    hl: BTreeMap<i32, i32>, //store segment keyed by left point
+    hr: BTreeMap<i32, i32>, //store segment keyed by right point
 }
 
-
-/** 
+/**
  * `&self` means the method takes an immutable reference.
  * If you need a mutable reference, change it to `&mut self` instead.
  */
 impl SummaryRanges {
 
+    /** Initialize your data structure here. */
     fn new() -> Self {
-        Self{
-            set:BTreeSet::new(),
-        }
+        SummaryRanges{ hl: BTreeMap::new(), hr: BTreeMap::new() }
     }
-    
+
+    fn remove(&mut self, l: i32, r: i32) {
+        self.hl.remove(&l);
+        self.hr.remove(&r);
+    }
+
+    fn insert(&mut self, l: i32, r: i32) {
+        self.hl.insert(l, r);
+        self.hr.insert(r, l);
+    }
+
     fn add_num(&mut self, val: i32) {
-        self.set.insert(val);
-    }
-    
-    fn get_intervals(&self) -> Vec<Vec<i32>> {
-        let mut ans:Vec<Vec<i32>> = vec![];
-        let mut cur = None;
-        let mut i = 0;
-        for &val in self.set.iter(){
-            // println!("{}: {:?}", val, cur);
-            match cur{
-                Some(x) => {
-                    if x+1 == val{
-                        cur = Some(val);
-                        continue;
-                    }
-                    
-                    ans[i].push(x);
-                    ans.push(vec![val]);
-                    i+=1;
-                    cur = Some(val);
-                },
-                None => {
-                    ans.push(vec![val]);
-                    cur = Some(val);
-                },
+        match (self.hr.get_key_value(&(val - 1)), self.hl.get_key_value(&(val + 1))) {
+            // 2: 0,1 & 3,4
+            (Some((&rp, &lp)), Some((&lq, &rq))) => {
+                self.remove(lp, rp);
+                self.remove(lq, rq);
+                self.insert(lp, rq);
+            },
+            // 2: 0,1
+            (Some((&rp, &lp)), None) => {
+                self.remove(lp, rp);
+                self.insert(lp, rp + 1);
+            },
+            // 2: 3,4
+            (None, Some((&lq, &rq))) => {
+                self.remove(lq, rq);
+                self.insert(lq - 1, rq);
+            },
+            (None, None) => {
+                // check if include
+                if self.hr.range(val..).next().filter(|(&_, &l)| l <= val).is_none() {
+                    self.insert(val, val);
+                }
             }
         }
-        ans[i].push(cur.unwrap());
-        ans
+    }
+
+    fn get_intervals(&self) -> Vec<Vec<i32>> {
+        self.hl.iter().map(|(&l, &r)| vec![l, r]).collect()
     }
 }
 
