@@ -1,40 +1,27 @@
-use std::collections::HashMap;
+// https://leetcode.com/problems/russian-doll-envelopes/discuss/82763/Java-NLogN-Solution-with-Explanation
+// https://github.com/z-Wind/LeetCode/blob/main/longest-increasing-subsequence/longest-increasing-subsequence.rs
+
 impl Solution {
-    pub fn max_envelopes(envelopes: Vec<Vec<i32>>) -> i32 {
-        let mut dp:HashMap<usize, i32> = HashMap::new();
+    pub fn max_envelopes(mut envelopes: Vec<Vec<i32>>) -> i32 {
+        envelopes.sort_unstable_by(|a, b| 
+            if a[0] == b[0]{
+                b[1].cmp(&a[1])
+            } else {
+                a[0].cmp(&b[0])
+            }
+        );
+        // println!("{:?}", envelopes);
         
-        let mut max_e = 0;
-        for i in 0..envelopes.len(){
-            max_e = max_e.max(max_envelopes(&mut dp, &envelopes, i));    
-        }
-        // println!("{:?}", dp);
-        max_e
-    }
-}
-
-fn max_envelopes(
-    dp: &mut HashMap<usize, i32>,
-    envelopes: &Vec<Vec<i32>>,
-    start: usize,
-) -> i32 {
-    if dp.contains_key(&start) {
-        return *dp.get(&start).unwrap();
-    }
-
-    let mut max_e:i32 = 0;
-    for i in 0..envelopes.len() {
-        if i != start
-            && envelopes[i][0] > envelopes[start][0]
-            && envelopes[i][1] > envelopes[start][1]
-        {
-            let temp = max_envelopes(dp, envelopes, i);
-            if temp > max_e{
-                max_e = temp;
+        let mut piles = Vec::with_capacity(envelopes.len());
+        for envelope in envelopes {
+            let num = envelope[1];
+            let idx = piles.binary_search(&num).unwrap_or_else(|e| e);
+            if idx == piles.len(){
+                piles.push(num);
+            } else {
+                piles[idx] = num;
             }
         }
+        piles.len() as i32
     }
-    max_e += 1;
-    // println!("{:?}:{}", envelopes[start], max_e);
-    dp.insert(start,max_e);
-    return max_e;
 }
