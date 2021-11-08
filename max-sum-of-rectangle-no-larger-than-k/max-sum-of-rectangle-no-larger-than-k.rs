@@ -1,48 +1,37 @@
-// https://github.com/z-Wind/LeetCode/blob/main/range-sum-query-2d-immutable/range-sum-query-2d-immutable.rs
-
+// https://leetcode.com/problems/max-sum-of-rectangle-no-larger-than-k/discuss/83599/Accepted-C%2B%2B-codes-with-explanation-and-references
+use std::collections::BTreeSet;
 impl Solution {
     pub fn max_sum_submatrix(matrix: Vec<Vec<i32>>, k: i32) -> i32 {
-        let m = matrix.len();
-        let n = matrix[0].len();
-        let num_matrix = NumMatrix::new(matrix);
-        
-        let mut ans = i32::MIN;
-        for row1 in 0..m{
-            for col1 in 0..n{
-                for row2 in 0..=row1{
-                    for col2 in 0..=col1{
-                        let sum = num_matrix.sum_region(row2,col2,row1,col1);
-                        // println!("{},{} -> {},{}: {}", row2, col2, row1, col1, sum);
-                        if sum <= k{
-                            ans = ans.max(sum);
-                        }
-                    }
+        if matrix.is_empty(){ 
+            return 0;
+        }
+        let row = matrix.len();
+        let col = matrix[0].len();
+        let mut res = i32::MIN;
+        for l in 0..col {
+            let mut sums = vec![0;row];
+            for r in l..col {
+                for i in 0..row {
+                    sums[i] += matrix[i][r];
                 }
+
+                // Find the max subarray no more than K 
+                let mut accuSet = BTreeSet::new();
+                accuSet.insert(0);
+                let mut curSum = 0;
+                let mut curMax = i32::MIN;
+                for &sum in sums.iter(){
+                    curSum += sum;
+                    let iter = accuSet.range(curSum - k..);
+                    match iter.map(|x| curSum-x).max(){
+                        Some(x) => curMax = curMax.max(x),
+                        _ => (),
+                    }
+                    accuSet.insert(curSum);
+                }
+                res = res.max(curMax);
             }
         }
-        ans
-    }
-}
-
-struct NumMatrix {
-    sums: Vec<Vec<i32>>,
-}
-
-impl NumMatrix {
-
-    fn new(matrix: Vec<Vec<i32>>) -> Self {
-        let mut sums:Vec<Vec<i32>> = vec![vec![0;matrix[0].len()+1];matrix.len()+1];
-        for i in (0..matrix.len()){
-            for j in (0..matrix[0].len()){
-                sums[i+1][j+1] = sums[i][j+1] + sums[i+1][j] - sums[i][j] + matrix[i][j]
-            }
-        }
-        
-        // println!("{:?}", sums);
-        Self { sums }
-    }
-    
-    fn sum_region(&self, row1: usize, col1: usize, row2: usize, col2: usize) -> i32 {    
-        self.sums[row2+1][col2+1] - self.sums[row1][col2+1] - self.sums[row2+1][col1] + self.sums[row1][col1]
+        return res;
     }
 }
