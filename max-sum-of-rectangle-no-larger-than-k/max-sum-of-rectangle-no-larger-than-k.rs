@@ -19,7 +19,6 @@ impl Solution {
                 let mut accuSet = BTreeSet::new();
                 accuSet.insert(0);
                 let mut curSum = 0;
-                let mut curMax = i32::MIN;
                 for sum in &rowsum{
                     curSum += sum;
                     if let Some(x) = accuSet.range(curSum - k..).next() {
@@ -30,7 +29,6 @@ impl Solution {
                     };
                     accuSet.insert(curSum);
                 }
-                res = res.max(curMax);
             }
         }
         res
