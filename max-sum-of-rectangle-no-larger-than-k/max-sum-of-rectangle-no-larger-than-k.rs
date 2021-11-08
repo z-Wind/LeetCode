@@ -9,10 +9,10 @@ impl Solution {
         let col = matrix[0].len();
         let mut res = i32::MIN;
         for l in 0..col {
-            let mut sums = vec![0;row];
+            let mut rowsum  = vec![0;row];
             for r in l..col {
                 for i in 0..row {
-                    sums[i] += matrix[i][r];
+                    rowsum[i] += matrix[i][r];
                 }
 
                 // Find the max subarray no more than K 
@@ -20,18 +20,19 @@ impl Solution {
                 accuSet.insert(0);
                 let mut curSum = 0;
                 let mut curMax = i32::MIN;
-                for &sum in sums.iter(){
+                for sum in &rowsum{
                     curSum += sum;
-                    let iter = accuSet.range(curSum - k..);
-                    match iter.map(|x| curSum-x).max(){
-                        Some(x) => curMax = curMax.max(x),
-                        _ => (),
-                    }
+                    if let Some(x) = accuSet.range(curSum - k..).next() {
+                        res = res.max(curSum - x);
+                        if res == k {
+                            return k;
+                        }
+                    };
                     accuSet.insert(curSum);
                 }
                 res = res.max(curMax);
             }
         }
-        return res;
+        res
     }
 }
