@@ -5,24 +5,25 @@ impl Solution {
         let n = nums.len();
         nums.sort();
         
-        let mut ans = vec![];
+        let mut ans = n-1;
         let mut dp:Vec<Vec<i32>> = vec![vec![];n];
         for i in (0..n).rev(){
             dp[i].push(nums[i]);
+            let mut max_j = i;
             for j in i+1..n{
-                let mut temp = vec![nums[i]];
-                if nums[j] % nums[i] == 0{
-                    temp.extend_from_slice(&dp[j]);
-                }
-                if dp[i].len() < temp.len(){
-                    dp[i] = temp;
+                if nums[j] % nums[i] == 0 && (max_j==i || dp[j].len() > dp[max_j].len()){
+                    max_j = j;    
                 }
             }
-            if ans.len() < dp[i].len(){
-                ans = dp[i].clone();
+            if max_j != i{
+                let mut temp = dp[max_j].clone();
+                dp[i].append(&mut temp);
+            }
+            if dp[ans].len() < dp[i].len(){
+                ans = i
             }
         }
         // println!("{:?}", dp);
-        ans
+        dp[ans].clone()
     }
 }
