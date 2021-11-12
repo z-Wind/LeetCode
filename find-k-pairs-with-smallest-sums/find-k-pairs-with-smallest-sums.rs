@@ -1,27 +1,37 @@
+// https://leetcode.com/problems/find-k-pairs-with-smallest-sums/discuss/1359522/Rust-Binary-Heap
+// https://leetcode.com/problems/find-k-pairs-with-smallest-sums/discuss/84551/simple-Java-O(KlogK)-solution-with-explanation
+
+use std::collections::BinaryHeap;
 impl Solution {
     pub fn k_smallest_pairs(nums1: Vec<i32>, nums2: Vec<i32>, k: i32) -> Vec<Vec<i32>> {
+        // nums1 = [1,7,11], nums2 = [2,4,6], k = 3
+        // 1+2  1+4  1+6
+        // 7+2  7+4  7+6
+        // 11+2 11+4 11+6
         let k = k as usize;
-        let n1 = nums1.len();
-        let n2 = nums2.len();
-        let mut ans: Vec<Vec<i32>> = Vec::with_capacity(k);
-        let mut idx = vec![0;n1];
-        for _ in 0..k {
-            let mut ele:Vec<i32> = vec![i32::MAX>>1, i32::MAX>>1];
-            let mut min_i=0;
-            for i in 0..n1 {
-                if idx[i] < n2 && nums1[i] + nums2[idx[i]] < ele[0] + ele[1]{
-                    ele[0] = nums1[i];
-                    ele[1] = nums2[idx[i]];
-                    min_i = i;
-                }
-            }
-            if ele[0] == i32::MAX>>1{
+        let mut res: Vec<Vec<i32>> = Vec::new();
+        let (n1, n2) = (nums1.len(), nums2.len());
+        // start of with the first column
+        let mut heap: BinaryHeap<(i32, usize, usize)> = BinaryHeap::from(
+            (0..n1)
+                .map(|x| (-nums1[x] - nums2[0], x, 0))
+                .collect::<Vec<(i32, usize, usize)>>(),
+        );
+        
+        // pop off the lowest one
+        while let Some((_, i, j)) = heap.pop() {
+            res.push(vec![nums1[i], nums2[j]]);
+            // end if reach k
+            if res.len() == k {
                 break;
             }
-            ans.push(ele);
-            idx[min_i] += 1;
+            // push the right handside sum into the heap
+            if j < n2 - 1 {
+                // i,j => i,j+1 just insert the next element
+                heap.push((-nums1[i] - nums2[j + 1], i, j + 1));
+            }
         }
-        
-        ans
+
+        res
     }
 }
