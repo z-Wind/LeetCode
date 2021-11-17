@@ -1,21 +1,30 @@
-// dp[i][pos] = max(if nums[i] < nums[j] 1+dp[j][neg]) for j in i+1..n
-// dp[i][neg] = max(if nums[i] > nums[j] 1+dp[j][pos]) for j in i+1..n
+// https://leetcode.com/problems/wiggle-subsequence/discuss/84843/Easy-understanding-DP-solution-with-O(n)-Java-version
+// up position, it means nums[i] > nums[i-1]
+// down position, it means nums[i] < nums[i-1]
+// equals to position, nums[i] == nums[i-1]
+// 
+// when up/down does not upate, could change ref num
+// [3,4,3,2,2,3]
+//        3  ->  4  -> 3  -> 2  -> 2  -> 3
+// up   1(3)  2(4)   2(4)  2(4)  2(4)  4(3)      
+// down 1(3)  1(4)   3(3)  3(2)  3(2)  3(3)
 
 impl Solution {
     pub fn wiggle_max_length(nums: Vec<i32>) -> i32 {
         let n = nums.len();
-        let mut dp:Vec<Vec<i32>> = vec![vec![1,1];n];
-        let mut ans = 0;
-        for i in (0..n-1).rev(){
-            for j in (i+1..n).rev(){
-                if nums[i] < nums[j]{
-                    dp[i][0] = dp[i][0].max(1+dp[j][1]) 
-                } else if nums[i] > nums[j]{
-                    dp[i][1] = dp[i][1].max(1+dp[j][0]) 
-                }
+        if (n < 2){
+            return n as i32;
+        }
+            
+        let mut down = 1;
+        let mut up = 1;
+        for i in 1..n {
+            if nums[i] > nums[i - 1]{
+                up = down + 1;
+            } else if nums[i] < nums[i - 1]{
+                down = up + 1;
             }
         }
-        // println!("{:?}", dp);
-        dp[0].iter().max().cloned().unwrap()
+        down.max(up)
     }
 }
