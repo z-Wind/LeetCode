@@ -21,7 +21,7 @@ impl RandomizedCollection {
     
     fn insert(&mut self, val: i32) -> bool {
         let exist = self.map.contains_key(&val);
-        self.map.entry(val).or_insert(HashSet::new()).insert(self.vec.len());
+        self.map.entry(val).or_default().insert(self.vec.len());
         self.vec.push(val);
         !exist
     }
