@@ -1,5 +1,7 @@
-use rand::thread_rng;
-use rand::seq::SliceRandom;
+// https://zhuanlan.zhihu.com/p/110630952
+// Fisher-Yates Algorithm
+
+use rand::{thread_rng, Rng};
 
 struct Solution {
     nums: Vec<i32>,
@@ -24,7 +26,13 @@ impl Solution {
     
     fn shuffle(&self) -> Vec<i32> {
         let mut v = self.nums.clone();
-        v.shuffle(&mut thread_rng());
+        let mut rng = thread_rng();
+        let n = v.len();
+        
+        for i in 0..n-1{
+            let j = rng.gen_range(i,n);
+            v.swap(i,j);
+        }
         v
     }
 }
