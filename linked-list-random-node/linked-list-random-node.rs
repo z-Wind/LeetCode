@@ -14,10 +14,13 @@
 //     }
 //   }
 // }
+
+// https://zhuanlan.zhihu.com/p/29178293
+// Reservoir Sampling
 use rand::{thread_rng, Rng};
 
 struct Solution {
-    vec:Vec<i32>,
+    head:Option<Box<ListNode>>,
 }
 
 
@@ -27,23 +30,29 @@ struct Solution {
  */
 impl Solution {
 
-    fn new(mut head: Option<Box<ListNode>>) -> Self {
-        let mut vec = Vec::new();
-        
-        while let Some(node) = head{
-            head = node.next;
-            vec.push(node.val);
-        }
-        
+    fn new(head: Option<Box<ListNode>>) -> Self {        
         Self{
-            vec
+            head
         }
     }
     
     fn get_random(&self) -> i32 {
         let mut rng = thread_rng();
-        let i: usize = rng.gen_range(0, self.vec.len());
-        self.vec[i]
+        let k = 1;
+        let mut vals = vec![0;k];
+        let mut i = 1;
+        
+        let mut h = &self.head;
+        while let Some(node) = h{
+            let sel = rng.gen_range(0, i);
+            if sel < k {
+                vals[sel] = node.val;
+            }
+            h = &node.next;
+            i+=1;
+        }
+        
+        vals[0]
     }
 }
 
