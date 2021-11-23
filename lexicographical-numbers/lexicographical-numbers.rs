@@ -1,26 +1,24 @@
 impl Solution {
     pub fn lexical_order(n: i32) -> Vec<i32> {
-        let mut ans = vec![];
+        let mut ans = Vec::with_capacity(n as usize);
         for i in 1..=9{
             if i > n{
                 break;
             }
             ans.push(i);
-            ans.append(&mut lexical_order(i,n));
+            lexical_order(&mut ans, i,n);
         }
         ans
     }
 }
 
-fn lexical_order(head:i32, n: i32) -> Vec<i32> {
-    let mut ans = vec![];
+fn lexical_order(ans: &mut Vec<i32>, head:i32, n: i32) {
     for i in 0..=9{
         let num = head*10+i;
         if num > n{
             break;
         }
         ans.push(num);
-        ans.append(&mut lexical_order(num,n));
+        lexical_order(ans, num,n);
     }
-    ans
 }
