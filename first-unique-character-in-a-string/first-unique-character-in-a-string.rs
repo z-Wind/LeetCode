@@ -1,19 +1,17 @@
 impl Solution {
     pub fn first_uniq_char(s: String) -> i32 {
-        let mut counts:Vec<i32> = vec![-1;26];
-        for (idx,c) in s.bytes().enumerate(){
+        let s = s.as_bytes();
+        let mut counts:Vec<i32> = vec![0;26];
+        for c in s.iter(){
             let i = (c - b'a') as usize;
-            if counts[i] == -1{
-                counts[i] = idx as i32;    
-            } else {
-                counts[i] = -2;
+            counts[i]+=1;
+        }
+        for idx in 0..s.len(){
+            let i = (s[idx] - b'a') as usize;
+            if counts[i] == 1{
+                return idx as i32;
             }
-            
         }
-        
-        match counts.iter().filter(|x| **x>=0).min(){
-            Some(&i) => i,
-            None => -1,
-        }
+        -1
     }
 }
