@@ -6,8 +6,8 @@ impl Solution {
             let i = (c - b'a') as usize;
             counts[i]+=1;
         }
-        for idx in 0..s.len(){
-            let i = (s[idx] - b'a') as usize;
+        for (idx,c) in s.iter().enumerate(){
+            let i = (c - b'a') as usize;
             if counts[i] == 1{
                 return idx as i32;
             }
