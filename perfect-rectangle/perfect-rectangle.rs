@@ -3,19 +3,10 @@
 use std::collections::HashSet;
 impl Solution {
     pub fn is_rectangle_cover(rectangles: Vec<Vec<i32>>) -> bool {
-        let mut x = i32::MAX;
-        let mut y = i32::MAX;
-        let mut a = i32::MIN;
-        let mut b = i32::MIN;
         let mut area = 0;
 
         let mut set: HashSet<(i32, i32)> = HashSet::new();
         for rec in rectangles {
-            x = x.min(rec[0]);
-            y = y.min(rec[1]);
-            a = a.max(rec[2]);
-            b = b.max(rec[3]);
-
             area += (rec[2] - rec[0]) * (rec[3] - rec[1]);
 
             let bottom_left = (rec[0], rec[1]);
@@ -36,11 +27,22 @@ impl Solution {
             }
         }
         // println!("{:?}", set);
-        set.len() == 4
-            && set.contains(&(x, y))
-            && set.contains(&(a, y))
-            && set.contains(&(x, b))
-            && set.contains(&(a, b))
-            && area == (a - x) * (b - y)
+        if set.len() != 4{
+            return false;
+        }
+           
+        
+        let mut x = i32::MAX;
+        let mut y = i32::MAX;
+        let mut a = i32::MIN;
+        let mut b = i32::MIN;
+        for p in set{
+            x = x.min(p.0);
+            y = y.min(p.1);
+            a = a.max(p.0);
+            b = b.max(p.1);
+        }
+        
+        area == (a - x) * (b - y)
     }
 }
