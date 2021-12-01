@@ -1,8 +1,10 @@
+// Reservoir sampling
+
 use std::collections::HashMap;
-use rand::seq::SliceRandom;
+use rand::{thread_rng, Rng};
 
 struct Solution {
-    map:HashMap<i32,Vec<i32>>,
+    nums:Vec<i32>,
 }
 
 
@@ -13,22 +15,26 @@ struct Solution {
 impl Solution {
 
     fn new(nums: Vec<i32>) -> Self {
-        let mut map = HashMap::new();
-        for i in 0..nums.len(){
-            map.entry(nums[i]).or_insert(Vec::new()).push(i as i32);
-        }
         Self{
-            map,
+            nums,
         }
     }
     
     fn pick(&self, target: i32) -> i32 {
-        *self
-            .map
-            .get(&target)
-            .unwrap()
-            .choose(&mut rand::thread_rng())
-            .unwrap()
+        let mut rng = thread_rng();
+        let mut idx = 0;
+        let mut count = 0;
+        for i in 0..self.nums.len() {
+            if self.nums[i] != target{
+                continue;
+            }
+            count += 1;
+            if rng.gen_range(0, count) == 0{
+                idx = i;
+            }
+        }
+        
+        idx as i32
     }
 }
 
