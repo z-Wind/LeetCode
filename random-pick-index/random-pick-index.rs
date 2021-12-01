@@ -1,5 +1,5 @@
 use std::collections::HashMap;
-use rand::{thread_rng, Rng};
+use rand::seq::SliceRandom;
 
 struct Solution {
     map:HashMap<i32,Vec<i32>>,
@@ -23,10 +23,12 @@ impl Solution {
     }
     
     fn pick(&self, target: i32) -> i32 {
-        let mut rng = thread_rng();
-        let v = self.map.get(&target).unwrap();
-        let i: usize = rng.gen_range(0, v.len());
-        v[i]
+        *self
+            .map
+            .get(&target)
+            .unwrap()
+            .choose(&mut rand::thread_rng())
+            .unwrap()
     }
 }
 
