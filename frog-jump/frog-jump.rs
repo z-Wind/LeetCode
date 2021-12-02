@@ -1,40 +1,35 @@
-use std::collections::HashMap;
+// https://leetcode.com/problems/frog-jump/discuss/193816/Concise-and-fast-DP-solution-using-2D-array-instead-of-HashMap-with-text-and-video-explanation.
+
+// let dp(i) denote a set containing all next jump size at stone i
+// The maximum jump size the frog can make at each stone if possible is shown as followings: 
+// stone:      0, 1, 2, 3, 4, 5
+// jump size:  1, 2, 3, 4, 5, 6 (suppose frog made jump with size k + 1 at each stone)
+
 impl Solution {
     pub fn can_cross(stones: Vec<i32>) -> bool {
-        let mut dp:HashMap<(usize,i32),bool> = HashMap::new();
-        if stones[1] != stones[0]+1{
-            return false;
+        let N = stones.len();
+        let mut dp:Vec<Vec<bool>> = vec![vec![false;N+1];N];
+        dp[0][1] = true;
+        
+        for i in 1..N{
+            for j in 0..i{
+                let diff = (stones[i] - stones[j]) as usize;
+                if diff > N || !dp[j][diff]{
+                    continue;
+                }
+                dp[i][diff] = true;
+                if diff >= 1{
+                    dp[i][diff - 1] = true;
+                }
+                if diff + 1 <= N{
+                    dp[i][diff + 1] = true;
+                }
+                if i == N - 1 {
+                    return true;
+                }
+            }
         }
-        can_cross(&mut dp, &stones, 1, 1)
-    }
-}
 
-fn can_cross(dp:&mut HashMap<(usize,i32),bool>,stones: &Vec<i32>, start:usize, step:i32) -> bool {
-    if start == stones.len()-1{
-        return true;
+        return false;
     }
-    if dp.contains_key(&(start,step)){
-        return *dp.get(&(start,step)).unwrap();
-    }
-    
-    // println!("{} step:{}",stones[start],step);
-    let mut ans = false;
-    for i in start+1..stones.len(){
-        let gap = stones[i] - stones[start];
-        if  gap == step - 1 && can_cross(dp, &stones, i, step-1){
-            ans = true;
-            break;
-        } else if gap == step && can_cross(dp, &stones, i, step){
-            ans = true;
-            break;
-        } else if gap == step + 1 && can_cross(dp, &stones, i, step+1){
-            ans = true;
-            break;
-        } else if gap > step + 1 {
-            break;
-        }
-    }
-    
-    dp.insert((start,step), ans);
-    ans
 }
