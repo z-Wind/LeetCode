@@ -7,8 +7,8 @@ impl Solution {
         let mut num = num as u32;
         let mut s:Vec<char> = Vec::new();
         while num > 0{
-            s.push(char::from_digit(num%16, 16).unwrap());
-            num/=16;
+            s.push(char::from_digit(num & 15, 16).unwrap());
+            num>>=4;
         }
         s.into_iter().rev().collect()
     }
