@@ -20,16 +20,17 @@ fn can_cross(dp:&mut HashMap<(usize,i32),bool>,stones: &Vec<i32>, start:usize, s
     // println!("{} step:{}",stones[start],step);
     let mut ans = false;
     for i in start+1..stones.len(){
-        if stones[i] == stones[start] + step - 1 && can_cross(dp, &stones, i, step-1){
+        let gap = stones[i] - stones[start];
+        if  gap == step - 1 && can_cross(dp, &stones, i, step-1){
             ans = true;
             break;
-        } else if stones[i] == stones[start] + step && can_cross(dp, &stones, i, step){
+        } else if gap == step && can_cross(dp, &stones, i, step){
             ans = true;
             break;
-        } else if stones[i] == stones[start] + step + 1 && can_cross(dp, &stones, i, step+1){
+        } else if gap == step + 1 && can_cross(dp, &stones, i, step+1){
             ans = true;
             break;
-        } else if stones[i] > stones[start] + step + 1 {
+        } else if gap > step + 1 {
             break;
         }
     }
