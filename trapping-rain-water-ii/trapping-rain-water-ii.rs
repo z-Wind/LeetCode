@@ -6,7 +6,6 @@ impl Solution {
     pub fn trap_rain_water(height_map: Vec<Vec<i32>>) -> i32 {
         let m = height_map.len();
         let n = height_map[0].len();
-        let dirs: Vec<(i32, i32)> = vec![(1, 0), (-1, 0), (0, 1), (0, -1)];
         let mut res = 0;
         let mut pq: BinaryHeap<(Reverse<i32>, usize, usize)> = BinaryHeap::new();
         let mut visited = vec![vec![false; n]; m];
@@ -24,11 +23,12 @@ impl Solution {
             pq.push((Reverse(height_map[m - 1][i]), m - 1, i));
             visited[m - 1][i] = true;
         }
-
+        
+        let dirs: Vec<(i32, i32)> = vec![(1, 0), (-1, 0), (0, 1), (0, -1)];
         while let Some((Reverse(h), x, y)) = pq.pop() {
-            for &(offset_x, offset_y) in dirs.iter() {
-                let i = x + offset_x as usize;
-                let j = y + offset_y as usize;
+            for d in 0..4 {
+                let i = x + dirs[d].0 as usize;
+                let j = y + dirs[d].1 as usize;
                 if (i >= m || j >= n || visited[i][j]) {
                     continue;
                 }
