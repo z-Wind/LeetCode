@@ -1,40 +1,17 @@
-// if n >= 3
-// n-3+1
-// n-4+1
-// n-n+1
-// sum: (n-3+1)*(n+1) - sum(3..=n)
-//    = (n-2)(n+1) - (sum(1..=n) - (1+2))
-//    = (n-2)(n+1) - ((n+1)*n/2 - 3)
-//    = (n+1)/2 * [ 2*(n-2) - n] + 3
-//    = (n+1)/2 * (n-4) + 3
-//    = (n+1)(n-4)/2 + 3
+// https://leetcode.com/problems/arithmetic-slices/discuss/90058/Simple-Java-solution-9-lines-2ms
 
 impl Solution {
     pub fn number_of_arithmetic_slices(nums: Vec<i32>) -> i32 {
-        let len = nums.len();
-        if len < 3{
-            return 0;
-        }
-        
-        let mut count:i32 = 0;
-        
-        let mut i = 0;
-        while i < len-2{
-            let mut n:i32 = 2;
-            let diff = nums[i+1] - nums[i];
-            for j in i+1..len-1{
-                if nums[j+1] - nums[j] == diff{
-                    n+=1;
-                } else {
-                    break;
-                }
+        let mut curr = 0;
+        let mut sum = 0;
+        for i in 2..nums.len(){
+            if nums[i]-nums[i-1] == nums[i-1]-nums[i-2] {
+                curr += 1;
+                sum += curr;
+            } else {
+                curr = 0;
             }
-            
-            if n >= 3{
-                count += ((n+1)*(n-4)/2+3);    
-            }
-            i += (n as usize - 1);
         }
-        count
+        return sum;
     }
 }
