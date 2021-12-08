@@ -1,17 +1,29 @@
+// https://leetcode.com/problems/fizz-buzz/discuss/89931/Java-4ms-solution-Not-using-%22%22-operation
+
 impl Solution {
     pub fn fizz_buzz(n: i32) -> Vec<String> {
         let mut ans:Vec<String> = Vec::with_capacity(n as usize);
+        let mut fizz = 0;
+        let mut buzz = 0;
         for i in 1..=n{
-            ans.push(i.to_string());
-        }
-        for i in (2..n).step_by(3){
-            ans[i as usize] = String::from("Fizz")
-        }
-        for i in (4..n).step_by(5){
-            ans[i as usize] = String::from("Buzz")
-        }
-        for i in (14..n).step_by(15){
-            ans[i as usize] = String::from("FizzBuzz")
+            fizz += 1;
+            buzz += 1;
+            match (fizz, buzz){
+                (3,5) => {
+                    ans.push(String::from("FizzBuzz"));
+                    fizz = 0;
+                    buzz = 0;
+                },
+                (3,_) => {
+                    ans.push(String::from("Fizz"));
+                    fizz = 0;
+                },
+                (_,5) => {
+                    ans.push(String::from("Buzz"));
+                    buzz = 0;
+                },
+                (_,_) => ans.push(i.to_string()),
+            }
         }
         ans
     }
