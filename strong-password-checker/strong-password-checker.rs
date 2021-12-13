@@ -49,12 +49,16 @@ fn checker(pw: &[u8], start:usize, mut n:i32, step:i32, mut count:i32, lower:i32
     let mut ans = i32::MAX;
     
     // insert
-    if n<6 || lower < 1{
-        ans = ans.min(checker(pw, start+2, n+1, step+1, 1, lower+1, upper, digit));
-    } else if upper < 1{
-        ans = ans.min(checker(pw, start+2, n+1, step+1, 1, lower, upper+1, digit));
-    } else if digit < 1{
-        ans = ans.min(checker(pw, start+2, n+1, step+1, 1, lower, upper, digit+1));
+    if n < 6{
+        if lower < 1{
+            ans = ans.min(checker(pw, start+2, n+1, step+1, 1, lower+1, upper, digit));
+        } else if upper < 1{
+            ans = ans.min(checker(pw, start+2, n+1, step+1, 1, lower, upper+1, digit));
+        } else if digit < 1{
+            ans = ans.min(checker(pw, start+2, n+1, step+1, 1, lower, upper, digit+1));
+        } else {
+            ans = ans.min(checker(pw, start+2, n+1, step+1, 1, lower, upper, digit));
+        }
     }
     
     // delete
