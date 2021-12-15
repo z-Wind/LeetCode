@@ -1,46 +1,35 @@
+// https://leetcode.com/problems/reconstruct-original-digits-from-english/discuss/91207/one-pass-O(n)-JAVA-Solution-Simple-and-Clear
+
 impl Solution {
     pub fn original_digits(s: String) -> String {
-        let map = vec![
-            ("zero", '0', b'z'),
-            ("one", '1', b'o'),
-            ("two", '2', b'w'),
-            ("three", '3', b'h'),
-            ("four", '4', b'u'),
-            ("five", '5', b'f'),
-            ("six", '6', b'x'),
-            ("seven", '7', b's'),
-            ("eight", '8', b'g'),
-            ("nine", '9', b'i'),
-        ];
-
-        let mut counts = vec![0; 26];
-        for c in s.bytes() {
-            let i = (c - b'a') as usize;
-            counts[i] += 1;
+        let mut count = vec![0;10];
+        for c in s.chars(){
+            match c {
+                'z' => count[0]+=1,
+                'w' => count[2]+=1,
+                'x' => count[6]+=1,
+                's' => count[7]+=1, //7-6
+                'g' => count[8]+=1,
+                'u' => count[4]+=1, 
+                'f' => count[5]+=1, //5-4
+                'h' => count[3]+=1, //3-8
+                'i' => count[9]+=1, //9-8-5-6
+                'o' => count[1]+=1, //1-0-2-4
+                _ => (),
+            }
         }
-        
-        // check order
-        // (z)ero
-        // si(x) => (s)even
-        // ei(g)ht => t(h)ree
-        // t(w)o
-        // fo(u)r => (f)ive
-        // done all above
-        // n(i)ne
-        // (o)ne
-        let mut ans: Vec<char> = Vec::new();
-        for i in vec![0, 6, 7, 8, 3, 2, 4, 5, 9, 1]{
-            let (s, num, b) = map[i];
-            while counts[(b - b'a') as usize] != 0{
-                for c in s.bytes(){
-                    let i = (c - b'a') as usize;
-                    counts[i] -= 1;
-                }
-                ans.push(num)
-            }    
-        }        
-        
-        ans.sort_unstable();
-        ans.into_iter().collect()
+        count[7] -= count[6];
+        count[5] -= count[4];
+        count[3] -= count[8];
+        count[9] = count[9] - count[8] - count[5] - count[6];
+        count[1] = count[1] - count[0] - count[2] - count[4];
+        let mut ans = String::new();
+        for i in 0..=9{
+            let c = std::char::from_digit(i as u32, 10).unwrap();
+            for j in 0..count[i]{
+                ans.push(c)
+            }
+        }
+        ans
     }
 }
