@@ -33,8 +33,9 @@ impl Solution {
             let mut rst = (lines[c][first].1 - lines[c][first].0 + 1 + ignore);
             while end < lines[c].len(){
                 // println!("1st:{}, k:{}, {:?} -> ... -> {:?} -> {:?}", first, ignore, lines[c][first], lines[c][end-1], lines[c][end]);
-                if ignore >= (lines[c][end].0 - lines[c][end-1].1 - 1) {
-                    ignore -= (lines[c][end].0 - lines[c][end-1].1 - 1);
+                let dis = (lines[c][end].0 - lines[c][end-1].1 - 1);
+                if ignore >=  dis{
+                    ignore -= dis;
                     rst = rst.max(lines[c][end].1 - lines[c][first].0 + 1 + ignore);
                     end += 1;
                 } else {
