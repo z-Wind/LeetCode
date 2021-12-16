@@ -1,59 +1,26 @@
+// https://leetcode.com/problems/longest-repeating-character-replacement/discuss/91271/Java-12-lines-O(n)-sliding-window-solution-with-explanation
+// make a window , and if it match to expand or not to shift
+
 impl Solution {
     pub fn character_replacement(s: String, k: i32) -> i32 {
         let s = s.as_bytes();
-        let n = s.len();
-        if k == n as i32 - 1{
-            return n as i32;
-        }
-        let mut lines:[Vec<(i32,i32)>;26] = Default::default();
-        
+        let k = k as usize;
+        let len = s.len();
+        let mut count: [usize; 26] = [0; 26];
+
         let mut start = 0;
-        let mut c = s[0];
-        for i in 1..n{
-            if c != s[i]{
-                let idx = (c-b'A') as usize;
-                lines[idx].push((start as i32, (i-1) as i32));
-                start = i;
-                c = s[i]
+        let mut maxCount = 0;
+        for end in 0..len {
+            let i = (s[end] - b'A') as usize;
+            count[i] += 1;
+            maxCount = maxCount.max(count[i]);
+            // (end - start + 1) means the current longest length, if the (maxCount + k) < (the current longest length), we move whole windows right.
+            // otherwise the start stays at current position, but the end moves, means next round the longest length will increase.
+            if maxCount + k < end - start + 1 {
+                count[(s[start] - b'A') as usize] -= 1;
+                start += 1;
             }
         }
-        lines[(c-b'A') as usize].push((start as i32, (n-1) as i32));
-        
-        // println!("{:?}", lines);
-        
-        let mut ans:i32 = 0;
-        for c in 0..26{
-            if lines[c].len() == 0{
-                continue;
-            }
-            // println!("{}", c);
-            let mut ignore:i32 = k;
-            let mut first:usize = 0;
-            let mut end:usize = 1;
-            let mut rst = (lines[c][first].1 - lines[c][first].0 + 1 + ignore);
-            while end < lines[c].len(){
-                // println!("1st:{}, k:{}, {:?} -> ... -> {:?} -> {:?}", first, ignore, lines[c][first], lines[c][end-1], lines[c][end]);
-                let dis = (lines[c][end].0 - lines[c][end-1].1 - 1);
-                if ignore >=  dis{
-                    ignore -= dis;
-                    rst = rst.max(lines[c][end].1 - lines[c][first].0 + 1 + ignore);
-                    end += 1;
-                } else {
-                    ignore += (lines[c][first+1].0 - lines[c][first].1 - 1);
-                    first += 1;
-                }
-                // println!("rst:{}", rst);
-            }
-            // println!("1st:{}, k:{}", first, ignore);
-            if ignore >= 0{
-                rst = rst.max(lines[c][end-1].1 - lines[c][first].0 + 1 + ignore);
-            }
-            ans = ans.max(rst);
-            if ans >= n as i32{
-                break;
-            }
-        }
-        
-        ans.min(n as i32)
+        (s.len() - start) as i32
     }
 }
