@@ -1,9 +1,9 @@
-use std::collections::{HashMap,BTreeMap,BTreeSet};
+use std::collections::{HashMap,BTreeMap,HashSet};
 
 #[derive(Default, Debug)]
 struct AllOne {
     map:HashMap<String,i32>,
-    min_map:BTreeMap<i32,BTreeSet<String>>,
+    min_map:BTreeMap<i32,HashSet<String>>,
 }
 
 
