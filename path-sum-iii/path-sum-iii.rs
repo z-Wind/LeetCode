@@ -5,7 +5,7 @@
 //   pub left: Option<Rc<RefCell<TreeNode>>>,
 //   pub right: Option<Rc<RefCell<TreeNode>>>,
 // }
-// 
+//
 // impl TreeNode {
 //   #[inline]
 //   pub fn new(val: i32) -> Self {
@@ -17,47 +17,50 @@
 //   }
 // }
 
-use std::rc::Rc;
+// https://leetcode.com/problems/path-sum-iii/discuss/91878/17-ms-O(n)-java-Prefix-sum-method/96424
+
 use std::cell::RefCell;
+use std::collections::HashMap;
+use std::rc::Rc;
 impl Solution {
     pub fn path_sum(root: Option<Rc<RefCell<TreeNode>>>, target_sum: i32) -> i32 {
-        let (.., ans) = path_sum(root.as_ref(), target_sum as i64);
-        ans
+        if root.is_none() {
+            return 0;
+        }
+        // The map stores <prefix sum, frequency> pairs before getting to the current node. 
+        // We can imagine a path from the root to the current node. 
+        // The sum from any node in the middle of the path to the current node = the difference between the sum from the root to the current node and the prefix sum of the node in the middle.
+        let mut map: HashMap<i32, i32> = HashMap::new();
+        map.insert(0, 1);
+        find_path_sum(root.as_ref(), 0, target_sum, &mut map)
     }
 }
 
-fn path_sum(root: Option<&Rc<RefCell<TreeNode>>>, target_sum: i64) -> (Vec<i64>, i32) {
-    if root.is_none(){
-        return (Vec::new(), 0);
+fn find_path_sum(
+    curr: Option<&Rc<RefCell<TreeNode>>>,
+    mut sum: i32,
+    target: i32,
+    map: &mut HashMap<i32, i32>,
+) -> i32 {
+    if curr.is_none() {
+        return 0;
     }
+    // update the prefix sum by adding the current val
+    sum += curr.unwrap().borrow().val;
     
-    let mut count = 0;
-    let val = root.as_ref().unwrap().borrow().val as i64;
-    if val == target_sum{
-        count += 1;
-    }
+    // get the number of valid path, ended by the current node
+    let numPathToCurr = *map.get(&(sum - target)).unwrap_or(&0);
     
-    let mut left = path_sum(root.as_ref().unwrap().borrow().left.as_ref(), target_sum);
-    for sum in left.0.iter_mut(){
-        *sum += val;
-        if *sum == target_sum{
-            count += 1;
-        }
-    }
-    count += left.1;
+    // update the map with the current sum, so the map is good to be passed to the next recursion
+    *map.entry(sum).or_insert(0) += 1;
     
-    let mut right = path_sum(root.as_ref().unwrap().borrow().right.as_ref(), target_sum);
-    for sum in right.0.iter_mut(){
-        *sum += val;
-        if *sum == target_sum{
-            count += 1;
-        }
-    }
-    count += right.1;
+    // add the 3 parts discussed in 8. together
+    let res = numPathToCurr
+        + find_path_sum(curr.unwrap().borrow().left.as_ref(), sum, target, map)
+        + find_path_sum(curr.unwrap().borrow().right.as_ref(), sum, target, map);
     
-    left.0.append(&mut right.0);
-    left.0.push(val);
-    
-    (left.0, count)
-    
+    // restore the map, as the recursion goes from the bottom to the top
+    *map.entry(sum).or_insert(0) -= 1;
+
+    return res;
 }
