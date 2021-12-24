@@ -1,13 +1,11 @@
-// (1+k)*k/2 >= n >= k*(k-1)/2
+// (1+k)*k/2 >= n
+// (k^2)/2 + k/2 - n = 0
+// k = -1/2 + sqrt(1/4 + 2n)
 
 impl Solution {
     pub fn arrange_coins(n: i32) -> i32 {        
-        let n = n as i64;
-        let mut k: i64 = 1;
+        let k = -0.5 + (0.25 + n as f64 * 2.0).sqrt();
         
-        while (1 + k) * k / 2 <= n {
-            k += 1;
-        }
-        k as i32 - 1
+        k as i32
     }
 }
