@@ -1,19 +1,39 @@
-use std::collections::HashSet;
 impl Solution {
     pub fn find_duplicates(mut nums: Vec<i32>) -> Vec<i32> {        
         let n = nums.len();
-        let mut ans = HashSet::new();
-        for i in 0..n{            
-            while nums[i] != i as i32 + 1{
-                // println!("{}:{:?} {:?}", i, nums, ans);
-                let j = nums[i] as usize -1;
-                if nums[i] == nums[j]{
-                    ans.insert(nums[i]);
+        let mut ans = vec![];
+        for i in 0..n{
+            if nums[i] <= 0{
+                continue;
+            }
+            // println!("i:{}", i);
+            
+            let mut num = nums[i];
+            let mut idx = num as usize -1;
+            if idx == i{
+                nums[i] = 0;
+                continue;
+            } else {
+                nums[i] = -2;   
+            }
+            loop{
+                // println!("{}:{} {:?}", num, nums[idx], nums);
+                if nums[idx] == 0{
+                    ans.push(num);
+                    nums[idx] = -1;
                     break;
+                } else {
+                    if nums[idx] == -2{
+                        nums[idx] = 0;
+                        break;
+                    }
+                    num = nums[idx];
+                    nums[idx] = 0;
+                    idx = num as usize -1;
                 }
-                nums.swap(i,j);
-            }            
+            }
         }
-        ans.into_iter().collect()
+        // println!("{:?}", nums);
+        ans
     }
 }
