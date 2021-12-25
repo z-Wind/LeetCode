@@ -1,15 +1,19 @@
+use std::collections::HashSet;
 impl Solution {
-    pub fn find_duplicates(nums: Vec<i32>) -> Vec<i32> {
-        let mut counts = vec![0;nums.len()];
-        
-        let mut ans = vec![];
-        for num in nums{
-            let i = num as usize -1;
-            counts[i] += 1;
-            if counts[i] > 1{
-                ans.push(num);
-            }
+    pub fn find_duplicates(mut nums: Vec<i32>) -> Vec<i32> {        
+        let n = nums.len();
+        let mut ans = HashSet::new();
+        for i in 0..n{            
+            while nums[i] != i as i32 + 1{
+                // println!("{}:{:?} {:?}", i, nums, ans);
+                let j = nums[i] as usize -1;
+                if nums[i] == nums[j]{
+                    ans.insert(nums[i]);
+                    break;
+                }
+                nums.swap(i,j);
+            }            
         }
-        ans
+        ans.into_iter().collect()
     }
 }
