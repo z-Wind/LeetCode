@@ -7,9 +7,10 @@ impl Solution {
         for i in 0..n{
             let idx = nums[i].abs() as usize -1;
             if nums[idx] < 0{
-                ans.push(nums[i].abs());
+                ans.push(idx as i32 + 1);
+            } else {
+                nums[idx] = -nums[idx];
             }
-            nums[idx] = -nums[idx];
         }
         // println!("{:?}", nums);
         ans
