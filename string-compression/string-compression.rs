@@ -31,9 +31,9 @@ impl Solution {
                 i += 1;   
             }
         }
-        for _ in i..n{
-            chars.pop();
-        }
+        // for _ in i..n{
+        //     chars.pop();
+        // }
 
         i as i32
     }
