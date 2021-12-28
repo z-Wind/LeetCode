@@ -9,12 +9,12 @@ impl Solution {
                 if i == j{
                     continue;
                 }
-                let x: i64 = (points[i][0] - points[j][0]) as i64;
-                let y: i64 = (points[i][1] - points[j][1]) as i64;
-                let dis: i64 = x * x + y * y;
+                let x = points[i][0] - points[j][0];
+                let y = points[i][1] - points[j][1];
+                let dis = x * x + y * y;
                 *map.entry(dis).or_insert(0) += 1;
             }
-            ans += map.values().map(|&count| count * (count - 1)).sum::<i32>();
+            ans += map.values().map(|count| count * (count - 1)).sum::<i32>();
             map.clear();
         }
 
