@@ -6,9 +6,9 @@ impl Solution {
         }
         // println!("{:?}", nums);
         
-        nums.into_iter()
+        nums.iter()
             .enumerate()
-            .filter(|(_, x)| *x > 0)
+            .filter(|(_, x)| **x > 0)
             .map(|(i, _)| i as i32 + 1)
             .collect()
     }
