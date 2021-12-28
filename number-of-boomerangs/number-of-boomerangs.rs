@@ -2,6 +2,7 @@ use std::collections::HashMap;
 impl Solution {
     pub fn number_of_boomerangs(points: Vec<Vec<i32>>) -> i32 {
         let n = points.len();
+        let mut ans = 0;
         let mut map: Vec<HashMap<i64, i32>> = vec![HashMap::new(); n];
         for i in 0..n {
             for j in i + 1..n {
@@ -11,17 +12,10 @@ impl Solution {
                 *map[i].entry(dis).or_insert(0) += 1;
                 *map[j].entry(dis).or_insert(0) += 1;
             }
+            ans += map[i].values().map(|&count| count * (count - 1)).sum::<i32>();
         }
         // println!("{:?}", map);
 
-        let mut ans = 0;
-        for m in map{
-            for &count in m.values(){
-                if count > 1{
-                    ans += count * (count - 1);
-                }
-            }
-        }
         ans
     }
 }
