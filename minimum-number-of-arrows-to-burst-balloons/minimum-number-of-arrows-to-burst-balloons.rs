@@ -5,9 +5,9 @@ impl Solution {
         
         let mut count = 1;
         let mut end = points[0][1];
-        for p in &points[1..]{
-            if end < p[0]{
-                end = p[1];
+        for i in 1..points.len(){
+            if end < points[i][0]{
+                end = points[i][1];
                 count += 1;
             } 
         }
