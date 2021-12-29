@@ -4,10 +4,10 @@ impl Solution {
         // println!("{:?}", points);
         
         let mut count = 1;
-        let mut end = points[0][1];
-        for i in 1..points.len(){
-            if end < points[i][0]{
-                end = points[i][1];
+        let mut arrow = points[0][1];
+        for p in &points[1..]{
+            if arrow < p[0]{
+                arrow = p[1];
                 count += 1;
             } 
         }
