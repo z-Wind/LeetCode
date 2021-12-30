@@ -8,9 +8,9 @@
 impl Solution {
     pub fn min_moves(mut nums: Vec<i32>) -> i32 {
         let n = nums.len() as i32;
-        let mut min = i32::MAX;
+        let mut min = nums[0];
         let mut sum = 0;
-        for num in nums{
+        for &num in nums.iter(){
             sum += num;
             min = min.min(num);
         }
