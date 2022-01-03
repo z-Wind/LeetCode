@@ -1,27 +1,18 @@
-use std::collections::BTreeMap;
+// https://leetcode.com/problems/132-pattern/discuss/94071/Single-pass-C%2B%2B-O(n)-space-and-time-solution-(8-lines)-with-detailed-explanation.
+
 impl Solution {
     pub fn find132pattern(nums: Vec<i32>) -> bool {
-        let n = nums.len();
-        if n <= 2{
-            return false;
-        }
-        
-        let mut min = vec![i32::MAX;n];
-        let mut max = vec![i32::MIN;n];
-        let mut map = BTreeMap::new();
-        map.insert(nums[0], 0);
-        for k in 1..n{
-            min[k] = nums[k-1].min(min[k-1]);
-            max[k] = nums[k-1].max(max[k-1]);
-            if min[k] < nums[k] && nums[k] < max[k]{
-                for (_, &j) in map.range(nums[k]+1..){
-                    if min[j] < nums[k]{
-                        return true;
-                    }
-                }
+        let mut s3 = i32::MIN;
+        let mut s2 = Vec::new();
+        for &num in nums.iter().rev(){
+            if num < s3 {
+                return true;
             }
-            map.insert(nums[k], k);
+            while !s2.is_empty() && num > *s2.last().unwrap() { 
+              s3 = s2.pop().unwrap(); 
+            }
+            s2.push(num);
         }
-        false
+        return false;
     }
 }
