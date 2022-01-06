@@ -12,14 +12,8 @@ impl Solution {
             for j in 0..n {
                 if (grid[i][j] == 1) {
                     islands += 1; // count islands
-                    if (i - 1 < m && grid[i - 1][j] == 1) {
-                        neighbours += 1; // count up neighbours
-                    }
                     if (i + 1 < m && grid[i + 1][j] == 1) {
                         neighbours += 1; // count down neighbours
-                    }
-                    if (j - 1 < n && grid[i][j - 1] == 1) {
-                        neighbours += 1; // count left neighbours
                     }
                     if (j + 1 < n && grid[i][j + 1] == 1) {
                         neighbours += 1; // count right neighbours
@@ -28,6 +22,6 @@ impl Solution {
             }
         }
 
-        return islands * 4 - neighbours;
+        return islands * 4 - neighbours * 2;
     }
 }
