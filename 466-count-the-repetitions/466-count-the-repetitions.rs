@@ -2,11 +2,12 @@ impl Solution {
     pub fn get_max_repetitions(s1: String, n1: i32, s2: String, n2: i32) -> i32 {
         let s1_len = s1.len();
         let n1 = n1 as usize;
-        let s2_len = s2.len();
         let n2 = n2 as usize;
         
         let mut s1_iter = s1.bytes().cycle().take(s1_len * n1);
+        let s2 = s2.repeat(n2);
         let s2 = s2.as_bytes();
+        let s2_len = s2.len();
         let mut i = 0;
         let mut j = 0;
         let mut k = 0;
@@ -24,15 +25,15 @@ impl Solution {
             }
             i += 1;
             dp.push(j);
-            if k == 0 && j % n2 == 0{
+            if k == 0{
                 break;
             }
         }
         
         let n = n1 / i;
-        let mut ans = n * (j / n2);
+        let mut ans = n * j;
         let idx = n1 - n * i;
         // println!("i:{}, j:{}, idx:{} {:?}", i, j, idx, dp);
-        (ans + dp[idx] / n2) as i32
+        (ans + dp[idx]) as i32
     }
 }
