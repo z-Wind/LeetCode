@@ -1,4 +1,5 @@
 // https://leetcode.com/problems/can-i-win/discuss/95277/Java-solution-using-HashMap-with-detailed-explanation
+// https://leetcode.com/problems/can-i-win/discuss/95277/Java-solution-using-HashMap-with-detailed-explanation/99601
 
 use std::collections::HashMap;
 impl Solution {
@@ -21,7 +22,6 @@ fn check(dp:&mut HashMap<i32, bool>, n: i32, state: i32, desired_total: i32) -> 
     }
     
     let mut ans = false;
-    // println!("{}: {}, {:?}", player, desired_total, nums);
     for i in 0..n {
         let shift = (1<<i);
         if (state & shift) != 0 {
