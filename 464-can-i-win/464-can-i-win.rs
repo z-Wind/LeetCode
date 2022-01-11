@@ -25,7 +25,7 @@ fn check(dp:&mut HashMap<i32, bool>, nums: &mut Vec<bool>, desired_total: i32, p
     let mut ans = false;
     let n = nums.len();
     // println!("{}: {}, {:?}", player, desired_total, nums);
-    for i in 0..n {
+    for i in (0..n).rev() {
         if !nums[i]{
             continue;
         }
