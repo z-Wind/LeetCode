@@ -2,6 +2,15 @@
 // Time: O(|s1| * n1) where |s1| is the length of s1
 // Space: O(n1)
 
+//  prefixCount      patternCount     suffixCount
+// -------------> a ------> a ... a -------------> n1
+//               /|\        |
+//                |         .
+//                |         .
+//                |         .
+//                |         |
+//                \-- ... --/
+
 use std::collections::HashMap;
 impl Solution {
     pub fn get_max_repetitions(s1: String, n1: i32, s2: String, n2: i32) -> i32 {
@@ -9,11 +18,11 @@ impl Solution {
         let s2 = s2.as_bytes();
         let n1 = n1 as usize;
         let n2 = n2 as usize;
-        
-        let mut kToRepeatCount:HashMap<usize,usize> = HashMap::new();
-        let mut nextIndexToK:HashMap<usize,usize> = HashMap::new();
-        kToRepeatCount.insert(0,0);
-        nextIndexToK.insert(0,0);
+
+        let mut kToRepeatCount: HashMap<usize, usize> = HashMap::new();
+        let mut nextIndexToK: HashMap<usize, usize> = HashMap::new();
+        kToRepeatCount.insert(0, 0);
+        nextIndexToK.insert(0, 0);
         let mut j = 0;
         let mut cnt = 0;
         for k in 1..=n1 {
@@ -28,13 +37,14 @@ impl Solution {
             }
             if let Some(start) = nextIndexToK.get(&j) {
                 let prefixCount = *kToRepeatCount.get(start).unwrap();
-                let patternCount = (n1 - start) / (k - start) * (cnt - prefixCount);
-                let key = start + (n1 - start) % (k - start);
+                let repeatStep = k - start;
+                let patternCount = (n1 - start) / repeatStep * (cnt - prefixCount);
+                let key = start + (n1 - start) % repeatStep;
                 let suffixCount = *kToRepeatCount.get(&key).unwrap() - prefixCount;
                 return ((prefixCount + patternCount + suffixCount) / n2) as i32;
             }
-            kToRepeatCount.insert(k,cnt);
-            nextIndexToK.insert(j,k);
+            kToRepeatCount.insert(k, cnt);
+            nextIndexToK.insert(j, k);
         }
         return (*kToRepeatCount.get(&n1).unwrap() / n2) as i32;
     }
