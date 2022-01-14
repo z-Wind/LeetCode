@@ -4,24 +4,15 @@
  * fn rand7() -> i32;
  */
 
+// https://leetcode.com/problems/implement-rand10-using-rand7/discuss/150301/Three-line-Java-solution-the-idea-can-be-generalized-to-"Implement-RandM()-Using-RandN()"/196858
+
 impl Solution {
     pub fn rand10() -> i32 {
-        let mut num = None;
-        while num.is_none(){
-            num = match (rand7(), rand7()){
-                (1, 1..=3) => Some(1),
-                (1, 4..=6) => Some(2),
-                (2, 1..=3) => Some(3),
-                (2, 4..=6) => Some(4),
-                (3, 1..=3) => Some(5),
-                (3, 4..=6) => Some(6),
-                (4, 1..=3) => Some(7),
-                (4, 4..=6) => Some(8),
-                (5, 1..=3) => Some(9),
-                (5, 4..=6) => Some(10),
-                _ => None,
-            };
+        loop {
+            let rand = 7 * (rand7() - 1) + (rand7() - 1); // 0 to 48
+            if rand < 40 {
+                return rand % 10 + 1;
+            }
         }
-        num.unwrap()
     }
 }
