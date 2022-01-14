@@ -27,7 +27,7 @@ fn canForm(word: &str, dict: &HashSet<String>) -> bool {
     let mut dp = vec![false; n + 1];
     dp[0] = true;
     for i in 1..=n {
-        for j in 0..i {
+        for j in (0..i).rev() {
             if dp[j] && dict.contains(&word[j..i]) {
                 dp[i] = true;
                 break;
