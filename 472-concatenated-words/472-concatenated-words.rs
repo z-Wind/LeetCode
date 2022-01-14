@@ -1,70 +1,39 @@
+// https://leetcode.com/problems/concatenated-words/discuss/95652/Java-DP-Solution
+
+use std::collections::HashSet;
 impl Solution {
     pub fn find_all_concatenated_words_in_a_dict(mut words: Vec<String>) -> Vec<String> {
         words.sort_unstable_by_key(|s| s.len());
-        
-        let mut ans = Vec::new();
-        let mut trie = Trie::new();
-        for word in words{
-            if word.is_empty(){
-                continue;
+
+        let mut result = Vec::new();
+        let mut preWords = HashSet::new();
+        for word in words {
+            if canForm(&word, &preWords) {
+                result.push(word.clone());
             }
-            if trie.starts_in(&word) {
-                ans.push(word);
-            } else {
-                trie.insert(&word);    
-            }
+            preWords.insert(word);
         }
-        
-        ans
+
+        result
     }
 }
 
-#[derive(Debug, Default)]
-struct Trie {
-    is_end: bool,
-    children: [Option<Box<Trie>>;26],
-}
-
-
-/** 
- * `&self` means the method takes an immutable reference.
- * If you need a mutable reference, change it to `&mut self` instead.
- */
-impl Trie {
-
-    /** Initialize your data structure here. */
-    fn new() -> Self {
-        Default::default()
+fn canForm(word: &str, dict: &HashSet<String>) -> bool {
+    if dict.is_empty() {
+        return false;
     }
-    
-    /** Inserts a word into the trie. */
-    fn insert(&mut self, word: &str) {
-        let mut curr = self;
-        for i in word.bytes().map(|c| (c - b'a') as usize){
-            curr = curr.children[i].get_or_insert(Box::new(Trie::new()));
-        }
-        curr.is_end = true;
-    }
-    
-    fn starts_in(&self, word: &str) -> bool {
-        if word.is_empty(){
-            return true;
-        }
-        // println!("{}", word);
 
-        let mut curr = self;
-        for (i, c) in word.bytes().map(|c| (c - b'a') as usize).enumerate(){
-            match &curr.children[c]{
-                None => return false,
-                Some(node) => curr = node,
-            }
-            if curr.is_end{
-                if self.starts_in(&word[i+1..]){
-                    return true;
-                }
+    let n = word.len();
+    let mut dp = vec![false; n + 1];
+    dp[0] = true;
+    for i in 1..=n {
+        for j in 0..i {
+            if dp[j] && dict.contains(&word[j..i]) {
+                dp[i] = true;
+                break;
             }
         }
-
-        false
     }
+
+    return dp[n];
 }
