@@ -5,7 +5,10 @@ impl Solution {
         let mut ans = Vec::new();
         let mut trie = Trie::new();
         for word in words{
-            if trie.starts_in(&word).unwrap_or(0) > 1{
+            if word.is_empty(){
+                continue;
+            }
+            if trie.starts_in(&word) {
                 ans.push(word);
             } else {
                 trie.insert(&word);    
@@ -43,28 +46,25 @@ impl Trie {
         curr.is_end = true;
     }
     
-    fn starts_in(&self, word: &str) -> Option<i32> {
+    fn starts_in(&self, word: &str) -> bool {
         if word.is_empty(){
-            return Some(0);
+            return true;
         }
         // println!("{}", word);
 
-        let mut ans = None;
         let mut curr = self;
         for (i, c) in word.bytes().map(|c| (c - b'a') as usize).enumerate(){
             match &curr.children[c]{
-                None => break,
+                None => return false,
                 Some(node) => curr = node,
             }
             if curr.is_end{
-                match self.starts_in(&word[i+1..]){
-                    Some(count) => return Some(1+count),
-                    None => (),
+                if self.starts_in(&word[i+1..]){
+                    return true;
                 }
             }
         }
 
-        // println!("{} => {:?}", word, ans);
-        ans
+        false
     }
 }
