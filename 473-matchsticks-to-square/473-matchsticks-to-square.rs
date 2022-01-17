@@ -20,13 +20,15 @@ fn explore(
     mut cur_sum: i32,
     level: i32,
 ) -> bool {
-    if level == 4 {
-        return i_start == matchsticks.len() && temp.is_empty();
-    } else if cur_sum > target {
+    if cur_sum > target {
         return false;
     } else if cur_sum == target {
         temp.extend_from_slice(&matchsticks[i_start..]);
-        return explore(target, &temp, Vec::new(), 0, 0, level + 1);
+        if level == 2{
+            return temp.iter().sum::<i32>() == target;
+        } else {
+            return explore(target, &temp, Vec::new(), 0, 0, level + 1);
+        }
     }
     
     // println!("{},{}:{} {:?} {:?}", target, level, cur_sum, &matchsticks[i_start..], temp);
