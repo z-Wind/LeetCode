@@ -8,13 +8,14 @@ impl Solution {
         let mut memo = vec![vec![0; n + 1]; m + 1];
         for s in strs {
             // count number of zeroes and ones in current string
-            let (numZeroes, numOnes) = s.chars().fold((0, 0), |acc, c| {
+            let (mut numZeroes, mut numOnes) = (0, 0);
+            for c in s.chars() {
                 if c == '0' {
-                    (acc.0 + 1, acc.1)
+                    numZeroes += 1;
                 } else {
-                    (acc.0, acc.1 + 1)
+                    numOnes += 1;
                 }
-            });
+            }
             // println!("{}:({},{})", s, numZeroes, numOnes);
 
             // memo[i][j] = the max number of strings that can be formed with i 0's and j 1's
