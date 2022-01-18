@@ -5,14 +5,17 @@ impl Solution {
         let n = heaters.len();
         heaters.sort_unstable();
 
-        let mut radius = 0;        
+        let mut radius = 0;
         for house in houses {
-            let r = match heaters.binary_search(&house).unwrap_or_else(|x| x){
-                0 => heaters[0] - house,
-                i if i == n => house - heaters[n-1],
-                i => (heaters[i] - house).min(house - heaters[i-1]),
+            let r = match heaters.binary_search(&house) {
+                Ok(_) => 0,
+                Err(i) => match i {
+                    0 => heaters[i] - house,
+                    _ if i == n => house - heaters[i - 1],
+                    _ => (heaters[i] - house).min(house - heaters[i - 1]),
+                },
             };
-            
+
             radius = radius.max(r);
         }
 
