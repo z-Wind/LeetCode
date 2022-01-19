@@ -1,19 +1,13 @@
-// https://github.com/z-Wind/LeetCode/blob/main/461-hamming-distance/461-hamming-distance.rs
+// https://leetcode.com/problems/total-hamming-distance/discuss/96226/Java-O(n)-time-O(1)-Space
 
 impl Solution {
     pub fn total_hamming_distance(nums: Vec<i32>) -> i32 {
-        let n = nums.len();
-        let mut sum = 0;
-        for i in 0..n {
-            for j in i + 1..n {
-                sum += hamming_distance(nums[i], nums[j]);
-            }
+        let n = nums.len() as i32;
+        let mut total:i32 = 0;
+        for i in 0..32 {
+            let bitCount = nums.iter().fold(0, |acc, &num| acc + ((num >> i) & 1));
+            total += bitCount * (n - bitCount);
         }
-        sum
+        return total;
     }
-}
-
-fn hamming_distance(x: i32, y: i32) -> i32 {
-    let diff = x ^ y;
-    diff.count_ones() as i32
 }
