@@ -23,7 +23,7 @@ impl Solution {
         // 2n-1 palindrome 911 => 91119
         for prefix in (start..end).rev() {
             let num = prefix * start + reverse(prefix) % start;
-            println!("{}", num);
+            // println!("{}", num);
             for x in (start..end).rev() {
                 if num / x > x {
                     break;
