@@ -1,39 +1,55 @@
-// https://leetcode.com/problems/sliding-window-median/discuss/1341219/Rust-Binary-Search-%2B-Vec-Heap-beats-100-mem-and-speed
+// https://leetcode.com/problems/sliding-window-median/discuss/96346/Java-using-two-Tree-Sets-O(n-logk)/538502
+
+use std::cmp::Reverse;
+use std::collections::BTreeSet;
 
 impl Solution {
     pub fn median_sliding_window(nums: Vec<i32>, k: i32) -> Vec<f64> {
-        // println!("{:?}", nums);
-        
         let k = k as usize;
-        let mut res: Vec<f64> = vec![];
-        let mut window:Vec<i32> = Vec::new();
-        window.extend_from_slice(&nums[..k]);
-        window.sort_unstable();
-        res.push(get_median(&window, k));
-        
-        for i in 1..nums.len()-(k-1) {
-            // println!("{} {:?} {:?}", nums[i-1], window, window.binary_search(&nums[i-1]));
-            // remove previous elem
-            window.remove(window.binary_search(&nums[i-1]).unwrap());
-            
-            // find where to insert
-            let num = nums[i+k-1];
-            let idx = window.binary_search(&num).unwrap_or_else(|x| x);
-            // add new elem
-            window.insert(idx, num);
-            
-            // get median
-            res.push(get_median(&window, k));
+        let n = nums.len();
+        let mut left = BTreeSet::new();
+        let mut right = BTreeSet::new();
+        let mut res = vec![0.0; n - k + 1];
+
+        for i in 0..k {
+            left.insert(Reverse((nums[i], i)));
         }
-        res
+        balance(&mut left, &mut right);
+        res[0] = getMedian(k, &left, &right);
+
+        let mut r = 1;
+        for i in k..n {
+            if !left.remove(&Reverse((nums[i - k], i - k))) {
+                right.remove(&(nums[i - k], i - k));
+            }
+
+            right.insert((nums[i], i));
+            let e = right.iter().next().unwrap().clone();
+            right.remove(&e);
+            left.insert(Reverse(e));
+            balance(&mut left, &mut right);
+            
+            res[r] = getMedian(k, &left, &right);
+            r += 1;
+        }
+
+        return res;
     }
 }
 
-fn get_median(window:&Vec<i32>, k:usize) -> f64{
-    let mid = k / 2;
-    if k % 2 == 1 {
-        window[mid] as f64
+fn balance(left: &mut BTreeSet<Reverse<(i32, usize)>>, right: &mut BTreeSet<(i32, usize)>) {
+    while left.len() > right.len() {
+        let e = left.iter().next().unwrap().clone();
+        left.remove(&e);
+        right.insert(e.0);
+    }
+}
+
+fn getMedian(k: usize, left: &BTreeSet<Reverse<(i32, usize)>>, right: &BTreeSet<(i32, usize)>) -> f64 {
+    // k % 2 == 0
+    if k & 1 == 0 {
+        return ((left.iter().next().unwrap().0).0 as f64 + right.iter().next().unwrap().0 as f64) / 2.0;
     } else {
-        (window[mid - 1] as f64 + window[mid] as f64) / 2.0
+        return right.iter().next().unwrap().0 as f64;
     }
 }
