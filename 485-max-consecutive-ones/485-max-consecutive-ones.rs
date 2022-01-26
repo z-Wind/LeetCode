@@ -4,15 +4,14 @@ impl Solution {
         let mut count = 0;
         for num in nums {
             match num {
-                0 => {
+                0 => count = 0,
+                1 => { 
+                    count += 1;
                     ans = ans.max(count);
-                    count = 0;
                 },
-                1 => count += 1,
                 _ => panic!("impossible"),
             }
         }
-        ans = ans.max(count);
         
         ans
     }
