@@ -13,7 +13,7 @@ impl Solution {
             if sum(2, i) > num {
                 break;
             }
-            if let Some(x) = binary_search(num, i){
+            if let Some(x) = binary_search(num, i) {
                 ans = ans.min(x);
             }
         }
@@ -21,7 +21,7 @@ impl Solution {
     }
 }
 
-fn binary_search(num: u128, n:u128) -> Option<u128> {
+fn binary_search(num: u128, n: u32) -> Option<u128> {
     let mut left = 2;
     let mut right = num - 1;
     while left <= right {
@@ -34,7 +34,7 @@ fn binary_search(num: u128, n:u128) -> Option<u128> {
         let mid = left + (right - left) / 2;
         let res = sum(mid, n);
         if res == num {
-            return Some(mid)
+            return Some(mid);
         } else if res > num {
             right = mid - 1;
         } else {
@@ -44,6 +44,6 @@ fn binary_search(num: u128, n:u128) -> Option<u128> {
     None
 }
 
-fn sum(r: u128, n: u128) -> u128{
-    (r.pow(n as u32) - 1) / (r - 1)
+fn sum(r: u128, n: u32) -> u128 {
+    (r.pow(n) - 1) / (r - 1)
 }
