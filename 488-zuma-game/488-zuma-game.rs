@@ -11,7 +11,7 @@ impl Solution {
             *map.get_mut(&c).unwrap() += 1;
         }
         let mut ans = i32::MAX;
-        find_min_step(&mut ans, 0, board, &mut map);
+        // find_min_step(&mut ans, 0, board, &mut map);
         find_min_step_all(&mut ans, 0, board, &mut map);
         if ans == i32::MAX{
             -1
