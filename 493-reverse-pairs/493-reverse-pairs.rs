@@ -1,4 +1,5 @@
 // https://github.com/z-Wind/LeetCode/blob/main/count-of-range-sum/count-of-range-sum.rs
+// https://leetcode.com/problems/reverse-pairs/discuss/97268/General-principles-behind-problems-similar-to-%22Reverse-Pairs%22
 
 impl Solution {
     pub fn reverse_pairs(nums: Vec<i32>) -> i32 {
