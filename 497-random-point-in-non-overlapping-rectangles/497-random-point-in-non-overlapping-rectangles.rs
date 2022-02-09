@@ -1,7 +1,6 @@
 use rand::{rngs::ThreadRng, thread_rng, Rng};
 
 struct Solution {
-    areas_total: i64,
     areas: Vec<i64>,
     rects: Vec<Vec<i32>>,
     rng: ThreadRng,
@@ -13,16 +12,12 @@ struct Solution {
  */
 impl Solution {
     fn new(rects: Vec<Vec<i32>>) -> Self {
-        let mut areas_total = 0;
-        let mut areas = Vec::with_capacity(rects.len());
-        for i in 0..rects.len() {
-            let area = get_area(&rects[i]);
-            areas_total += area;
-            areas.push(area);
-        }
+        let mut areas = rects.iter().scan(0, |sum, rect| {
+            *sum = *sum + get_area(rect);
+            Some(*sum)
+        }).collect();
 
         Self {
-            areas_total,
             areas,
             rects,
             rng: rand::thread_rng(),
@@ -32,17 +27,9 @@ impl Solution {
     fn pick(&mut self) -> Vec<i32> {
         // select which rect
         // probability: area/areas_total
-        let mut area = self.rng.gen_range(1, self.areas_total + 1);
-        let mut i = 0;
-        let mut count = 0;
-        while i < self.areas.len() {
-            count += self.areas[i];
-            if count >= area {
-                break;
-            }
-            i += 1;
-        }
-        // println!("sel:{} {} {} {:?}", i, area, self.areas_total, self.areas);
+        let mut area = self.rng.gen_range(1, self.areas.last().unwrap() + 1);
+        let mut i = self.areas.binary_search(&area).unwrap_or_else(|x| x);;
+        // println!("sel:{} {} {:?}", i, area, self.areas);
         
         // gen point
         // probability: 1/area
