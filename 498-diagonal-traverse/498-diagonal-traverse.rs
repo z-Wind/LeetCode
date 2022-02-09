@@ -2,40 +2,43 @@ impl Solution {
     pub fn find_diagonal_order(mat: Vec<Vec<i32>>) -> Vec<i32> {
         let m = mat.len();
         let n = mat[0].len();
-        let mut ans = Vec::with_capacity(m*n);
-        
-        let mut rev = false;
-        for i_start in 0..m {
-            let mut temp = Vec::new();
-            let mut i = i_start;
-            let mut j = 0;
-            while i < m && j < n {
-                temp.push(mat[i][j]);
-                i -= 1;
-                j += 1;
+        let mut ans = Vec::with_capacity(m * n);
+
+        let mut up = true;
+        let mut i = 0;
+        let mut j = 0;
+        for _ in 0..m * n {
+            // println!("{},{}", i, j);
+            ans.push(mat[i][j]);
+
+            match (up, i, j) {
+                (true, ..) if j == n - 1 => {
+                    i += 1;
+                    up = false;
+                }
+                (true, ..) if i == 0 => {
+                    j += 1;
+                    up = false;
+                }
+                (true, ..) => {
+                    i -= 1;
+                    j += 1;
+                }
+                (false, ..) if i == m - 1 => {
+                    j += 1;
+                    up = true;
+                }
+                (false, ..) if j == 0 => {
+                    i += 1;
+                    up = true;
+                }
+                (false, ..) => {
+                    i += 1;
+                    j -= 1;
+                }
             }
-            if rev {
-                temp.reverse();
-            }
-            ans.extend_from_slice(&temp);
-            rev = !rev;
         }
-        for j_start in 1..n {
-            let mut temp = Vec::new();
-            let mut i = m - 1;
-            let mut j = j_start;
-            while i < m && j < n {
-                temp.push(mat[i][j]);
-                i -= 1;
-                j += 1;
-            }
-            if rev {
-                temp.reverse();
-            }
-            ans.extend_from_slice(&temp);
-            rev = !rev;
-        }
-        
+
         ans
     }
 }
