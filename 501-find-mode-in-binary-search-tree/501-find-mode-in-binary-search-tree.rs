@@ -40,8 +40,8 @@ impl Solution {
     }
 }
 
-
-fn inorder(getlist:bool, root: Option<Rc<RefCell<TreeNode>>>, maxCount:&mut i32, currCount:&mut i32, pre:&mut Option<Rc<RefCell<TreeNode>>>, ans:&mut Vec<i32>){
+// use inorder to get sorted order
+fn inorder(getlist:bool, root: Option<Rc<RefCell<TreeNode>>>, maxCount:&mut i32, currCount:&mut i32, pre:&mut Option<i32>, ans:&mut Vec<i32>){
     if root.is_none() {
         return;
     }
@@ -53,7 +53,7 @@ fn inorder(getlist:bool, root: Option<Rc<RefCell<TreeNode>>>, maxCount:&mut i32,
     inorder(getlist, left, maxCount, currCount, pre, ans);
     
     // extra action
-    if pre.is_some() && pre.as_ref().unwrap().borrow().val == val {
+    if pre.is_some() && pre.unwrap() == val {
         *currCount += 1;
     } else {
         *currCount = 1;
@@ -63,7 +63,7 @@ fn inorder(getlist:bool, root: Option<Rc<RefCell<TreeNode>>>, maxCount:&mut i32,
     } else if currCount == maxCount {
         ans.push(val);
     }
-    *pre = root;
+    *pre = Some(val);
     
     inorder(getlist, right, maxCount, currCount, pre, ans);
 }
