@@ -10,20 +10,20 @@ impl Solution {
             .zip(profits.into_iter())
             .map(|ele| Reverse(ele))
             .collect();
-        let mut pqPro: BinaryHeap<(i32, i32)> = BinaryHeap::new();
+        let mut pqPro = BinaryHeap::new();
 
         for _ in 0..k {
             while let Some(Reverse((cap, pro))) = pqCap.peek() {
                 if *cap > w {
                     break;
                 }
-                pqPro.push((*pro, *cap));
+                pqPro.push(*pro);
                 pqCap.pop();
             }
 
             match pqPro.pop() {
                 None => break,
-                Some((pro, _)) => w += pro,
+                Some(pro) => w += pro,
             }
         }
 
