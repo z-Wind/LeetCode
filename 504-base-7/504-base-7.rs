@@ -1,19 +1,22 @@
 impl Solution {
-    pub fn convert_to_base7(num: i32) -> String {
+    pub fn convert_to_base7(mut num: i32) -> String {
         if num == 0 {
             return String::from("0");
         }
         
+        let mut sign = if num.is_negative() {
+            num *= -1;
+            String::from("-")
+        } else {
+            String::new()
+        };
+        
         let mut s = String::new();
-        let mut n = num.abs();
-        while n != 0 {
-            s.push_str(&(n % 7).to_string());
-            n /= 7;
-        }
-        if num.is_negative() {
-            s.push('-');
+        while num != 0 {
+            s = (num % 7).to_string() + &s;
+            num /= 7;
         }
         
-        s.chars().rev().collect()
+        sign + &s
     }
 }
