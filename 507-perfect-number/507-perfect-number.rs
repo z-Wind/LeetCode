@@ -1,20 +1,8 @@
-// https://leetcode.com/problems/perfect-number/discuss/98594/Simple-Java-Solution/102848
+// https://en.wikipedia.org/wiki/List_of_Mersenne_primes_and_perfect_numbers
+// https://zh.wikipedia.org/wiki/%E5%AE%8C%E5%85%A8%E6%95%B0
 
 impl Solution {
     pub fn check_perfect_number(num: i32) -> bool {
-        if num == 1 {
-            return false;
-        }
-        
-        let mut sum = 1;
-        let max = (num as f64).sqrt() as i32;
-        for div in 2..=max {
-            if num % div == 0 {
-                sum += div;
-                sum += num / div;
-            }
-        }
-
-        sum == num
+        num == 6 || num == 28 || num == 496 || num == 8128 || num == 33550336
     }
 }
