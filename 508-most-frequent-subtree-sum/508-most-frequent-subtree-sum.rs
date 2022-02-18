@@ -22,9 +22,9 @@ use std::rc::Rc;
 impl Solution {
     pub fn find_frequent_tree_sum(root: Option<Rc<RefCell<TreeNode>>>) -> Vec<i32> {
         let mut map = HashMap::new();
-        tree_sum(root.as_ref(), &mut map);
+        let mut max_freq = 0;
+        tree_sum(root.as_ref(), &mut map, &mut max_freq);
 
-        let max_freq = map.values().max().cloned().unwrap();
         map.into_iter()
             .filter(|(k, v)| *v == max_freq)
             .map(|(k, _)| k)
@@ -32,7 +32,7 @@ impl Solution {
     }
 }
 
-fn tree_sum(root: Option<&Rc<RefCell<TreeNode>>>, map: &mut HashMap<i32, i32>) -> i32 {
+fn tree_sum(root: Option<&Rc<RefCell<TreeNode>>>, map: &mut HashMap<i32, i32>, max_freq: &mut i32) -> i32 {
     if root.is_none() {
         return 0;
     }
@@ -41,8 +41,10 @@ fn tree_sum(root: Option<&Rc<RefCell<TreeNode>>>, map: &mut HashMap<i32, i32>) -
     let val = root.val;
     let left = root.left.as_ref();
     let right = root.right.as_ref();
-    let sum = val + tree_sum(left, map) + tree_sum(right, map);
-    *map.entry(sum).or_insert(0) += 1;
+    let sum = val + tree_sum(left, map, max_freq) + tree_sum(right, map, max_freq);
+    let entry = map.entry(sum).or_insert(0);
+    *entry += 1;
+    *max_freq = (*max_freq).max(*entry);
 
     return sum;
 }
