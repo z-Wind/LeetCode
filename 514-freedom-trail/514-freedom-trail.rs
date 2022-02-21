@@ -33,9 +33,9 @@ fn find_rotate_steps(
     let step = ring[c]
         .iter()
         .map(|&next_ring_idx| {
-            let r =
-                ((next_ring_idx + n - ring_idx) % n).min((ring_idx + n - next_ring_idx) % n) as i32;
-            1 + r + find_rotate_steps(ring, n, key, next_ring_idx, key_idx + 1, map)
+            let mut dis = (next_ring_idx as i32 - ring_idx as i32).abs();
+            dis = dis.min(n as i32 - dis);
+            1 + dis + find_rotate_steps(ring, n, key, next_ring_idx, key_idx + 1, map)
         })
         .min()
         .unwrap();
