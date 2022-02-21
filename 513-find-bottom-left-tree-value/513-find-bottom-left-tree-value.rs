@@ -26,21 +26,15 @@ impl Solution {
         let mut ans = root.as_ref().unwrap().borrow().val;
         queue.push_back(root.unwrap());
         
-        while !queue.is_empty() {
-            // println!("{:?}", queue);
-            ans = queue.front().unwrap().borrow().val;
+        while let Some(node) = queue.pop_front() {
+            ans = node.borrow().val;
             
-            let n = queue.len();
-            for _ in 0..n {
-                let node = queue.pop_front().unwrap();
-                let node = node.borrow();
-                if let Some(left) = &node.left {
-                    queue.push_back(left.clone());
-                }
-                if let Some(right) = &node.right {
-                    queue.push_back(right.clone());
-                }
+            if let Some(right) = &node.borrow().right {
+                queue.push_back(right.clone());
             }    
+            if let Some(left) = &node.borrow().left {
+                queue.push_back(left.clone());
+            }
         }
         
         ans
