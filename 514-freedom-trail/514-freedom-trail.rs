@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 impl Solution {
     pub fn find_rotate_steps(ring: String, key: String) -> i32 {
         let mut ring_vec = vec![Vec::new(); 26];
@@ -9,7 +7,7 @@ impl Solution {
         }
         let key: Vec<u8> = key.bytes().collect();
 
-        let mut map = HashMap::new();
+        let mut map = vec![vec![0; key.len()];ring.len()];
         find_rotate_steps(&ring_vec, ring.len(), &key, 0, 0, &mut map)
     }
 }
@@ -20,17 +18,17 @@ fn find_rotate_steps(
     key: &Vec<u8>,
     ring_idx: usize,
     key_idx: usize,
-    map: &mut HashMap<(usize, usize), i32>,
+    map: &mut Vec<Vec<i32>>,
 ) -> i32 {
     if key_idx == key.len() {
         return 0;
     }
-    if let Some(step) = map.get(&(ring_idx, key_idx)) {
-        return *step;
+    if map[ring_idx][key_idx] != 0 {
+        return map[ring_idx][key_idx];
     }
 
     let c = (key[key_idx] - b'a') as usize;
-    let step = ring[c]
+    map[ring_idx][key_idx] = ring[c]
         .iter()
         .map(|&next_ring_idx| {
             let mut dis = (next_ring_idx as i32 - ring_idx as i32).abs();
@@ -39,7 +37,5 @@ fn find_rotate_steps(
         })
         .min()
         .unwrap();
-    // println!("{},{} => {}", ring_idx, key_idx, step);
-    map.insert((ring_idx, key_idx), step);
-    step
+    map[ring_idx][key_idx]
 }
