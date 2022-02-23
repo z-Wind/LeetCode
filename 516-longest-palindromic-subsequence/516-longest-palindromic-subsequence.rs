@@ -18,12 +18,12 @@ fn compare_subseq(map: &mut Vec<Vec<i32>>, s: &Vec<char>, i: usize, j: usize) ->
         return map[i][j];
     }
 
-    let ans = if s[i] == s[j] {
+    map[i][j] = if s[i] == s[j] {
         2 + compare_subseq(map, s, i + 1, j - 1)
     } else {
         compare_subseq(map, s, i, j - 1).max(compare_subseq(map, s, i + 1, j))
     };
-    map[i][j] = ans;
-    ans
+    
+    map[i][j]
 }
 
