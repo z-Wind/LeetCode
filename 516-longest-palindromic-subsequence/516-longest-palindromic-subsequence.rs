@@ -1,29 +1,24 @@
+// https://leetcode.com/problems/longest-palindromic-subsequence/discuss/99101/Straight-forward-Java-DP-solution
+
 impl Solution {
     pub fn longest_palindrome_subseq(s: String) -> i32 {
         let n = s.len();
         let s: Vec<char> = s.chars().collect();
-        let mut map = vec![vec![0; n]; n];
-        compare_subseq(&mut map, &s, 0, n - 1)
+        let mut dp = vec![vec![0; n]; n];
+
+        for i in (0..n).rev() {
+            dp[i][i] = 1;
+            for j in i + 1..n {
+                dp[i][j] = if s[i] == s[j] {
+                    dp[i + 1][j - 1] + 2
+                } else {
+                    dp[i + 1][j].max(dp[i][j - 1])
+                };
+            }
+        }
+
+        dp[0][n - 1]
     }
 }
 
-fn compare_subseq(map: &mut Vec<Vec<i32>>, s: &Vec<char>, i: usize, j: usize) -> i32 {
-    if i == j {
-        return 1;
-    } else if i > j {
-        return 0;
-    }
-
-    if map[i][j] != 0 {
-        return map[i][j];
-    }
-
-    map[i][j] = if s[i] == s[j] {
-        2 + compare_subseq(map, s, i + 1, j - 1)
-    } else {
-        compare_subseq(map, s, i, j - 1).max(compare_subseq(map, s, i + 1, j))
-    };
-    
-    map[i][j]
-}
 
