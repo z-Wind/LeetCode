@@ -1,40 +1,51 @@
-// https://github.com/z-Wind/LeetCode/blob/main/combination-sum/combination-sum.rs
+// https://leetcode.com/problems/coin-change-2/discuss/99212/Knapsack-problem-Java-solution-with-thinking-process-O(nm)-Time-and-O(m)-Space
 
-use std::collections::HashMap;
+// ith coins & amount j
+// dp[i][j] = dp[i-1][j] + dp[i][j-coins[i-1]]
+
+//                     dp[i-1][j]
+// dp[i][j-coins[i-1]  dp[i][j]
+
+// dp[j-coins[i-1] dp[j](update)
+
 impl Solution {
-    pub fn change(amount: i32, mut coins: Vec<i32>) -> i32 {
-        if amount == 0 {
-            return 1;
-        }
-        coins.sort_unstable();
-        let mut map = HashMap::new();
-        explore(&mut map, &coins, amount, 0, 0)
+    pub fn change(amount: i32, coins: Vec<i32>) -> i32 {
+        // change(amount, coins)
+        change_1D(amount, coins)
     }
 }
 
-fn explore(
-    map: &mut HashMap<(usize, i32), i32>,
-    coins: &Vec<i32>,
-    target: i32,
-    i_start: usize,
-    cur_sum: i32,
-) -> i32 {
-    let key = (i_start, cur_sum);
-    if let Some(x) = map.get(&key) {
-        return *x;
-    }
-    // println!("{} {}", coins[i_start], cur_sum);
-    let mut ans = 0;
-    for i in i_start..coins.len() {
-        let sum = cur_sum + coins[i];
-        if sum == target {
-            ans += 1;
-        } else if sum < target {
-            ans += explore(map, coins, target, i, sum);
-        } else {
-            break;
+fn change(amount: i32, coins: Vec<i32>) -> i32 {
+    let amount = amount as usize;
+
+    let mut dp = vec![vec![0; amount + 1]; coins.len() + 1];
+    dp[0][0] = 1;
+    for i in 1..=coins.len() {
+        dp[i][0] = 1;
+        for j in 1..=amount {
+            dp[i][j] = dp[i - 1][j];
+            if j >= coins[i - 1] as usize {
+                dp[i][j] += dp[i][j - coins[i - 1] as usize]
+            }
         }
     }
-    map.insert(key, ans);
-    ans
+    // println!("{:?}", dp);
+
+    dp[coins.len()][amount]
+}
+
+fn change_1D(amount: i32, coins: Vec<i32>) -> i32 {
+    let amount = amount as usize;
+
+    let mut dp = vec![0; amount + 1];
+    dp[0] = 1;
+    for coin in coins {
+        let coin = coin as usize;
+        for j in coin..=amount {
+            dp[j] += dp[j - coin]
+        }
+    }
+    // println!("{:?}", dp);
+
+    dp[amount]
 }
