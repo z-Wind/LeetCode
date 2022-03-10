@@ -1,51 +1,29 @@
-use std::collections::{HashMap, HashSet};
+// https://leetcode.com/problems/longest-uncommon-subsequence-ii/discuss/99453/Python-Simple-Explanation
 
 impl Solution {
-    pub fn find_lu_slength(strs: Vec<String>) -> i32 {
-        let mut map = vec![HashMap::new();11];
-        for s in strs {
-            *map[s.len()].entry(s).or_insert(0) += 1;
-        }
-        
-        for i in (1..=10).rev() {
-            let m = map.pop().unwrap();
-            if m.len() == 0 {
-                continue;
-            }
-            
-            if m.values().any(|&x| x == 1) {
-                return i as i32;
-            }
-            
-            for s in m.keys() {
-                for sub in gen_subseq(s) {
-                    if sub.len() >= i {
-                        continue;
-                    }
-                    if let Some(count) = map[sub.len()].get_mut(&sub) {
-                        *count += 1;
-                    }
-                }
+    pub fn find_lu_slength(mut strs: Vec<String>) -> i32 {
+        strs.sort_unstable_by_key(|s| -(s.len() as i32));
+        // println!("{:?}", strs);
+        for (i, word1) in strs.iter().enumerate() {
+            if strs
+                .iter()
+                .enumerate()
+                .all(|(j, word2)| i == j || !is_subseq(word1, word2))
+            {
+                return word1.len() as i32;
             }
         }
-        
-        -1
+        return -1;
     }
 }
 
-fn gen_subseq(s: &str) -> HashSet<String> {
-    let mut ans:HashSet<String> = HashSet::new();
-    
-    for c in s.chars() {
-        let mut tmp = ans.clone();
-        for mut ss in tmp.drain() {
-            ss.push(c);
-            ans.insert(ss);
+fn is_subseq(w1: &str, w2: &str) -> bool {
+    // True iff word1 is a subsequence of word2.
+    let mut i = 0;
+    for c in w2.chars() {
+        if i < w1.len() && w1[i..i + 1] == c.to_string() {
+            i += 1
         }
-        
-        ans.insert(c.to_string());
     }
-    // println!("{}:{:?}", s, ans);
-    
-    ans
+    i == w1.len()
 }
