@@ -9,21 +9,20 @@ impl Solution {
 
         let mut sum = 0;
         let mut longest_subarray = 0;
-        for i in 0..nums.len() as i32 {
-            match nums[i as usize] {
+        for (i, num) in nums.into_iter().enumerate() {
+            let i = i as i32;
+            match num {
                 0 => sum -= 1,
                 1 => sum += 1,
                 x => panic!("{} is not zero or one", x),
             }
             if let Some(idx) = mp.get(&sum) {
-                if longest_subarray < i - idx {
-                    longest_subarray = i - idx;
-                }
+                longest_subarray = longest_subarray.max(i - idx);
             } else {
                 mp.insert(sum, i);
             }
         }
-        
-        longest_subarray as i32
+
+        longest_subarray
     }
 }
