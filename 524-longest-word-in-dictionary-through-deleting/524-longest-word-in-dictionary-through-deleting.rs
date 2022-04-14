@@ -12,8 +12,12 @@ impl Solution {
             let dictWord = dictWord.as_bytes();
             let mut i = 0;
             for &c in s.iter() {
-                if i < dictWord.len() && c == dictWord[i] {
-                    i += 1;
+                if i < dictWord.len() {
+                    if c == dictWord[i] {
+                        i += 1;
+                    }
+                } else {
+                    break;
                 }
             }
 
