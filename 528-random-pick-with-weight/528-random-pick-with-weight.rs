@@ -1,8 +1,7 @@
 use rand::{thread_rng, Rng, rngs::ThreadRng};
 
 struct Solution {
-    sum: i32,
-    w: Vec<i32>,
+    sums: Vec<i32>,
 }
 
 
@@ -13,20 +12,21 @@ struct Solution {
 impl Solution {
 
     fn new(w: Vec<i32>) -> Self {
+        let mut sums = vec![0; w.len()+1];
+        for (i, num) in w.iter().enumerate() {
+            sums[i+1] = sums[i] + num;
+        }
         Self {
-            sum: w.iter().sum(),
-            w,
+            sums,
         }
     }
     
     fn pick_index(&self) -> i32 {
         let mut rng = rand::thread_rng();
-        let stop = rng.gen_range(0, self.sum);
-        let mut sum = 0;
-        for (i, num) in self.w.iter().enumerate() {
-            sum += num;
-            // [0, sum1), [sum1, sum2), .... [sum_n, sum)
-            if sum > stop {
+        let stop = rng.gen_range(0, self.sums.last().unwrap());
+        for (i, bound) in self.sums.windows(2).enumerate() {
+            // [0, sum1), [sum1, sum2), .... [sum_n, sum_total)
+            if bound[0] <= stop && stop < bound[1] {
                 return i as i32;
             }
         }
