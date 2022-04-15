@@ -9,24 +9,18 @@ struct Solution {
  * If you need a mutable reference, change it to `&mut self` instead.
  */
 impl Solution {
-    fn new(w: Vec<i32>) -> Self {
-        let mut sums = vec![0; w.len() + 1];
-        for (i, num) in w.iter().enumerate() {
-            sums[i + 1] = sums[i] + num;
+    fn new(mut w: Vec<i32>) -> Self {
+        for i in 1..w.len() {
+            w[i] += w[i-1];
         }
-        Self { sums }
+        Self { sums:w }
     }
 
     fn pick_index(&self) -> i32 {
         let mut rng = rand::thread_rng();
-        let stop = rng.gen_range(0, self.sums[self.sums.len() - 1]);
-        for (i, bound) in self.sums.windows(2).enumerate() {
-            // [0, sum1), [sum1, sum2), .... [sum_n, sum_total)
-            if bound[0] <= stop && stop < bound[1] {
-                return i as i32;
-            }
-        }
-        unreachable!("The loop should always return");
+        let stop = rng.gen_range(1, self.sums[self.sums.len() - 1] + 1);
+        // [1, sum1], [sum1+1, sum2], .... [sum_n+1, sum_total]
+        self.sums.binary_search(&stop).unwrap_or_else(|x| x) as i32
     }
 }
 
