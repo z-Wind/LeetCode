@@ -1,25 +1,20 @@
-use std::collections::HashSet;
+// https://leetcode.com/problems/k-diff-pairs-in-an-array/discuss/1756967/Well-Explained-oror-Two-Easy-Solutions
+
+use std::collections::HashMap;
 
 impl Solution {
     pub fn find_pairs(nums: Vec<i32>, k: i32) -> i32 {
-        let mut set = HashSet::new();
-        let mut record = HashSet::new();
+        let mut map = HashMap::new();
+
+        for num in nums {
+            *map.entry(num).or_insert(0) += 1;
+        }
 
         let mut count = 0;
-        for num in nums {
-            let x = num + k;
-            if set.contains(&x) && !record.contains(&(num, x)){
-                record.insert((num, x));
+        for (num, freq) in map.iter() {
+            if (k > 0 && map.contains_key(&(num + k))) || (k == 0 && *freq > 1) {
                 count += 1;
             }
-            
-            let x = num - k;
-            if set.contains(&x) && !record.contains(&(x, num)){
-                record.insert((x, num));
-                count += 1;
-            }
-
-            set.insert(num);
         }
 
         return count;
