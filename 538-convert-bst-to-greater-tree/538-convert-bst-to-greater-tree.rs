@@ -30,14 +30,10 @@ fn convert_bst(root: Option<Rc<RefCell<TreeNode>>>, sum:&mut i32)  {
     match root {
         None => (),
         Some(node) => {
-            let val = node.borrow().val;
-            let mut left = node.borrow_mut().left.clone();
-            let mut right = node.borrow_mut().right.clone();
-            
-            convert_bst(right, sum);
-            *sum += val;
+            convert_bst(node.borrow().right.clone(), sum);
+            *sum += node.borrow().val;
             node.borrow_mut().val = *sum;
-            convert_bst(left, sum);
+            convert_bst(node.borrow().left.clone(), sum);
         }
     }
 }
