@@ -1,14 +1,32 @@
+// https://leetcode.com/problems/minimum-time-difference/discuss/100640/Verbose-Java-Solution-Bucket/208661
+
 impl Solution {
     pub fn find_min_difference(time_points: Vec<String>) -> i32 {
-        let mut time_points: Vec<i32> = time_points.into_iter().map(time_to_num).collect();
-        time_points.sort_unstable();
-        
-        let mut ans = i32::MAX;
-        for w in time_points.windows(2) {
-            ans = ans.min(w[1] - w[0]);
+        let mut mark = vec![false; 24 * 60];
+        let mut start = usize::MAX;
+        let mut end = usize::MIN;
+        for num in time_points.into_iter().map(time_to_num) {
+            let num = num as usize;
+            mark[num] = match mark[num] {
+                true => return 0,
+                false => {
+                    start = start.min(num);
+                    end = end.max(num);
+                    true
+                }
+            }
         }
 
-        ans.min(time_points[0] + 60 * 24 - time_points.last().unwrap())
+        let mut ans = start + 60 * 24 - end;
+        let mut prev = start;
+        for i in start + 1..=end {
+            if mark[i] {
+                ans = ans.min(i - prev);
+                prev = i;
+            }
+        }
+
+        ans as i32
     }
 }
 
