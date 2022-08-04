@@ -11,9 +11,10 @@ impl Solution {
         time_points.sort_unstable();
         time_points.push(time_points[0] + 60 * 24);
 
-        (1..time_points.len())
-            .map(|i| time_points[i] - time_points[i - 1])
-            .min()
-            .expect("Number") as i32
+        let mut ans = i32::MAX;
+        for w in time_points.windows(2) {
+            ans = ans.min(w[1] - w[0]);
+        }
+        ans
     }
 }
