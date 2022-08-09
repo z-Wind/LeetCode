@@ -4,12 +4,11 @@ impl Solution {
         let mut right = nums.len() - 1;
         while right > left {
             let mid = left + (right - left) / 2;
-            // println!("{},{},{}", nums[left], nums[mid], nums[right]);
 
             // 1,1,3,3,4
             // 0,1,1,3,3
             // 1,1,2,3,3
-            if (mid - left) % 2 == 0 {
+            if mid % 2 == 0 {
                 if nums[mid] == nums[mid + 1] {
                     left = mid + 2;
                 } else if nums[mid] == nums[mid - 1] {
