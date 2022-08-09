@@ -8,9 +8,9 @@ impl Solution {
             .enumerate()
             .map(|(i, chunk)| {
                 if i % 2 == 0 {
-                    chunk.into_iter().rev().collect::<String>()
+                    chunk.iter().rev().collect::<String>()
                 } else {
-                    chunk.into_iter().collect()
+                    chunk.iter().collect()
                 }
             })
             .collect()
