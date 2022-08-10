@@ -1,7 +1,5 @@
 // https://leetcode.com/problems/01-matrix/discuss/1369741/C%2B%2BJavaPython-BFS-DP-solutions-with-Picture-Clean-and-Concise-O(1)-Space
 
-use std::collections::VecDeque;
-
 impl Solution {
     pub fn update_matrix(mut mat: Vec<Vec<i32>>) -> Vec<Vec<i32>> {
         let (m, n) = (mat.len(), mat[0].len());
