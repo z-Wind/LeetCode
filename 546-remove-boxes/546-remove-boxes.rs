@@ -10,30 +10,30 @@ impl Solution {
     pub fn remove_boxes(boxes: Vec<i32>) -> i32 {
         let n = boxes.len();
         let mut dp = vec![vec![vec![0; n]; n]; n];
-        remove_boxes(&mut dp, &boxes, 0, n - 1, 0)
+        remove_boxes(&mut dp, &boxes, 0, n - 1, 0) as i32
     }
 }
 
 fn remove_boxes(
-    dp: &mut Vec<Vec<Vec<i32>>>,
+    dp: &mut Vec<Vec<Vec<usize>>>,
     boxes: &Vec<i32>,
     i: usize,
     j: usize,
     k: usize,
-) -> i32 {
+) -> usize {
     if i > j {
         return 0;
     } else if i == j {
-        return ((k + 1) * (k + 1)) as i32;
+        return (k + 1) * (k + 1);
     } else if dp[i][j][k] > 0 {
         return dp[i][j][k];
     }
-    
+
     let results = {
         let mut points = 0;
         let mut i = i;
         let mut k = k;
-        
+
         // combine
         while i < j && boxes[i] == boxes[i + 1] {
             i += 1;
