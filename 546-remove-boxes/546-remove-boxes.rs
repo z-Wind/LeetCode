@@ -18,9 +18,9 @@ impl Solution {
 fn remove_boxes(
     dp: &mut HashMap<(usize, usize, i32), i32>,
     boxes: &Vec<i32>,
-    i: usize,
+    mut i: usize,
     j: usize,
-    k: i32,
+    mut k: i32,
 ) -> i32 {
     let key = (i, j, k);
     if let Some(&p) = dp.get(&key) {
@@ -31,7 +31,17 @@ fn remove_boxes(
     } else if i == j {
         return (k + 1) * (k + 1);
     }
-
+    
+    // combine
+    while i < j {
+        if boxes[i] == boxes[i+1] {
+            i += 1;
+            k += 1;
+        } else {
+            break;
+        }
+    }
+    
     let mut points = remove_boxes(dp, boxes, i, i, k) + remove_boxes(dp, boxes, i + 1, j, 0);
     for l in i + 1..=j {
         if boxes[l] == boxes[i] {
