@@ -6,30 +6,28 @@
 // a. T(i, i - 1, k) = 0: no boxes so no points, and this is true for any k (you can interpret it as nowhere to attach the boxes).
 // b. T(i, i, k) = (k + 1) * (k + 1): only one box left in the subarray but we've already got k boxes of the same color attached to its left, so the total number of boxes of the same color is (k + 1) and the maximum point is (k + 1) * (k + 1).
 
-use std::collections::HashMap;
-
 impl Solution {
     pub fn remove_boxes(boxes: Vec<i32>) -> i32 {
-        let mut dp = HashMap::new();
-        remove_boxes(&mut dp, &boxes, 0, boxes.len() - 1, 0)
+        let n = boxes.len();
+        let mut dp = vec![vec![vec![0;n];n];n];
+        remove_boxes(&mut dp, &boxes, 0, n - 1, 0) as i32
     }
 }
 
 fn remove_boxes(
-    dp: &mut HashMap<(usize, usize, i32), i32>,
+    dp: &mut Vec<Vec<Vec<usize>>>,
     boxes: &Vec<i32>,
     mut i: usize,
     j: usize,
-    mut k: i32,
-) -> i32 {
+    mut k: usize,
+) -> usize {
     let key = (i, j, k);
-    if let Some(&p) = dp.get(&key) {
-        return p;
-    }
     if i > j {
         return 0;
     } else if i == j {
         return (k + 1) * (k + 1);
+    } else if dp[i][j][k] > 0 {
+        return dp[i][j][k];
     }
     
     // combine
@@ -51,6 +49,6 @@ fn remove_boxes(
         }
     }
 
-    dp.insert(key, points);
+    dp[key.0][key.1][key.2] = points;
     return points;
 }
