@@ -21,6 +21,8 @@ fn nums_possible_records(dp: &mut Vec<Vec<Vec<i64>>>, n: usize, L: usize, A: usi
         let Lc = if L < 2 { 1 } else { 0 };
         let Ac = if A < 1 { 1 } else { 0 };
         1 + Lc + Ac
+    } else if L == 2 && A == 1 {
+        nums_possible_records(dp, n-1, 0, A)    // P
     } else {
         nums_possible_records(dp, n-1, 0, A)    // P
       + nums_possible_records(dp, n-1, L+1, A)  // L
