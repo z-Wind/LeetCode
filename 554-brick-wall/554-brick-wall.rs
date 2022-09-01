@@ -3,10 +3,9 @@ use std::collections::HashMap;
 impl Solution {
     pub fn least_bricks(wall: Vec<Vec<i32>>) -> i32 {
         let n = wall.len();
-        let width: i32 = wall[0].iter().sum();
         let mut lines = HashMap::new();
-        for i in 0..n {
-            wall[i][0..wall[i].len() - 1].iter().fold(0, |mut edge, w| {
+        for row in wall {
+            row[0..row.len() - 1].iter().fold(0, |mut edge, w| {
                 edge += w;
                 lines
                     .entry(edge)
