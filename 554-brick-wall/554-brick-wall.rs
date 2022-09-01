@@ -6,13 +6,16 @@ impl Solution {
         let width: i32 = wall[0].iter().sum();
         let mut lines = HashMap::new();
         for i in 0..n {
-            let mut edge = 0;
-            for j in 0..wall[i].len() - 1 {
-                edge += wall[i][j];
-                lines.entry(edge).and_modify(|counter| *counter -= 1).or_insert(n as i32 - 1);
-            }
+            wall[i][0..wall[i].len() - 1].iter().fold(0, |mut edge, w| {
+                edge += w;
+                lines
+                    .entry(edge)
+                    .and_modify(|counter| *counter -= 1)
+                    .or_insert(n as i32 - 1);
+                edge
+            });
         }
-        
+
         if lines.is_empty() {
             return n as i32;
         }
