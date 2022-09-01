@@ -15,6 +15,6 @@ impl Solution {
             }
         }
 
-        crosses.into_values().min().unwrap_or(n as i32)
+        *crosses.values().min().unwrap_or(&(n as i32))
     }
 }
