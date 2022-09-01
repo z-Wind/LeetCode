@@ -4,6 +4,7 @@ impl Solution {
     pub fn least_bricks(wall: Vec<Vec<i32>>) -> i32 {
         let n = wall.len();
         let mut lines = HashMap::new();
+        let mut ans = n as i32;
         for row in wall {
             let mut edge = 0;
             for j in 0..row.len() - 1 {
@@ -12,12 +13,10 @@ impl Solution {
                     .entry(edge)
                     .and_modify(|counter| *counter -= 1)
                     .or_insert(n as i32 - 1);
+                ans = ans.min(lines[&edge]);
             }
         }
 
-        if lines.is_empty() {
-            return n as i32;
-        }
-        lines.into_values().min().unwrap()
+        ans
     }
 }
