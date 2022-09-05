@@ -11,7 +11,7 @@ impl Solution {
         let mut map: HashMap<i32, i32> = HashMap::new();
         map.insert(0, 1);
 
-        for num in nums {
+        for num in nums.iter() {
             sum += num;
             if let Some(&freq) = map.get(&(sum - k)) {
                 ans += freq;
