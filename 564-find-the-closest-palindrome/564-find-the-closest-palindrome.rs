@@ -22,7 +22,7 @@ impl Solution {
         prefix_num += 2;
         let more = prefix_num * shift_prefix + reverse_num(prefix_num, 10, suffix);
         let diff_more = (more - num).abs();
-
+        
         let mut candidates = vec![(diff_equal, equal), (diff_less, less), (diff_more, more)];
         candidates.sort_unstable();
         // println!("{:?}", candidates);
@@ -45,7 +45,8 @@ fn reverse_num(mut num: i64, radix: i64, suffix: usize) -> i64 {
     if n >= suffix {
         return reversed % 10_i64.pow(suffix as u32);
     }
-
+    
+    // append 9 to num, like "1001" => "9x9" => "999"
     (10i64.pow((suffix - n) as u32) - 1) * 10i64.pow(n as u32)
         + reversed % 10_i64.pow(suffix as u32)
 }
