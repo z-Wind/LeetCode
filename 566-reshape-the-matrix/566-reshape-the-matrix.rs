@@ -9,14 +9,12 @@ impl Solution {
             return mat;
         }
 
-        let mut data = mat.into_iter().flatten();
-        let mut result: Vec<Vec<i32>> = Vec::with_capacity(r);
-        for i in 0..r {
-            let mut v = Vec::with_capacity(c);
-            for j in 0..c {
-                v.push(data.next().expect("number"));
+        let mut result = vec![vec![0; c]; r];
+        for i in 0..m {
+            for j in 0..n {
+                let loc = i * n + j;
+                result[loc / c][loc % c] = mat[i][j];
             }
-            result.push(v);
         }
 
         result
