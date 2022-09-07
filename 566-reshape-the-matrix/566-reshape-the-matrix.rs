@@ -1,3 +1,5 @@
+// https://leetcode.com/problems/reshape-the-matrix/discuss/2151421/3ms-simple-solution
+
 impl Solution {
     pub fn matrix_reshape(mat: Vec<Vec<i32>>, r: i32, c: i32) -> Vec<Vec<i32>> {
         let m = mat.len();
@@ -9,14 +11,9 @@ impl Solution {
             return mat;
         }
 
-        let mut result = vec![vec![0; c]; r];
-        for i in 0..m {
-            for j in 0..n {
-                let loc = i * n + j;
-                result[loc / c][loc % c] = mat[i][j];
-            }
-        }
-
-        result
+        mat.concat() // flatten
+            .chunks(c) // devide
+            .map(|row| row.to_vec())
+            .collect() // restructure
     }
 }
