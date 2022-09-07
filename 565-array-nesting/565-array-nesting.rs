@@ -1,16 +1,16 @@
 impl Solution {
-    pub fn array_nesting(nums: Vec<i32>) -> i32 {
+    pub fn array_nesting(mut nums: Vec<i32>) -> i32 {
         let n = nums.len();
-        let mut visited = vec![false; n];
         let mut ans = 0;
         for i in 0..n {
             let mut idx = i;
             let mut count = 0;
-            while !visited[idx] {
+            while nums[idx] != -1 {
                 // print!("{},", idx);
                 count += 1;
-                visited[idx] = true;
-                idx = nums[idx] as usize;
+                let temp = nums[idx];
+                nums[idx] = -1;
+                idx = temp as usize;
             }
             // println!("\n------------");
             
