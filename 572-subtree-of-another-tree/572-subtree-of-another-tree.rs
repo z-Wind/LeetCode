@@ -16,6 +16,9 @@
 //     }
 //   }
 // }
+
+// https://leetcode.com/problems/subtree-of-another-tree/discuss/1676378/Rust-4ms-or-2.3
+
 use std::cell::RefCell;
 use std::rc::Rc;
 impl Solution {
@@ -23,36 +26,14 @@ impl Solution {
         root: Option<Rc<RefCell<TreeNode>>>,
         sub_root: Option<Rc<RefCell<TreeNode>>>,
     ) -> bool {
-        is_subtree(&root, &sub_root)
-    }
-}
-
-fn is_subtree(
-    root: &Option<Rc<RefCell<TreeNode>>>,
-    sub_root: &Option<Rc<RefCell<TreeNode>>>,
-) -> bool {
-    if root.is_none() {
-        return false;
-    }
-
-    let left = &root.as_ref().unwrap().borrow().left;
-    let right = &root.as_ref().unwrap().borrow().right;
-
-    is_same(root, sub_root) || is_subtree(left, sub_root) || is_subtree(right, sub_root)
-}
-
-fn is_same(root: &Option<Rc<RefCell<TreeNode>>>, sub_root: &Option<Rc<RefCell<TreeNode>>>) -> bool {
-    match (root, sub_root) {
-        (None, None) => true,
-        (Some(node), Some(sub_node)) => {
-            let left = &node.borrow().left;
-            let right = &node.borrow().right;
-            let sub_left = &sub_node.borrow().left;
-            let sub_right = &sub_node.borrow().right;
-            node.borrow().val == sub_node.borrow().val
-                && is_same(left, sub_left)
-                && is_same(right, sub_right)
+        if root == sub_root {
+            return true;
         }
-        _ => false,
+        if let Some(node) = root {
+            Self::is_subtree(node.borrow().left.clone(), sub_root.clone())
+                || Self::is_subtree(node.borrow().right.clone(), sub_root.clone())
+        } else {
+            return false;
+        }
     }
 }
