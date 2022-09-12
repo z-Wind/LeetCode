@@ -30,8 +30,9 @@ impl Solution {
             return true;
         }
         if let Some(node) = root {
-            Self::is_subtree(node.borrow().left.clone(), sub_root.clone())
-                || Self::is_subtree(node.borrow().right.clone(), sub_root.clone())
+            let node = node.borrow();
+            Self::is_subtree(node.left.clone(), sub_root.clone())
+                || Self::is_subtree(node.right.clone(), sub_root.clone())
         } else {
             return false;
         }
