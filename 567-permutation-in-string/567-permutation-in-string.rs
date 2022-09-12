@@ -1,3 +1,5 @@
+// https://leetcode.com/problems/permutation-in-string/discuss/1761953/Python3-SLIDING-WINDOW-OPTIMIZED-(-)-Explained/1277759
+
 use std::collections::HashMap;
 
 impl Solution {
@@ -14,32 +16,25 @@ impl Solution {
         }
 
         let s2 = s2.as_bytes();
-        let mut i = 0;
-        let mut j = 0;
-        while j < m {
-            match chars.get(&s2[j]) {
-                None => {
-                    for k in i..=j {
-                        chars.entry(s2[k]).and_modify(|x| *x += 1);
-                    }
-                    i = j + 1;
-                    j = i;
-                    // println!("");
-                }
-                Some(0) => {
-                    chars.entry(s2[i]).and_modify(|x| *x += 1);
-                    i += 1;
-                    if i > j {
-                        j = i;
-                    }
-                }
-                _ => {
-                    // print!("{}", s2[j] as char);
-                    chars.entry(s2[j]).and_modify(|x| *x -= 1);
-                    j += 1;
+        let mut count = 0;
+        for i in 0..m {
+            if let Some(x) = chars.get_mut(&s2[i]) {
+                *x -= 1;
+                if *x == 0 {
+                    count += 1;
                 }
             }
-            if j - i == n {
+
+            if i >= n {
+                if let Some(x) = chars.get_mut(&s2[i - n]) {
+                    *x += 1;
+                    if *x == 1 {
+                        count -= 1;
+                    }
+                }
+            }
+
+            if count == chars.len() {
                 return true;
             }
         }
