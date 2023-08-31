@@ -1,38 +1,26 @@
-// https://leetcode.com/problems/shortest-unsorted-continuous-subarray/solutions/1188866/rust-two-pass-time-o-n-space-o-1/
+// https://leetcode.com/problems/shortest-unsorted-continuous-subarray/solutions/103057/java-o-n-time-o-1-space/
 
 impl Solution {
     pub fn find_unsorted_subarray(nums: Vec<i32>) -> i32 {
         let n = nums.len();
 
-        let (left, _) = nums.iter().enumerate().rev().fold(
-            (n - 1, i32::MAX),
-            |(mut left, mut min), (i, &num)| {
-                if num <= min {
-                    min = num;
+        let ((left, _), (right, _)) = (0..n).fold(
+            ((n + 1, i32::MAX), (n, i32::MIN)),
+            |((mut left, mut min), (mut right, mut max)), i| {
+                if nums[n - 1 - i] <= min {
+                    min = nums[n - 1 - i];
                 } else {
-                    left = i;
+                    left = n - 1 - i;
+                }
+                if nums[i] >= max {
+                    max = nums[i];
+                } else {
+                    right = i;
                 }
 
-                (left, min)
+                ((left, min), (right, max))
             },
         );
-
-        if left == n - 1 {
-            return 0;
-        }
-
-        let (right, _) =
-            nums.iter()
-                .enumerate()
-                .fold((0, i32::MIN), |(mut right, mut max), (i, &num)| {
-                    if num >= max {
-                        max = num;
-                    } else {
-                        right = i;
-                    }
-
-                    (right, max)
-                });
 
         // println!("{},{}", left, right);
         (right - left + 1) as i32
