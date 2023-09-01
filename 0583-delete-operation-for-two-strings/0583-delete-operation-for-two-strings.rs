@@ -19,18 +19,14 @@ fn solve(dp: &mut Vec<Vec<i32>>, i: usize, j: usize, word1: &[u8], word2: &[u8])
         return dp[i][j];
     }
 
-    let step1 = match word1[i..].iter().position(|c| *c == word2[j]) {
-        Some(step) => step as i32 + solve(dp, i + step + 1, j + 1, word1, word2),
-        None => 1 + solve(dp, i + 1, j, word1, word2),
+    let step = if word1[i] == word2[j] {
+        solve(dp, i + 1, j + 1, word1, word2)
+    } else {
+        (1 + solve(dp, i, j + 1, word1, word2))
+            .min((1 + solve(dp, i + 1, j, word1, word2)))
+            .min((2 + solve(dp, i + 1, j + 1, word1, word2)))
     };
-    let step2 = match word2[j..].iter().position(|c| *c == word1[i]) {
-        Some(step) => step as i32 + solve(dp, i + 1, j + step + 1, word1, word2),
-        None => 1 + solve(dp, i, j + 1, word1, word2),
-    };
-    let step3 = 2 + solve(dp, i + 1, j + 1, word1, word2);
 
-    // println!("{},{}: {}, {}, {}",i,j,step1,step2,step3);
-
-    dp[i][j] = step1.min(step2).min(step3);
+    dp[i][j] = step;
     dp[i][j]
 }
