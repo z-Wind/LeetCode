@@ -1,57 +1,61 @@
+// https://leetcode.com/problems/erect-the-fence/solutions/2828904/python3-monotone-chain-with-detailed-explanations-o-nlogn/
+
+use std::collections::HashSet;
+
 impl Solution {
     pub fn outer_trees(trees: Vec<Vec<i32>>) -> Vec<Vec<i32>> {
-        let n = trees.len();
-        if n <= 3 {
+        if trees.len() <= 3 {
             return trees;
         }
 
-        let mut trees = trees;
-        trees.sort_unstable_by_key(|x| x[0]);
-        // println!("{:?}", trees);
+        let mut points = trees;
+        // sort points, so we are moving from left to right from bottom to top
+        points.sort_unstable();
+        // println!("{:?}", points);
+        let leftToRight = construct_half_hull(points.iter());
+        // reverse points, so we are moving from right to left
+        let rightToLeft = construct_half_hull(points.iter().rev());
 
-        let mut used = vec![0; n];
-
-        let mut result = vec![trees[0].clone()];
-        used[0] = 1;
-        let mut i = 0;
-        loop {
-            let mut j = match used.iter().position(|&x| x == 0) {
-                Some(x) => x,
-                None => break,
-            };
-            let mut cross = 0;
-            for k in 0..n {
-                if k == i || k == j || used[k] == 1 {
-                    continue;
-                }
-                let a = (trees[j][0] - trees[i][0], trees[j][1] - trees[i][1]);
-                let b = (trees[k][0] - trees[i][0], trees[k][1] - trees[i][1]);
-                cross = cross_product(b, a);
-                if cross > 0 || (cross == 0 && a.0 * a.0 + a.1 * a.1 > b.0 * b.0 + b.1 * b.1) {
-                    j = k;
-                }
-            }
-            if i != 0 {
-                let a = (trees[j][0] - trees[i][0], trees[j][1] - trees[i][1]);
-                let b = (trees[0][0] - trees[i][0], trees[0][1] - trees[i][1]);
-                cross = cross_product(b, a);
-                if cross > 0 {
-                    j = 0;
-                }
-            }
-            // println!("{:?} to {:?}", trees[i], trees[j]);
-            if j == 0 {
-                break;
-            }
-            result.push(trees[j].clone());
-            used[j] = 1;
-            i = j;
-        }
-        result
+        // it is posible that the top and bottom parts have same points (e.g., all points form a line)
+        // we remove the duplicated points using a set
+        let mut result = leftToRight;
+        result.extend(rightToLeft);
+        let result: HashSet<_> = result.into_iter().collect();
+        result.into_iter().collect()
     }
 }
 
 // https://en.wikipedia.org/wiki/Cross_product
-fn cross_product(a: (i32, i32), b: (i32, i32)) -> i32 {
-    a.0 * b.1 - b.0 * a.1
+fn cross_product(p1: &[i32], p2: &[i32], p3: &[i32]) -> i32 {
+    // V1 = (P1,P2)
+    // V2 = (P2,P3)
+    // V1 = (a,b), V2 = (c,d)
+    // V1 X V2 = a*d - b*c
+
+    let a = p2[0] - p1[0];
+    let b = p2[1] - p1[1];
+    let c = p3[0] - p2[0];
+    let d = p3[1] - p2[1];
+
+    let result = a * d - b * c;
+    // println!("{:?},{:?},{:?} => {}", p1, p2, p3, result);
+    result
+}
+
+fn construct_half_hull<'a>(points: impl Iterator<Item = &'a Vec<i32>>) -> Vec<Vec<i32>> {
+    let mut stack: Vec<Vec<i32>> = Vec::new();
+    for p in points {
+        // println!("p:{:?}", p);
+        // if the chain formed by the current point
+        // and the last two points in the stack is not counterclockwise, pop it
+        while stack.len() >= 2
+            && cross_product(&stack[stack.len() - 2], &stack[stack.len() - 1], p) < 0
+        {
+            stack.pop();
+        }
+        // append the current point.
+        stack.push(p.clone());
+        // println!("stack:{:?}", stack);
+    }
+    stack
 }
