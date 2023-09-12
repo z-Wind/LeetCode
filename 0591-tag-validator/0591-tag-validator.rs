@@ -36,15 +36,15 @@ impl Solution {
                 }
                 State::TagRecognize => match code[i] {
                     b'/' => {
-                        if tags.is_empty(){
+                        if tags.is_empty() {
                             return false;
                         }
-                        
+
                         state = State::TagEnd;
                         i += 1;
                     }
                     b'!' => {
-                        if tags.is_empty(){
+                        if tags.is_empty() {
                             return false;
                         }
 
@@ -55,8 +55,8 @@ impl Solution {
                     _ => return false,
                 },
                 State::TagStart => {
-                    for j in i + 1..n {
-                        match code[j] {
+                    for (j, c) in code.iter().enumerate().skip(i + 1) {
+                        match c {
                             b'A'..=b'Z' => continue,
                             b'>' => {
                                 if j - i > 9 {
@@ -90,14 +90,9 @@ impl Solution {
                 },
                 State::CDATAStart => {
                     let s = b"[CDATA[";
-                    let last = i + s.len();
-                    if last > n {
-                        return false;
-                    }
-
-                    if code[i..last] == s[..] {
+                    if code[i..].starts_with(&s[..]) {
                         state = State::CDATAContent;
-                        i = last;
+                        i += s.len();
                     } else {
                         return false;
                     }
@@ -108,14 +103,9 @@ impl Solution {
                 },
                 State::CDATAEnd => {
                     let s = b"]]>";
-                    let last = i + s.len();
-                    if last > n {
-                        return false;
-                    }
-
-                    if code[i..last] == s[..] {
+                    if code[i..].starts_with(&s[..]) {
                         state = State::Char;
-                        i = last;
+                        i += s.len();
                     } else {
                         state = State::CDATAContent;
                         i += 1;
