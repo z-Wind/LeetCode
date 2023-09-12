@@ -17,12 +17,11 @@ impl Solution {
             return false;
         }
 
-        let mut closed = false;
         let mut i = 0;
         let mut tags: Vec<(usize, usize)> = Vec::new();
         let mut state = State::Char;
         while i < n {
-            println!("{} {}:{:?} {:?}", i, code[i] as char, state, tags);
+            // println!("{} {}:{:?} {:?}", i, code[i] as char, state, tags);
             match state {
                 State::Char => {
                     match code[i] {
@@ -37,6 +36,10 @@ impl Solution {
                 }
                 State::TagRecognize => match code[i] {
                     b'/' => {
+                        if tags.is_empty(){
+                            return false;
+                        }
+                        
                         state = State::TagEnd;
                         i += 1;
                     }
@@ -44,6 +47,7 @@ impl Solution {
                         if tags.is_empty(){
                             return false;
                         }
+
                         state = State::CDATAStart;
                         i += 1;
                     }
@@ -69,13 +73,11 @@ impl Solution {
                         }
                     }
                 }
-                State::TagEnd => match tags.last() {
+                State::TagEnd => match tags.pop() {
                     None => return false,
-                    Some(&(start, end)) => {
+                    Some((start, end)) => {
                         let last = i + end - start;
                         if last < n && code[last] == b'>' && code[start..end] == code[i..last] {
-                            tags.pop();
-                            closed = true;
                             i = last + 1;
                             state = State::Char;
                         } else {
@@ -121,6 +123,6 @@ impl Solution {
                 }
             }
         }
-        tags.is_empty() && closed
+        tags.is_empty()
     }
 }
