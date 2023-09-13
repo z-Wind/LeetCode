@@ -57,11 +57,7 @@ impl Solution {
             }
         }
 
-        if result.0 >= 0 {
-            format!("{}/{}", result.0, result.1)
-        } else {
-            format!("-{}/{}", result.0.abs(), result.1)
-        }
+        format!("{}/{}", result.0, result.1)
     }
 }
 
