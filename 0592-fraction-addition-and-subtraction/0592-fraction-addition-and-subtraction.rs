@@ -1,20 +1,22 @@
+// https://leetcode.com/problems/fraction-addition-and-subtraction/solutions/103384/small-simple-c-java-python/
+
 impl Solution {
     pub fn fraction_addition(expression: String) -> String {
-        let expression = expression.replace("-", "+-");
+        let expression = expression.replace('-', "+-");
         let expression = expression.trim_start_matches('+');
         let mut sc = expression.split(['+', '/']);
         // println!("{:?}", sc);
         let mut result = (0, 1);
-        
+
         while let (Some(a), Some(b)) = (sc.next(), sc.next()) {
             // println!("{},{}", a, b);
-            let a:i32 = a.parse().expect("number");
-            let b:i32 = b.parse().expect("number");
+            let a: i32 = a.parse().expect("number");
+            let b: i32 = b.parse().expect("number");
             result.0 = result.0 * b + result.1 * a;
             result.1 *= b;
 
             result = reduction(result);
-        }        
+        }
 
         format!("{}/{}", result.0, result.1)
     }
