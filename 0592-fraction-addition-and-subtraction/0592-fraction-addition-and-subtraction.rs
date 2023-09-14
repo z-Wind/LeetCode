@@ -1,84 +1,23 @@
-#[derive(Debug)]
-enum State {
-    Init,
-    Operator,
-    Fraction,
-}
-
 impl Solution {
     pub fn fraction_addition(expression: String) -> String {
-        let expression = expression.as_bytes();
-        let n = expression.len();
+        let expression = expression.replace("-", "+-");
+        let expression = expression.trim_start_matches('+');
+        let mut sc = expression.split(['+', '/']);
+        // println!("{:?}", sc);
         let mut result = (0, 1);
+        
+        while let (Some(a), Some(b)) = (sc.next(), sc.next()) {
+            // println!("{},{}", a, b);
+            let a:i32 = a.parse().expect("number");
+            let b:i32 = b.parse().expect("number");
+            result.0 = result.0 * b + result.1 * a;
+            result.1 *= b;
 
-        let mut state = State::Init;
-        let mut sign = 1;
-        let mut i = 0;
-        while i < n {
-            // println!(
-            //     "{} {} sign:{} {:?} => {:?}",
-            //     i, expression[i] as char, sign, result, state
-            // );
-            match state {
-                State::Init => match expression[i] {
-                    b'0'..=b'9' => state = State::Fraction,
-                    b'-' => state = State::Operator,
-                    _ => unreachable!(),
-                },
-                State::Operator => {
-                    match expression[i] {
-                        b'+' => {
-                            sign = 1;
-                            state = State::Fraction;
-                        }
-                        b'-' => {
-                            sign = -1;
-                            state = State::Fraction;
-                        }
-                        _ => unreachable!(),
-                    }
-                    i += 1;
-                }
-                State::Fraction => {
-                    let end = match expression[i..].iter().position(|&c| c == b'+' || c == b'-') {
-                        None => n,
-                        Some(offset) => i + offset,
-                    };
-                    let frac = fraction(&expression[i..end]);
-                    result = (
-                        result.0 * frac.1 + sign * frac.0 * result.1,
-                        result.1 * frac.1,
-                    );
-                    result = reduction(result);
-
-                    i = end;
-                    state = State::Operator;
-                }
-            }
-        }
+            result = reduction(result);
+        }        
 
         format!("{}/{}", result.0, result.1)
     }
-}
-
-fn fraction(frac: &[u8]) -> (i32, i32) {
-    let mut splits = frac.splitn(2, |&c| c == b'/');
-    let numerator = splits.next().expect("number");
-    let denominator = splits.next().expect("number");
-
-    let numerator = chars_to_int(numerator);
-    let denominator = chars_to_int(denominator);
-
-    (numerator, denominator)
-}
-
-fn chars_to_int(chars: &[u8]) -> i32 {
-    let mut num = 0;
-    for c in chars.iter() {
-        num = num * 10 + (c - b'0') as i32;
-    }
-
-    num
 }
 
 fn reduction(x: (i32, i32)) -> (i32, i32) {
