@@ -1,18 +1,27 @@
-use std::collections::HashMap;
+// https://leetcode.com/problems/longest-harmonious-subsequence/solutions/103499/three-c-solution-run-time-with-explanation/
 
 impl Solution {
     pub fn find_lhs(nums: Vec<i32>) -> i32 {
-        let mut map = HashMap::new();
-        for num in nums {
-            *map.entry(num).or_insert(0) += 1;
-        }
+        let mut nums = nums;
+        nums.sort_unstable();
+        // println!("{:?}", nums);
 
         let mut result = 0;
-        for (min, count) in map.iter() {
-            let max = min + 1;
-            match map.get(&max) {
-                None => (),
-                Some(c) => result = result.max(count + c),
+        let mut min_i = 0;
+        let mut max_i = 0;
+        for (i, &num) in nums.iter().enumerate().skip(1) {
+            // println!(
+            //     "cur:{}, min:{} ,max:{}, result:{}",
+            //     num, nums[min_i], nums[max_i], result
+            // );
+            if num != nums[min_i] + 1 {
+                min_i = max_i;
+            }
+            if num == nums[min_i] + 1 {
+                result = result.max((i - min_i + 1) as i32);
+            }
+            if num != nums[i - 1] {
+                max_i = i;
             }
         }
 
