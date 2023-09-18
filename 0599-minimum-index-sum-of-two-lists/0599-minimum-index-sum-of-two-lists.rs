@@ -8,13 +8,14 @@ impl Solution {
         let mut result = Vec::new();
         let mut min_sum = usize::MAX;
         for (i, s) in list2.into_iter().enumerate() {
-            if i > min_sum {
-                break;
-            }
             if let Some(j) = map1.get(&s) {
                 let sum = i + j;
                 match sum.cmp(&min_sum) {
-                    Ordering::Greater => (),
+                    Ordering::Greater => {
+                        if i > min_sum {
+                            break;
+                        }
+                    }
                     Ordering::Less => {
                         result.clear();
                         result.push(s);
