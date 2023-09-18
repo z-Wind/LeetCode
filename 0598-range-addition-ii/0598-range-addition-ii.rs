@@ -1,13 +1,13 @@
 impl Solution {
     pub fn max_count(m: i32, n: i32, ops: Vec<Vec<i32>>) -> i32 {
-        if ops.is_empty() {
-            return m * n;
+        let mut min_x = m;
+        let mut min_y = n;
+
+        for op in ops {
+            min_x = min_x.min(op[0]);
+            min_y = min_y.min(op[1]);
         }
 
-        let range = ops
-            .into_iter()
-            .fold((m, n), |acc, x| (acc.0.min(x[0]), acc.1.min(x[1])));
-
-        range.0 * range.1
+        min_x * min_y
     }
 }
